@@ -1,0 +1,36 @@
+﻿@model CEGA.Models.CierreRango
+@{
+    ViewData["Title"] = "Registrar Cierre por Rango";
+}
+
+<h2>📆 Registrar Cierre por Rango</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="CierrePorRango" method="post">
+    <div class="mb-3">
+        <label>Fecha de Inicio</label>
+        <input asp-for="FechaInicio" class="form-control" type="datetime-local" required />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Fin</label>
+        <input asp-for="FechaFin" class="form-control" type="datetime-local" required />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar Cierre</button>
+    <a asp-action="HistorialCierresRango" class="btn btn-secondary">Ver Historial</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

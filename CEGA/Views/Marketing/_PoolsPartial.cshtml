@@ -1,0 +1,65 @@
+﻿@model IEnumerable<CEGA.Models.PoolCorreo>
+
+<h4 class="mt-5">📬 Pools de Correos</h4>
+
+<!-- Botón para agregar -->
+<form asp-action="CrearPoolCorreo" asp-controller="Marketing" method="post" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <input name="Nombre" class="form-control" placeholder="Nombre del Pool" required />
+        </div>
+        <div class="col-md-3">
+            <input name="Descripcion" class="form-control" placeholder="Descripción" required />
+        </div>
+        <div class="col-md-4">
+            <input name="Correos" class="form-control" placeholder="Correo1;Correo2;..." required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">➕ Agregar Pool</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Correos</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pool in Model)
+            {
+                <tr>
+                    <td>@pool.Nombre</td>
+                    <td>@pool.Descripcion</td>
+                    <td>
+                        @foreach (var correo in (pool.Correos ?? "").Split(";", StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <div>@correo</div>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="EditarPool" asp-controller="Marketing" method="post" class="d-inline">
+                            <input type="hidden" name="Id" value="@pool.Id" />
+                            <button type="submit" class="btn btn-sm btn-primary">✏️ Editar</button>
+                        </form>
+
+                        <form asp-action="EliminarPool" asp-controller="Marketing" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este pool?');">
+                            <input type="hidden" name="id" value="@pool.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">🗑️ Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No hay pools registrados.</div>
+}

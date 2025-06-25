@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Gestión de Empleados";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadoSalario>;
+    var vacaciones = ViewBag.Vacaciones as IEnumerable<CEGA.Models.VacacionesEmpleado>;
+    var puestos = ViewBag.Puestos as IEnumerable<CEGA.Models.PuestoEmpleado>;
+    var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
+}
+
+
+<h2 class="text-center mb-4">👥 Módulo de Empleados</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<ul class="nav nav-tabs" id="empleadosTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="salario-tab" data-bs-toggle="tab" data-bs-target="#salario" type="button" role="tab">💰 Salarios</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vacaciones-tab" data-bs-toggle="tab" data-bs-target="#vacaciones" type="button" role="tab">🌴 Vacaciones</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="puesto-tab" data-bs-toggle="tab" data-bs-target="#puesto" type="button" role="tab">📌 Puestos</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="incapacidad-tab" data-bs-toggle="tab" data-bs-target="#incapacidad" type="button" role="tab">📝 Incapacidades</button>
+    </li>
+</ul>
+
+<div class="tab-content mt-4">
+    <div class="tab-pane fade show active" id="salario" role="tabpanel">
+        @await Html.PartialAsync("_SalariosPartial", salarios)
+    </div>
+    <div class="tab-pane fade" id="vacaciones" role="tabpanel">
+        @await Html.PartialAsync("_VacacionesPartial", vacaciones)
+    </div>
+    <div class="tab-pane fade" id="puesto" role="tabpanel">
+        @await Html.PartialAsync("_PuestosPartial", puestos)
+    </div>
+    <div class="tab-pane fade" id="incapacidad" role="tabpanel">
+        @await Html.PartialAsync("_IncapacidadesPartial", incapacidades)
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

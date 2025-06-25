@@ -1,0 +1,49 @@
+﻿@model CEGA.Models.AsignarRolViewModel
+@{
+    ViewData["Title"] = "Asignar rol a usuario";
+}
+
+<h2>Asignar Rol</h2>
+
+<div class="mb-3">
+    <p><strong>Correo del usuario:</strong> @Model.Email</p>
+    <p><strong>Rol actual:</strong> @Model.RolSeleccionado</p>
+</div>
+
+<form asp-action="AsignarRol" method="post">
+    <input type="hidden" asp-for="UsuarioId" />
+    <input type="hidden" asp-for="Email" />
+
+    <div class="form-group">
+        <label asp-for="RolSeleccionado">Rol</label>
+        <select asp-for="RolSeleccionado" asp-items="@(new SelectList(Model.RolesDisponibles))"
+                class="form-control" id="rol-select">
+        </select>
+        <span asp-validation-for="RolSeleccionado" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3" id="subrol-container" style="display: none;">
+        <label asp-for="SubRol">Sub-rol (solo empleados)</label>
+        <select asp-for="SubRol" asp-items="@(new SelectList(Model.SubRolesDisponibles))" class="form-control"></select>
+        <span asp-validation-for="SubRol" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-4">Asignar Rol</button>
+    <a asp-action="ListaUsuarios" class="btn btn-secondary mt-4 ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const rolSelect = document.getElementById("rol-select");
+        const subrolContainer = document.getElementById("subrol-container");
+
+        function toggleSubRol() {
+            subrolContainer.style.display = rolSelect.value === "Empleado" ? "block" : "none";
+        }
+
+        rolSelect.addEventListener("change", toggleSubRol);
+        toggleSubRol(); // ejecutar al cargar
+    </script>
+}

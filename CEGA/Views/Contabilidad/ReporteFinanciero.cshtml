@@ -1,0 +1,86 @@
+﻿@model CEGA.Models.ReporteFinancieroViewModel
+
+@{
+    ViewData["Title"] = "Reporte Financiero";
+}
+
+<h2 class="text-center mb-4">📊 Reporte Financiero</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="ReporteFinanciero" method="post" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label>Fecha Inicio</label>
+        <input asp-for="FechaInicio" class="form-control" type="date" />
+    </div>
+    <div class="col-md-4">
+        <label>Fecha Fin</label>
+        <input asp-for="FechaFin" class="form-control" type="date" />
+    </div>
+    <div class="col-md-4 align-self-end">
+        <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
+    </div>
+</form>
+
+@if (Model.Ingresos.Any() || Model.Egresos.Any())
+{
+    <div class="mb-3">
+        <button class="btn btn-outline-success me-2">📄 Exportar PDF</button>
+        <button class="btn btn-outline-info">📊 Exportar Excel</button>
+    </div>
+
+    <h4>💰 Ingresos</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ingreso in Model.Ingresos)
+            {
+                <tr>
+                    <td>@ingreso.Monto.ToString("C")</td>
+                    <td>@ingreso.Fecha.ToString("g")</td>
+                    <td>@ingreso.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">💸 Egresos</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Concepto</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var egreso in Model.Egresos)
+            {
+                <tr>
+                    <td>@egreso.Monto.ToString("C")</td>
+                    <td>@egreso.Fecha.ToString("g")</td>
+                    <td>@egreso.Concepto</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.FechaInicio != default && Model.FechaFin != default)
+{
+    <div class="alert alert-info">
+        No se encontraron ingresos ni egresos en el rango seleccionado.
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,55 @@
+﻿@model CEGA.Models.DesgloseReporteViewModel
+
+@{
+    ViewData["Title"] = "Desglose de Reporte Financiero";
+}
+
+<h2>📊 Desglose de Reporte Financiero</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<form asp-action="DesgloseReporte" method="post">
+    <div class="mb-3">
+        <label>Nombre del Reporte</label>
+        <input asp-for="NombreReporte" class="form-control" />
+        <span asp-validation-for="NombreReporte" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="IncluirIngresos" class="form-check-input" />
+        <label class="form-check-label">Incluir Ingresos</label>
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="IncluirEgresos" class="form-check-input" />
+        <label class="form-check-label">Incluir Egresos</label>
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="IncluirSalarios" class="form-check-input" />
+        <label class="form-check-label">Incluir Salarios</label>
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Inicio</label>
+        <input asp-for="FechaInicio" type="datetime-local" class="form-control" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Fecha de Fin</label>
+        <input asp-for="FechaFin" type="datetime-local" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generar Desglose</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

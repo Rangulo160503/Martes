@@ -1,0 +1,41 @@
+﻿@model List<CEGA.Models.IncapacidadEmpleado>
+
+@{
+    ViewData["Title"] = "Resultado del Reporte de Incapacidades";
+    var nombreReporte = TempData["NombreReporte"] as string ?? "Reporte de Incapacidades";
+}
+
+<h2>@nombreReporte</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No se encontraron incapacidades para los criterios seleccionados.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Descripción</th>
+                <th>Fecha de Presentación</th>
+                <th>Estado</th>
+                <th>Archivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.UsuarioID</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.FechaPresentacion.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        <a href="@item.ArchivoRuta" target="_blank">Ver archivo</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

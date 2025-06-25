@@ -1,0 +1,83 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<CEGA.Models.ApplicationUser> UserManager
+
+@model CEGA.Models.BuscarUsuarioFiltroViewModel
+@{
+    ViewData["Title"] = "Buscar usuarios por nombre y rol";
+}
+
+<h2 class="text-center">Usuarios Registrados</h2>
+
+<form method="get" asp-action="ListaUsuarios" class="row mb-4">
+    <div class="col-md-6">
+        <input name="filtroTexto" class="form-control" placeholder="Buscar por nombre, correo o usuario" value="@Model.FiltroTexto" />
+    </div>
+    <div class="col-md-4">
+        <select name="rolSeleccionado" class="form-select">
+            <option value="">-- Filtrar por rol --</option>
+            @foreach (var rol in Model.RolesDisponibles)
+            {
+                var selectedAttr = rol == Model.RolSeleccionado ? "selected" : "";
+                <option value="@rol" selected="@selectedAttr">@rol</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+</form>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.UsuariosFiltrados.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Usuario</th>
+                <th>Teléfono</th>
+                <th>Rol</th>
+                <th>Sub-rol</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Model.UsuariosFiltrados)
+            {
+                var roles = await UserManager.GetRolesAsync(usuario);
+                <tr>
+                    <td>@usuario.Nombre</td>
+                    <td>@usuario.Apellido</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.UserName</td>
+                    <td>@usuario.PhoneNumber</td>
+                    <td>@string.Join(", ", roles)</td>
+                    <td>
+                        @(roles.Contains("Empleado") ? usuario.SubRol ?? "(Sin sub-rol)" : "-")
+                    </td>
+                    <td>
+                        <a asp-action="AsignarRol" asp-route-id="@usuario.Id" class="btn btn-sm btn-primary mb-1">Asignar Rol</a>
+                        <form asp-action="EliminarUsuario" method="post" asp-route-id="@usuario.Id" onsubmit="return confirm('¿Estás seguro que deseas eliminar este usuario?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No se encontraron usuarios con los filtros aplicados.</div>
+}
+

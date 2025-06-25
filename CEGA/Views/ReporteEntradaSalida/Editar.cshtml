@@ -1,0 +1,56 @@
+﻿@model CEGA.Models.ReporteEntradaSalida
+
+@{
+    ViewData["Title"] = "Editar Reporte de Entradas/Salidas";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="NombreReporte"></label>
+        <input asp-for="NombreReporte" class="form-control" />
+        <span asp-validation-for="NombreReporte" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RolSeleccionado">Seleccionar Rol</label>
+        <select asp-for="RolSeleccionado" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Empleado">Empleado</option>
+            <option value="Cliente">Cliente</option>
+        </select>
+        <span asp-validation-for="RolSeleccionado" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaInicio">Fecha de Inicio</label>
+        <input asp-for="FechaInicio" type="date" class="form-control" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaFin">Fecha de Finalización</label>
+        <input asp-for="FechaFin" type="date" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Movimiento">Movimiento</label>
+        <select asp-for="Movimiento" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Salida">Salida</option>
+        </select>
+        <span asp-validation-for="Movimiento" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

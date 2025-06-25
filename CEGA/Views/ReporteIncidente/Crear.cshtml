@@ -1,0 +1,54 @@
+﻿@model CEGA.Models.ReporteIncidente
+
+@{
+    ViewData["Title"] = "Generar Reporte de Incidente";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<form asp-action="Crear" method="post">
+    <div class="form-group">
+        <label asp-for="NombreReporte"></label>
+        <input asp-for="NombreReporte" class="form-control" />
+        <span asp-validation-for="NombreReporte" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="UsuarioID">ID del Usuario</label>
+        <input asp-for="UsuarioID" class="form-control" />
+        <span asp-validation-for="UsuarioID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaAccidente">Fecha del Accidente</label>
+        <input asp-for="FechaAccidente" type="date" class="form-control" />
+        <span asp-validation-for="FechaAccidente" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Descripcion">Descripción del Accidente</label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Incapacidad">¿Hubo Incapacidad?</label>
+        <select asp-for="Incapacidad" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="Sí">Sí</option>
+            <option value="No">No</option>
+        </select>
+        <span asp-validation-for="Incapacidad" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generar Reporte</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

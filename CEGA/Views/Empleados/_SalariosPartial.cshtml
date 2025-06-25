@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CEGA.Models.EmpleadoSalario>
+
+<h4 class="mt-4">💰 Salarios Registrados</h4>
+
+<!-- Formulario para agregar salario -->
+<form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="mb-3">
+    <div class="row">
+        <div class="col-md-5">
+            <input name="usuarioId" class="form-control" placeholder="ID del Usuario" required />
+        </div>
+        <div class="col-md-5">
+            <input name="salario" type="number" step="0.01" class="form-control" placeholder="Salario Mensual" required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">➕ Agregar</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Usuario</th>
+                <th>Salario Mensual</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.UsuarioId</td>
+                    <td>@s.SalarioMensual.ToString("C")</td>
+                    <td>@s.FechaRegistro.ToShortDateString()</td>
+                    <td>
+                        <!-- Formulario Editar (reutiliza mismo formulario de agregar) -->
+                        <form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="d-inline">
+                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
+                            <input type="hidden" name="salario" value="@s.SalarioMensual" />
+                            <button type="submit" class="btn btn-sm btn-primary">✏️ Editar</button>
+                        </form>
+
+                        <!-- Botón eliminar -->
+                        <form asp-action="EliminarSalario" asp-controller="Empleados" method="post" class="d-inline" onsubmit="return confirm('¿Desea eliminar este salario?');">
+                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
+                            <button type="submit" class="btn btn-sm btn-danger">🗑️ Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">No hay salarios registrados.</div>
+}
