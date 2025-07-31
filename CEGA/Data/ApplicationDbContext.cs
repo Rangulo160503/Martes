@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using CEGA.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using CEGA.Models;
+using TuProyecto.Models;
 
 
 namespace CEGA.Data
@@ -30,6 +31,12 @@ namespace CEGA.Data
         public DbSet<ReporteIncapacidad> ReportesIncapacidades { get; set; }
         public DbSet<ReporteIncidente> ReportesIncidentes { get; set; }
         public DbSet<ReporteEntradaSalida> ReportesEntradasSalidas { get; set; }
+        public DbSet<Proyecto> Proyectos { get; set; }
+        public DbSet<ComentarioProyecto> ComentariosProyecto { get; set; }
+        public DbSet<TareaProyecto> TareasProyecto { get; set; }
+        public DbSet<AsignacionTareaEmpleado> AsignacionesTareaEmpleado { get; set; }
+        public DbSet<Plano> Planos { get; set; }
+        public DbSet<ComentarioPlano> ComentariosPlano { get; set; }
 
 
     }

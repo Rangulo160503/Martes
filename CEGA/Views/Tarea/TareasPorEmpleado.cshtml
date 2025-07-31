@@ -1,0 +1,37 @@
+﻿@model List<CEGA.Models.AsignacionTareaEmpleado>
+
+@{
+    ViewData["Title"] = "Tareas asignadas a empleado";
+    var usuario = ViewBag.Usuario as CEGA.Models.ApplicationUser;
+}
+
+<h2>Tareas asignadas a: @usuario.UserName</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Este empleado no tiene tareas asignadas.
+    </div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Tarea</th>
+                <th>Fechas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asignacion in Model)
+            {
+                <tr>
+                    <td>@asignacion.Tarea.Proyecto.Nombre</td>
+                    <td>@asignacion.Tarea.NombreTarea</td>
+                    <td>@asignacion.Tarea.FechaInicio.ToShortDateString() - @asignacion.Tarea.FechaFin.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

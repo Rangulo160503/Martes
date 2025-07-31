@@ -1,0 +1,37 @@
+﻿@model List<CEGA.Models.Plano>
+@{
+    ViewData["Title"] = "Comparar Planos";
+}
+
+<h2>Comparar Planos</h2>
+
+<form method="post" asp-action="VerComparacion">
+    <div class="mb-3">
+        <label for="plano1">Seleccione el primer plano:</label>
+        <select name="plano1" class="form-control" required>
+            <option value="">-- Seleccione uno --</option>
+            @foreach (var plano in Model)
+            {
+                <option value="@plano.Id">@plano.NombreArchivo</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="plano2">Seleccione el segundo plano:</label>
+        <select name="plano2" class="form-control" required>
+            <option value="">-- Seleccione uno --</option>
+            @foreach (var plano in Model)
+            {
+                <option value="@plano.Id">@plano.NombreArchivo</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Comparar</button>
+</form>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}

@@ -1,0 +1,46 @@
+﻿@model List<CEGA.Models.TareaProyecto>
+
+@{
+    ViewData["Title"] = "Lista de Tareas";
+}
+
+<h2>Listado de Tareas</h2>
+
+<div class="mb-3">
+    <a class="btn btn-success btn-sm" asp-action="Crear">Crear Tarea</a>
+    <a class="btn btn-info btn-sm" asp-action="Buscar">Buscar Tarea</a>
+    <a class="btn btn-secondary btn-sm" asp-action="AsignarEmpleado">Asignar Empleado</a>
+    <a class="btn btn-dark btn-sm" asp-action="ReporteConsolidado">Reporte Consolidado</a>
+    <a class="btn btn-primary btn-sm" asp-action="TareaSinAsignar">Tareas Sin Asignar</a>
+    <a class="btn btn-primary btn-sm" asp-action="TareasPorEmpleado">Tareas por Empleado</a>
+    <a class="btn btn-primary btn-sm" asp-action="VerAsignaciones">Ver Asignaciones</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Proyecto</th>
+            <th>Nombre Tarea</th>
+            <th>Detalles</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tarea in Model)
+        {
+            <tr>
+                <td>@tarea.Proyecto?.Nombre</td>
+                <td>@tarea.NombreTarea</td>
+                <td>@tarea.Detalles</td>
+                <td>@tarea.FechaInicio.ToString("yyyy-MM-dd")</td>
+                <td>@tarea.FechaFin.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" asp-action="Editar" asp-route-id="@tarea.Id">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@tarea.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,14 @@
+﻿@model CEGA.Models.TareaProyecto
+
+@{
+    ViewData["Title"] = "Resultado de Búsqueda de Tarea";
+}
+
+<h2>Tarea Encontrada</h2>
+
+<p><strong>Nombre:</strong> @Model.NombreTarea</p>
+<p><strong>Detalles:</strong> @Model.Detalles</p>
+<p><strong>Fecha Inicio:</strong> @Model.FechaInicio.ToShortDateString()</p>
+<p><strong>Fecha Finalización:</strong> @Model.FechaFin.ToShortDateString()</p>
+
+<a asp-action="Buscar" asp-route-proyectoId="@Model.ProyectoId" class="btn btn-secondary">Volver a buscar</a>

@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Eliminar Proyecto";
+    var proyectoEncontrado = ViewBag.ProyectoEncontrado as string;
+}
+
+<h2>Eliminar Proyecto</h2>
+
+<form asp-action="Eliminar" method="post">
+    <div>
+        <label>Nombre del Proyecto:</label>
+        <input type="text" name="nombre" />
+        <button type="submit">Buscar Proyecto</button>
+    </div>
+</form>
+
+@if (ViewBag.Mensaje != null)
+{
+    <p class="text-danger">@ViewBag.Mensaje</p>
+}
+
+@if (proyectoEncontrado != null)
+{
+    <hr />
+    <h4>¿Desea eliminar el proyecto <strong>@proyectoEncontrado</strong>?</h4>
+    <form asp-action="Eliminar" method="post">
+        <input type="hidden" name="nombre" value="@proyectoEncontrado" />
+        <input type="hidden" name="confirmar" value="true" />
+        <button type="submit">Sí, eliminar</button>
+        <a asp-action="Eliminar" class="btn btn-secondary">No, cancelar</a>
+    </form>
+}

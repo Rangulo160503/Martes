@@ -1,0 +1,42 @@
+﻿@model List<CEGA.Models.ComentarioPlano>
+@{
+    ViewData["Title"] = "Comentarios del Plano";
+    var plano = ViewBag.Plano as CEGA.Models.Plano;
+}
+
+<h2>Comentarios del Plano</h2>
+
+<p><strong>Plano:</strong> @plano.NombreArchivo (@plano.Disciplina)</p>
+<a asp-action="ListaPlanos" class="btn btn-secondary mb-3">← Volver a la lista</a>
+
+<form asp-action="AgregarComentario" method="post">
+    <input type="hidden" name="PlanoId" value="@plano.Id" />
+    <div class="mb-3">
+        <label for="texto" class="form-label">Nuevo comentario</label>
+        <textarea name="Texto" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+</form>
+
+<hr />
+
+@if (Model.Count == 0)
+{
+    <p>No hay comentarios todavía.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var comentario in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    @comentario.Texto
+                </div>
+                <form asp-action="EliminarComentario" method="post" asp-route-id="@comentario.Id" class="ms-2">
+                    <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                </form>
+            </li>
+        }
+    </ul>
+}

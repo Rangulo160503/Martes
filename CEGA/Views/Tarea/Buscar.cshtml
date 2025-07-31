@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Buscar Tarea";
+}
+
+<h2>Buscar Tarea en Proyecto</h2>
+
+<form asp-action="Buscar" method="post">
+    <input type="hidden" name="proyectoId" value="@ViewBag.ProyectoId" />
+    <div>
+        <label>Nombre de la Tarea:</label>
+        <input type="text" name="nombreTarea" />
+        <button type="submit">Buscar</button>
+    </div>
+</form>
+
+@if (ViewBag.Mensaje != null)
+{
+    <div class="text-danger">@ViewBag.Mensaje</div>
+}

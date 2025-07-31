@@ -4,6 +4,7 @@ using CEGA.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CEGA.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250730002151_PlanoPDF_Initial")]
+    partial class PlanoPDF_Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,31 +230,6 @@ namespace CEGA.Data.Migrations
                     b.ToTable("ClientesMarketing");
                 });
 
-            modelBuilder.Entity("CEGA.Models.ComentarioPlano", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PlanoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Texto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlanoId");
-
-                    b.ToTable("ComentariosPlano");
-                });
-
             modelBuilder.Entity("CEGA.Models.ComentarioProyecto", b =>
                 {
                     b.Property<int>("Id")
@@ -446,7 +424,7 @@ namespace CEGA.Data.Migrations
                     b.ToTable("Ingresos");
                 });
 
-            modelBuilder.Entity("CEGA.Models.Plano", b =>
+            modelBuilder.Entity("CEGA.Models.PlanoPDF", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -469,13 +447,9 @@ namespace CEGA.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SubidoPor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Planos");
+                    b.ToTable("PlanosPDF");
                 });
 
             modelBuilder.Entity("CEGA.Models.PoolCorreo", b =>
@@ -903,17 +877,6 @@ namespace CEGA.Data.Migrations
                     b.Navigation("Tarea");
 
                     b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("CEGA.Models.ComentarioPlano", b =>
-                {
-                    b.HasOne("CEGA.Models.Plano", "Plano")
-                        .WithMany()
-                        .HasForeignKey("PlanoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Plano");
                 });
 
             modelBuilder.Entity("CEGA.Models.ComentarioProyecto", b =>

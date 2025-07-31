@@ -97,6 +97,25 @@
 
         <hr class="bg-light" />
 
+        <!-- Módulo de Seguimiento -->
+        <div class="text-white small fw-bold px-3 mt-2">Seguimiento</div>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Crear">Crear Proyecto</a>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Buscar">Buscar Proyecto</a>
+
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Index">Ver Tareas</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Crear">Crear Tarea</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Buscar">Buscar Tarea</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="AsignarEmpleado">Asignar Empleado</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="ReporteConsolidado">Reporte Consolidado</a>
+
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Index">Ver Comentarios</a>
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Crear">Agregar Comentario</a>
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Buscar">Buscar Comentario</a>
+
+
+        <hr class="bg-light" />
+
         <!-- Cuenta actual -->
         @if (User.Identity?.IsAuthenticated ?? false)
         {

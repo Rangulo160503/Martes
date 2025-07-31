@@ -1,0 +1,20 @@
+﻿@model CEGA.Models.ComentarioProyecto
+
+@{
+    ViewData["Title"] = "Eliminar Comentario";
+}
+
+<h2>¿Desea eliminar este comentario?</h2>
+
+<div>
+    <p><strong>Nombre:</strong> @Model.NombreComentario</p>
+    <p><strong>Detalles:</strong> @Model.Detalles</p>
+    <p><strong>Proyecto:</strong> @Model.Proyecto.Nombre</p>
+</div>
+
+<form asp-action="ConfirmarEliminacion" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <button type="submit" name="confirmar" value="true" class="btn btn-danger">Sí, eliminar</button>
+    <button type="submit" name="confirmar" value="false" class="btn btn-secondary">No, cancelar</button>
+</form>
