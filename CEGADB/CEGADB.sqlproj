@@ -91,5 +91,7 @@
     <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
     <Build Include="dbo\Tables\AsignacionesTareaEmpleado.sql" />
     <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
+    <Build Include="dbo\Tables\TareaPlano.sql" />
+    <Build Include="dbo\Tables\AnotacionesPlano.sql" />
   </ItemGroup>
 </Project>
