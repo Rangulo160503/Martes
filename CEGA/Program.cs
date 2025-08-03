@@ -5,14 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔗 Configurar la conexión a la base de datos
+// Configurar la conexión a la base de datos
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        connectionString,
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
+    )
+);
 
-// 🔒 Configurar Identity con ApplicationUser y habilitar roles
+// Configurar Identity con ApplicationUser y habilitar roles
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false; // Opcional: desactiva confirmación por correo
@@ -20,7 +24,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 .AddRoles<IdentityRole>() // Habilita gestión de roles
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// 👁️ Mostrar errores detallados de EF Core en desarrollo
+// Mostrar errores detallados de EF Core en desarrollo
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // MVC + Razor Pages
@@ -29,7 +33,7 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// 🌐 Middleware HTTP
+// Middleware HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint(); // Página de errores de migración
@@ -54,7 +58,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// 🌱 Ejecutar el seeding para crear usuario admin y roles si no existen
+// Ejecutar el seeding para crear usuario admin y roles si no existen
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
