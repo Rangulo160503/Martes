@@ -1,12 +1,13 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CEGA.Controllers
 {
@@ -82,14 +83,32 @@ namespace CEGA.Controllers
         }
 
         // GET: Pdf/VerPlano/5
-        public async Task<IActionResult> VerPlano(int id)
+        public IActionResult VerPlano(int id)
         {
-            var plano = await _context.Planos.FirstOrDefaultAsync(p => p.Id == id);
+            var plano = _context.Planos.FirstOrDefault(p => p.Id == id);
             if (plano == null)
                 return NotFound();
 
-            return View(plano);
+            plano.RutaArchivo = "/docs/planos/" + plano.NombreArchivo;
+
+            var comentarios = _context.ComentariosPlano
+                .Where(c => c.PlanoId == id)
+                .ToList();
+
+            var tareas = _context.TareasPlano
+                .Where(t => t.PlanoId == id)
+                .ToList();
+
+            var vm = new VerPlanoViewModel
+            {
+                Plano = plano,
+                Comentarios = comentarios,
+                Tareas = tareas
+            };
+
+            return View(vm);
         }
+
 
         // GET: Pdf/CompararPlanos
         public async Task<IActionResult> CompararPlanos()
@@ -170,5 +189,75 @@ namespace CEGA.Controllers
 
             return NotFound();
         }
+        // GET: Pdf/PanelLateral/5
+        public async Task<IActionResult> PanelLateral(int id)
+        {
+            var plano = await _context.Planos.FindAsync(id);
+            if (plano == null)
+                return NotFound();
+
+            var comentarios = await _context.ComentariosPlano
+                .Where(c => c.PlanoId == id)
+                .ToListAsync();
+
+            var tareas = await _context.TareasPlano
+                .Where(t => t.PlanoId == id)
+                .ToListAsync();
+
+            ViewBag.Plano = plano;
+            ViewBag.Comentarios = comentarios;
+            ViewBag.Tareas = tareas;
+
+            return PartialView("_PanelLateral");
+        }
+
+        // POST: Pdf/AgregarTarea
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarTarea(TareaPlano tarea)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "La tarea no se pudo agregar. Verifica los datos.";
+                return RedirectToAction("Comentarios", new { id = tarea.PlanoId });
+            }
+
+            _context.TareasPlano.Add(tarea);
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Tarea agregada correctamente.";
+            return RedirectToAction("Comentarios", new { id = tarea.PlanoId });
+        }
+        [HttpPost]
+        [HttpPost]
+        public IActionResult GuardarComentario([FromBody] ComentarioPlano comentario)
+        {
+            if (string.IsNullOrWhiteSpace(comentario.Texto))
+            {
+                return BadRequest("El comentario no puede estar vacío.");
+            }
+
+            // Verifica si ya existe uno con misma posición exacta y texto
+            bool duplicado = _context.ComentariosPlano.Any(c =>
+                c.PlanoId == comentario.PlanoId &&
+                Math.Abs(c.CoordenadaX - comentario.CoordenadaX) < 0.01 &&
+                Math.Abs(c.CoordenadaY - comentario.CoordenadaY) < 0.01 &&
+                c.Texto == comentario.Texto);
+
+            if (duplicado)
+            {
+                return BadRequest("Ya existe una anotación en esa posición con el mismo texto.");
+            }
+
+            _context.ComentariosPlano.Add(comentario);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+        public async Task<IActionResult> PanelLateralPartial(int planoId)
+        {
+            return ViewComponent("AnotacionesTareas", new { planoId });
+        }
+
     }
 }

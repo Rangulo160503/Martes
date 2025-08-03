@@ -37,7 +37,7 @@ namespace CEGA.Data
         public DbSet<AsignacionTareaEmpleado> AsignacionesTareaEmpleado { get; set; }
         public DbSet<Plano> Planos { get; set; }
         public DbSet<ComentarioPlano> ComentariosPlano { get; set; }
-
+        public DbSet<TareaPlano> TareasPlano { get; set; }
 
     }
 }

@@ -1,0 +1,47 @@
+﻿@model CEGA.Models.ViewModels.VerPlanoViewModel
+
+<div class="panel-lateral p-3 bg-light border-start" style="min-width: 300px;">
+    <h4>Anotaciones</h4>
+
+    @if (!Model.Comentarios.Any())
+    {
+        <div class="alert alert-info">Este plano no tiene anotaciones aún.</div>
+    }
+    else
+    {
+        <ul class="list-group mb-4">
+            @foreach (var c in Model.Comentarios)
+            {
+                <li class="list-group-item">
+                    <strong>Comentario:</strong> @c.Texto<br />
+                    <small>Coordenadas: (@c.CoordenadaX, @c.CoordenadaY)</small><br />
+                    <button class="btn btn-sm btn-info mt-2" onclick="enfocarPorId('comentario-@c.Id')">Ver en plano</button>
+                </li>
+            }
+        </ul>
+
+    }
+
+    <h4>Tareas</h4>
+
+    @if (!Model.Tareas.Any())
+    {
+        <div class="alert alert-info">Este plano no tiene tareas registradas.</div>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var t in Model.Tareas)
+            {
+                <li class="list-group-item">
+                    <strong>Descripción:</strong> @t.Descripcion<br />
+                    <strong>Responsable:</strong> @t.Responsable<br />
+                    <strong>Fecha:</strong> @t.Fecha.ToShortDateString()<br />
+                    <small>Coordenadas: (@t.CoordenadaX, @t.CoordenadaY)</small><br />
+                    <button class="btn btn-sm btn-info mt-2" onclick="enfocarPorId('tarea-@t.Id')">Ver en plano</button>
+                </li>
+            }
+
+        </ul>
+    }
+</div>
