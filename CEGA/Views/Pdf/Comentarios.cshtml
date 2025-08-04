@@ -4,39 +4,62 @@
     var plano = ViewBag.Plano as CEGA.Models.Plano;
 }
 
-<h2>Comentarios del Plano</h2>
+<h2>Comentarios del Plano: @plano?.NombreArchivo</h2>
 
-<p><strong>Plano:</strong> @plano.NombreArchivo (@plano.Disciplina)</p>
-<a asp-action="ListaPlanos" class="btn btn-secondary mb-3">← Volver a la lista</a>
+@if (TempData["mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["mensaje"]</div>
+}
 
+<!-- Formulario para agregar nuevo comentario -->
 <form asp-action="AgregarComentario" method="post">
-    <input type="hidden" name="PlanoId" value="@plano.Id" />
+    <input type="hidden" name="PlanoId" value="@plano?.Id" />
+
     <div class="mb-3">
-        <label for="texto" class="form-label">Nuevo comentario</label>
-        <textarea name="Texto" class="form-control" required></textarea>
+        <label for="Texto">Nuevo Comentario:</label>
+        <textarea class="form-control" name="Texto" required></textarea>
     </div>
+
+    <div class="mb-3">
+        <label for="CoordenadaX">Coordenada X:</label>
+        <input type="number" step="any" name="CoordenadaX" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="CoordenadaY">Coordenada Y:</label>
+        <input type="number" step="any" name="CoordenadaY" class="form-control" />
+    </div>
+
     <button type="submit" class="btn btn-primary">Agregar Comentario</button>
 </form>
 
 <hr />
 
-@if (Model.Count == 0)
+<h4>Comentarios existentes:</h4>
+
+@if (Model != null && Model.Any())
 {
-    <p>No hay comentarios todavía.</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Texto</th>
+                <th>Fecha</th>
+                <th>Coordenadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var comentario in Model)
+            {
+                <tr>
+                    <td>@comentario.Texto</td>
+                    <td>@comentario.FechaCreacion.ToString("g")</td>
+                    <td>(@comentario.CoordenadaX, @comentario.CoordenadaY)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 else
 {
-    <ul class="list-group">
-        @foreach (var comentario in Model)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div>
-                    @comentario.Texto
-                </div>
-                <form asp-action="EliminarComentario" method="post" asp-route-id="@comentario.Id" class="ms-2">
-                    <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
-                </form>
-            </li>
-        }
-    </ul>
+    <p>No hay comentarios para este plano aún.</p>
 }

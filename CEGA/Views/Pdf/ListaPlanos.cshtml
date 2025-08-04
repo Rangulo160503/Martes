@@ -27,6 +27,7 @@
                 <th>Nombre del Archivo</th>
                 <th>Fecha de Subida</th>
                 <th>Ver</th>
+                <th>Agregar</th>
             </tr>
         </thead>
         <tbody>
@@ -42,7 +43,7 @@
                         <a asp-action="VerPlano" asp-route-id="@plano.Id" class="btn btn-sm btn-info">Ver Plano</a>
                     </td>
                     <td>
-                        <a asp-controller="Pdf" asp-action="Comentarios" asp-route-id="@plano.Id" class="btn btn-sm btn-secondary">💬 Comentarios</a>
+                        <a asp-controller="Pdf" asp-action="Comentarios" asp-route-id="@plano.Id" class="btn btn-success">Agregar Comentario</a>
                     </td>
                 </tr>
             }

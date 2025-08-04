@@ -14,7 +14,8 @@ namespace CEGA.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        // GET: Comentario/Crear?proyectoId=5
+        [HttpGet]
         public IActionResult Crear(int proyectoId)
         {
             var proyecto = _context.Proyectos.Find(proyectoId);
@@ -25,6 +26,7 @@ namespace CEGA.Controllers
             return View();
         }
 
+        // POST: Comentario/Crear
         [HttpPost]
         public IActionResult Crear(ComentarioProyecto comentario)
         {
@@ -43,23 +45,23 @@ namespace CEGA.Controllers
             TempData["mensaje"] = "Comentario creado correctamente";
             return RedirectToAction("Index", "Proyecto");
         }
+
         [HttpGet]
         public IActionResult Editar(int id)
         {
             var comentario = _context.ComentariosProyecto
                                      .Include(c => c.Proyecto)
                                      .FirstOrDefault(c => c.Id == id);
-
             if (comentario == null) return NotFound();
 
             return View(comentario);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Editar(ComentarioProyecto comentario)
         {
-            if (string.IsNullOrWhiteSpace(comentario.NombreComentario) &&
-                string.IsNullOrWhiteSpace(comentario.Detalles))
+            if (string.IsNullOrWhiteSpace(comentario.NombreComentario) && string.IsNullOrWhiteSpace(comentario.Detalles))
             {
                 ModelState.AddModelError(string.Empty, "Se necesita llenar todo el formulario");
                 return View(comentario);
@@ -79,6 +81,7 @@ namespace CEGA.Controllers
             TempData["mensaje"] = "Comentario editado correctamente";
             return RedirectToAction("Index", "Proyecto");
         }
+
         [HttpGet]
         public IActionResult Buscar(int proyectoId)
         {
@@ -87,6 +90,7 @@ namespace CEGA.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Buscar(int proyectoId, string nombreComentario)
         {
             ViewBag.ProyectoId = proyectoId;
@@ -102,24 +106,23 @@ namespace CEGA.Controllers
 
             if (comentario == null)
             {
-                ViewBag.Mensaje = "No hay una comentario con ese nombre";
+                ViewBag.Mensaje = "No hay un comentario con ese nombre";
                 return View();
             }
 
             return View("ResultadoBusqueda", comentario);
         }
+
         [HttpGet]
         public IActionResult Eliminar(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var comentario = _context.ComentariosProyecto
                 .Include(c => c.Proyecto)
                 .FirstOrDefault(c => c.Id == id);
 
-            if (comentario == null)
-                return NotFound();
+            if (comentario == null) return NotFound();
 
             return View(comentario);
         }
@@ -128,9 +131,7 @@ namespace CEGA.Controllers
         public IActionResult ConfirmarEliminacion(int id, bool confirmar)
         {
             var comentario = _context.ComentariosProyecto.Find(id);
-
-            if (comentario == null)
-                return NotFound();
+            if (comentario == null) return NotFound();
 
             if (!confirmar)
             {
@@ -144,13 +145,14 @@ namespace CEGA.Controllers
             TempData["mensaje"] = "Comentario eliminado exitosamente";
             return RedirectToAction("Index", "Proyecto");
         }
+
         [HttpGet]
         public IActionResult Index()
         {
-            var comentarios = _context.ComentariosProyecto.Include(c => c.Proyecto).ToList();
+            var comentarios = _context.ComentariosProyecto
+                                      .Include(c => c.Proyecto)
+                                      .ToList();
             return View(comentarios);
         }
-
-
     }
 }

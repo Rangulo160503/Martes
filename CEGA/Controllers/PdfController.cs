@@ -159,19 +159,20 @@ namespace CEGA.Controllers
 
         // POST: Pdf/AgregarComentario
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarComentario(ComentarioPlano comentario)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(comentario.Texto))
             {
-                TempData["Error"] = "El comentario no se pudo agregar. Verifica los datos.";
+                TempData["mensaje"] = "El comentario no puede estar vacío";
                 return RedirectToAction("Comentarios", new { id = comentario.PlanoId });
             }
+
+            comentario.FechaCreacion = DateTime.Now;
 
             _context.ComentariosPlano.Add(comentario);
             await _context.SaveChangesAsync();
 
-            TempData["Mensaje"] = "Comentario agregado correctamente.";
+            TempData["mensaje"] = "Comentario agregado correctamente";
             return RedirectToAction("Comentarios", new { id = comentario.PlanoId });
         }
 
@@ -184,12 +185,30 @@ namespace CEGA.Controllers
             {
                 _context.ComentariosPlano.Remove(comentario);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Comentarios", new { id = comentario.PlanoId });
+                return Ok();
             }
 
             return NotFound();
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmarEliminacionComentario(int id)
+        {
+            var comentario = await _context.ComentariosPlano.FindAsync(id);
+            if (comentario == null) return NotFound();
+
+            _context.ComentariosPlano.Remove(comentario);
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Comentario eliminado exitosamente";
+            return RedirectToAction("Comentarios", new { id = comentario.PlanoId });
+        }
+
         // GET: Pdf/PanelLateral/5
+        [HttpGet]
         public async Task<IActionResult> PanelLateral(int id)
         {
             var plano = await _context.Planos.FindAsync(id);
@@ -283,6 +302,34 @@ namespace CEGA.Controllers
 
             return NotFound();
         }
+        
+        [HttpGet]
+        public IActionResult BuscarComentario(int id)
+        {
+            ViewBag.PlanoId = id;
+            return View(); // Este archivo aún falta crearlo.
+        }
+        [HttpPost]
+        public IActionResult BuscarComentario(int id, string textoComentario)
+        {
+            if (string.IsNullOrWhiteSpace(textoComentario))
+            {
+                ViewBag.Mensaje = "Ingrese un texto de comentario";
+                return View();
+            }
+
+            var comentario = _context.ComentariosPlano
+                .FirstOrDefault(c => c.PlanoId == id && c.Texto.ToLower() == textoComentario.ToLower());
+
+            if (comentario == null)
+            {
+                ViewBag.Mensaje = "Comentario no encontrado";
+                return View();
+            }
+
+            return View("ResultadoBusqueda", comentario);
+        }
+
 
 
     }

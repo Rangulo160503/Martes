@@ -42,7 +42,6 @@ namespace CEGA.Controllers
                 Texto = dto.Texto,
                 CoordenadaX = dto.CoordenadaX,
                 CoordenadaY = dto.CoordenadaY,
-                ImagenBase64 = dto.ImagenBase64,
                 FechaCreacion = DateTime.Now
             };
 
@@ -59,7 +58,6 @@ namespace CEGA.Controllers
                     c.Texto,
                     c.CoordenadaX,
                     c.CoordenadaY,
-                    c.ImagenBase64,
                     Fecha = c.FechaCreacion.ToString("yyyy-MM-dd HH:mm:ss")
                 })
                 .ToList();

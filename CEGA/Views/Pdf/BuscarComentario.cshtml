@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Buscar Comentario";
+}
+
+<h2>Buscar Comentario para el plano @ViewBag.PlanoId</h2>
+
+<form method="post" asp-action="BuscarComentario" asp-route-id="@ViewBag.PlanoId">
+    <div class="mb-3">
+        <label for="nombreComentario">Nombre del comentario</label>
+        <input type="text" class="form-control" name="nombreComentario" />
+    </div>
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>

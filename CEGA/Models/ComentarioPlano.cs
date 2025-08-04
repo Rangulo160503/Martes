@@ -15,7 +15,6 @@ namespace CEGA.Models
         public string Texto { get; set; }
         public float CoordenadaX { get; set; }
         public float CoordenadaY { get; set; }
-        public string ImagenBase64 { get; set; }
         public DateTime FechaCreacion { get; set; }
     }
 }

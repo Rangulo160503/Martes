@@ -17,6 +17,15 @@
     Agregar tarea
 </button>
 
+<!-- Botón de descarga -->
+<a class="btn btn-outline-primary mb-3 ms-2"
+   href="@Model.Plano.RutaArchivo"
+   download
+   onclick="return confirmarDescarga()">
+    Descargar PDF con anotaciones
+</a>
+
+
 <!-- Visor PDF -->
 <div id="pdf-container" style="position: relative; width: 100%; height: 600px;">
     <embed src="@Model.Plano.RutaArchivo" type="application/pdf" style="width:100%; height:100%;" />
@@ -160,11 +169,17 @@
             });
         }
 
-        function guardarAnotacion(planoId, x, y, texto, imagenBase64) {
+               function guardarAnotacion(planoId, x, y, texto, imagenBase64) {
             fetch('/Pdf/GuardarComentario', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ PlanoId: planoId, CoordenadaX: x, CoordenadaY: y, Texto: texto, ImagenBase64: imagenBase64 })
+                body: JSON.stringify({
+                    PlanoId: planoId,
+                    CoordenadaX: x,
+                    CoordenadaY: y,
+                    Texto: texto,
+                    ImagenBase64: imagenBase64
+                })
             })
             .then(response => {
                 if (response.ok) {
@@ -179,7 +194,7 @@
                 alert("Ocurrió un error.");
             });
         }
-                function guardarTarea(planoId, x, y, descripcion, responsable, fecha) {
+                        function guardarTarea(planoId, x, y, descripcion, responsable, fecha) {
             fetch('/Pdf/GuardarTarea', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -258,6 +273,22 @@
                     }
                 });
             }
+        }
+        function eliminarComentario(id) {
+            if (confirm("¿Eliminar esta anotación?")) {
+                fetch(`/Pdf/EliminarComentario/${id}`, { method: 'POST' })
+                    .then(res => {
+                        if (res.ok) {
+                            location.reload();
+                        } else {
+                            alert("Error al eliminar anotación.");
+                        }
+                    });
+            }
+        }
+        function confirmarDescarga() {
+            const confirmar = confirm("¿Desea descargar el documento con anotaciones?");
+            return confirmar;
         }
 
     </script>
