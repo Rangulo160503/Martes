@@ -30,5 +30,42 @@ namespace CEGA.Controllers
             TempData["Mensaje"] = "Comentario guardado correctamente.";
             return RedirectToAction("VerPlano", "Pdf", new { id = comentario.PlanoId });
         }
+        [HttpPost("Crear")]
+        public async Task<IActionResult> Crear([FromBody] ComentarioPlano dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Datos inválidos o incompletos.");
+
+            var comentario = new ComentarioPlano
+            {
+                PlanoId = dto.PlanoId,
+                Texto = dto.Texto,
+                CoordenadaX = dto.CoordenadaX,
+                CoordenadaY = dto.CoordenadaY,
+                ImagenBase64 = dto.ImagenBase64,
+                FechaCreacion = DateTime.Now
+            };
+
+            _context.ComentariosPlano.Add(comentario);
+            await _context.SaveChangesAsync();
+
+            // Retornar todos los comentarios actualizados para ese plano
+            var comentarios = _context.ComentariosPlano
+                .Where(c => c.PlanoId == dto.PlanoId)
+                .OrderByDescending(c => c.FechaCreacion)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Texto,
+                    c.CoordenadaX,
+                    c.CoordenadaY,
+                    c.ImagenBase64,
+                    Fecha = c.FechaCreacion.ToString("yyyy-MM-dd HH:mm:ss")
+                })
+                .ToList();
+
+            return Ok(comentarios);
+        }
+
     }
 }

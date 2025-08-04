@@ -229,7 +229,6 @@ namespace CEGA.Controllers
             return RedirectToAction("Comentarios", new { id = tarea.PlanoId });
         }
         [HttpPost]
-        [HttpPost]
         public IActionResult GuardarComentario([FromBody] ComentarioPlano comentario)
         {
             if (string.IsNullOrWhiteSpace(comentario.Texto))
@@ -258,6 +257,33 @@ namespace CEGA.Controllers
         {
             return ViewComponent("AnotacionesTareas", new { planoId });
         }
+        [HttpPost]
+        public IActionResult GuardarTarea([FromBody] TareaPlano tarea)
+        {
+            if (string.IsNullOrWhiteSpace(tarea.Descripcion) || string.IsNullOrWhiteSpace(tarea.Responsable))
+                return BadRequest("Descripción y responsable son obligatorios.");
+
+            tarea.Fecha = DateTime.Now;
+
+            _context.TareasPlano.Add(tarea);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+        [HttpPost]
+        public async Task<IActionResult> EliminarTarea(int id)
+        {
+            var tarea = await _context.TareasPlano.FindAsync(id);
+            if (tarea != null)
+            {
+                _context.TareasPlano.Remove(tarea);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return NotFound();
+        }
+
 
     }
 }
