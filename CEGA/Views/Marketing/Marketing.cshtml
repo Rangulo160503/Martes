@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Marketing";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center mb-4">📣 Módulo de Marketing</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<ul class="nav nav-tabs" id="marketingTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="camp-tab" data-bs-toggle="tab" data-bs-target="#camp" type="button" role="tab">Campañas</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pool-tab" data-bs-toggle="tab" data-bs-target="#pool" type="button" role="tab">Pools de Correos</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="dist-tab" data-bs-toggle="tab" data-bs-target="#dist" type="button" role="tab">Distribuciones</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">Clientes</button>
+    </li>
+</ul>
+
+<div class="tab-content mt-4">
+    <div class="tab-pane fade show active" id="camp" role="tabpanel">
+        @await Html.PartialAsync("_CampanasPartial", ViewBag.Campanias as IEnumerable<CEGA.Models.CampMarketing>)
+    </div>
+    <div class="tab-pane fade" id="pool" role="tabpanel">
+        @await Html.PartialAsync("_PoolsPartial", ViewBag.Pools as IEnumerable<CEGA.Models.PoolCorreo>)
+    </div>
+    <div class="tab-pane fade" id="dist" role="tabpanel">
+        @await Html.PartialAsync("_DistribucionesPartial", ViewBag.Distribuciones as IEnumerable<CEGA.Models.DistribucionMarketing>)
+    </div>
+    <div class="tab-pane fade" id="clientes" role="tabpanel">
+        @await Html.PartialAsync("_ClientesPartial", ViewBag.Clientes as IEnumerable<CEGA.Models.ClienteMarketing>)
+    </div>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,48 @@
+﻿@model CEGA.Models.ViewModels.VerPlanoViewModel
+
+<div class="panel-lateral p-3 bg-light border-start" style="min-width: 300px;">
+    <h4>Anotaciones</h4>
+
+    @if (Model.Comentarios == null || !Model.Comentarios.Any())
+    {
+        <div class="alert alert-info">Este plano no tiene anotaciones aún.</div>
+    }
+    else
+    {
+        <ul class="list-group mb-4">
+            @foreach (var c in Model.Comentarios)
+            {
+                <li class="list-group-item" id="comentario-@c.Id">
+                    <strong>Comentario:</strong> @c.Texto<br />
+                    <small>Coordenadas: (@c.CoordenadaX, @c.CoordenadaY)</small><br />
+                    <button class="btn btn-sm btn-danger" onclick="eliminarComentario(@c.Id)">Eliminar</button>
+                </li>
+            }
+        </ul>
+    }
+
+    <h4>Tareas</h4>
+
+    @if (Model.Tareas == null || !Model.Tareas.Any())
+    {
+        <div class="alert alert-info">Este plano no tiene tareas registradas.</div>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var t in Model.Tareas)
+            {
+                <li class="list-group-item" id="tarea-@t.Id">
+                    <strong>Descripción:</strong> @t.Descripcion<br />
+                    <strong>Responsable:</strong> @t.Responsable<br />
+                    <strong>Fecha:</strong> @t.Fecha.ToShortDateString()<br />
+                    <small>Coordenadas: (@t.CoordenadaX, @t.CoordenadaY)</small><br />
+
+                    <!-- Botón para eliminar tarea -->
+                    <button class="btn btn-sm btn-danger mt-2" onclick="eliminarTarea(@t.Id)">Eliminar</button>
+                </li>
+            }
+        </ul>
+    }
+
+</div>

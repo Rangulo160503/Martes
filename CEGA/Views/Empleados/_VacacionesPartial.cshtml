@@ -1,0 +1,50 @@
+﻿@model IEnumerable<CEGA.Models.VacacionesEmpleado>
+
+<h4 class="mt-4">🌴 Solicitudes de Vacaciones</h4>
+
+<form asp-action="SolicitarVacaciones" asp-controller="Empleados" method="post" class="mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <input name="FechaInicio" type="date" class="form-control" required />
+        </div>
+        <div class="col-md-4">
+            <input name="DiasSolicitados" type="number" class="form-control" placeholder="Días Solicitados" required />
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-success w-100">➕ Solicitar</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Usuario</th>
+                <th>Fecha Inicio</th>
+                <th>Días Solicitados</th>
+                <th>Días Disponibles</th>
+                <th>Estado</th>
+                <th>Fecha Solicitud</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vac in Model)
+            {
+                <tr>
+                    <td>@vac.UsuarioID</td>
+                    <td>@vac.FechaInicio.ToShortDateString()</td>
+                    <td>@vac.DiasSolicitados</td>
+                    <td>@vac.DiasDisponibles</td>
+                    <td>@vac.Estado</td>
+                    <td>@vac.FechaSolicitud.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">No hay solicitudes de vacaciones registradas.</div>
+}

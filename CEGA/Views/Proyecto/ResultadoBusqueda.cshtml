@@ -1,0 +1,14 @@
+﻿@model CEGA.Models.Proyecto
+
+@{
+    ViewData["Title"] = "Resultado de Búsqueda";
+}
+
+<h2>Resultado de Búsqueda</h2>
+
+<p><strong>Nombre:</strong> @Model.Nombre</p>
+<p><strong>Detalles:</strong> @Model.Detalles</p>
+<p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToShortDateString()</p>
+<p><strong>Fecha de Finalización:</strong> @Model.FechaFin.ToShortDateString()</p>
+
+<a asp-action="Buscar" class="btn btn-secondary">Volver a buscar</a>

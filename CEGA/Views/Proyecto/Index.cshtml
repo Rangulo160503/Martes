@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CEGA.Models.Proyecto>
+
+@{
+    ViewData["Title"] = "Listado de Proyectos";
+}
+
+<h2>Listado de Proyectos</h2>
+
+@if (TempData["mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["mensaje"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Detalles</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Finalización</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var proyecto in Model)
+        {
+            <tr>
+                <td>@proyecto.Nombre</td>
+                <td>@proyecto.Detalles</td>
+                <td>@proyecto.FechaInicio.ToShortDateString()</td>
+                <td>@proyecto.FechaFin.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Editar" asp-route-id="@proyecto.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <form asp-action="Eliminar" method="post" style="display:inline;">
+                        <input type="hidden" name="nombre" value="@proyecto.Nombre" />
+                        <input type="hidden" name="confirmar" value="true" />
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                    <a asp-controller="Tarea" asp-action="Crear" asp-route-proyectoId="@proyecto.Id" class="btn btn-primary btn-sm">Crear Tarea</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Crear" class="btn btn-success mt-3">Crear nuevo proyecto</a>

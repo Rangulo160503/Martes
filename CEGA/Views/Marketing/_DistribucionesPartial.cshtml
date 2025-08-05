@@ -1,0 +1,78 @@
+﻿@model IEnumerable<CEGA.Models.DistribucionMarketing>
+
+<h4 class="mt-5">📤 Distribuciones</h4>
+
+<!-- Tarjeta que muestra la última distribución creada -->
+@if (TempData["UltimaDistribucionNombre"] != null)
+{
+    <div class="card border-success mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            ✅ Distribución creada exitosamente
+            <button class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Cerrar" onclick="this.closest('.card').remove();"></button>
+        </div>
+        <div class="card-body">
+            <p><strong>Nombre:</strong> @TempData["UltimaDistribucionNombre"]</p>
+            <p><strong>Descripción:</strong> @TempData["UltimaDistribucionDescripcion"]</p>
+            <p><strong>Fecha y hora:</strong> @TempData["UltimaDistribucionFecha"]</p>
+            <p><strong>Pool:</strong> @TempData["UltimaDistribucionPool"]</p>
+        </div>
+    </div>
+}
+
+<!-- Formulario para agregar distribución -->
+<form asp-action="CrearProgramacionDistribucion" asp-controller="Marketing" method="post" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <input name="Nombre" class="form-control" placeholder="Nombre" required />
+        </div>
+        <div class="col-md-3">
+            <input name="Descripcion" class="form-control" placeholder="Descripción" required />
+        </div>
+        <div class="col-md-3">
+            <input name="FechaHoraEnvio" type="datetime-local" class="form-control" required />
+        </div>
+        <div class="col-md-2">
+            <input name="NombrePool" class="form-control" placeholder="Nombre del Pool" required />
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-success w-100">➕</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha y Hora</th>
+                <th>Pool</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dist in Model)
+            {
+                <tr>
+                    <td>@dist.Nombre</td>
+                    <td>@dist.Descripcion</td>
+                    <td>@dist.FechaHoraEnvio</td>
+                    <td>@dist.NombrePool</td>
+                    <td>
+                        <form asp-action="EditarProgramacion" asp-controller="Marketing" method="post" class="d-inline">
+                            <input type="hidden" name="Id" value="@dist.Id" />
+                            <button type="submit" class="btn btn-sm btn-primary">✏️ Editar</button>
+                        </form>
+
+                        <form asp-action="EliminarProgramacion" asp-controller="Marketing" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta programación?');">
+                            <input type="hidden" name="id" value="@dist.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

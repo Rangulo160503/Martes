@@ -1,0 +1,66 @@
+﻿@model CEGA.Models.ContabilidadViewModel
+
+@{
+    ViewData["Title"] = "Ingresos";
+}
+
+<h2>Registrar Ingreso</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="CrearIngreso" method="post">
+    <div class="mb-3">
+        <label asp-for="NuevoIngreso.Descripcion" class="form-label"></label>
+        <input asp-for="NuevoIngreso.Descripcion" class="form-control" />
+        <span asp-validation-for="NuevoIngreso.Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevoIngreso.Monto" class="form-label"></label>
+        <input asp-for="NuevoIngreso.Monto" class="form-control" />
+        <span asp-validation-for="NuevoIngreso.Monto" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NuevoIngreso.Fecha" class="form-label"></label>
+        <input asp-for="NuevoIngreso.Fecha" type="date" class="form-control" />
+        <span asp-validation-for="NuevoIngreso.Fecha" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar</button>
+</form>
+
+<hr />
+
+<h3>Lista de Ingresos</h3>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Monto</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ingreso in Model.ListaIngresos)
+        {
+            <tr>
+                <td>@ingreso.Descripcion</td>
+                <td>@ingreso.Monto.ToString("C")</td>
+                <td>@ingreso.Fecha.ToShortDateString()</td>
+                <td>
+                    <a asp-action="EditarIngreso" asp-route-id="@ingreso.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="EliminarIngreso" asp-route-id="@ingreso.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

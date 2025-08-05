@@ -1,0 +1,30 @@
+﻿@model List<CEGA.Models.ReporteEntradaSalida>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Movimiento</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Final</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reporte in Model)
+        {
+            <tr>
+                <td>@reporte.NombreReporte</td>
+                <td>@reporte.RolSeleccionado</td>
+                <td>@reporte.Movimiento</td>
+                <td>@reporte.FechaInicio.ToShortDateString()</td>
+                <td>@reporte.FechaFin.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Editar" asp-route-id="@reporte.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Eliminar" asp-route-id="@reporte.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

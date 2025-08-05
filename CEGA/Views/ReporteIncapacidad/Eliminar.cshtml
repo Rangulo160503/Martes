@@ -1,0 +1,18 @@
+﻿@model CEGA.Models.ReporteIncapacidad
+
+@{
+    ViewData["Title"] = "Eliminar Reporte";
+}
+
+<h2>¿Desea eliminar el reporte?</h2>
+
+<div class="alert alert-warning">
+    <strong>Nombre del Reporte:</strong> @Model.NombreReporte<br />
+    <strong>Rango:</strong> @Model.FechaInicio.ToShortDateString() - @Model.FechaFin.ToShortDateString()
+</div>
+
+<form asp-action="Eliminar" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,41 @@
+﻿@model List<CEGA.Models.CierreDiario>
+@{
+    ViewData["Title"] = "Cierres Diarios";
+}
+
+<h2 class="mb-3">Cierres Diarios</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="Registrar" method="post" class="mb-4">
+    <button type="submit" class="btn btn-primary">Registrar Cierre Diario de Hoy</button>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Total Ingresos</th>
+            <th>Total Egresos</th>
+            <th>Balance Final</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cierre in Model)
+        {
+            <tr>
+                <td>@cierre.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@cierre.TotalIngresos.ToString("C")</td>
+                <td>@cierre.TotalEgresos.ToString("C")</td>
+                <td>@cierre.BalanceFinal.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>

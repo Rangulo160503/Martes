@@ -1,0 +1,43 @@
+﻿@model CEGA.Models.Proyecto
+
+@{
+    ViewData["Title"] = "Editar Proyecto";
+}
+
+<h2>Editar Proyecto</h2>
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label>Nombre del Proyecto</label>
+        <input asp-for="Nombre" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label>Detalles</label>
+        <textarea asp-for="Detalles"></textarea>
+        <span asp-validation-for="Detalles" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label>Fecha de Inicio</label>
+        <input asp-for="FechaInicio" type="date" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label>Fecha de Finalización</label>
+        <input asp-for="FechaFin" type="date" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Guardar Cambios</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

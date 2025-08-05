@@ -1,0 +1,49 @@
+﻿@model CEGA.Models.TareaProyecto
+
+<h2>Crear Tarea</h2>
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<form asp-action="Crear" method="post">
+    <input type="hidden" asp-for="ProyectoId" />
+
+    <div class="form-group">
+        <label>Proyecto:</label>
+        <input class="form-control" value="@ViewBag.NombreProyecto" disabled />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NombreTarea"></label>
+        <input asp-for="NombreTarea" class="form-control" />
+        <span asp-validation-for="NombreTarea" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Detalles"></label>
+        <textarea asp-for="Detalles" class="form-control"></textarea>
+        <span asp-validation-for="Detalles" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaInicio"></label>
+        <input asp-for="FechaInicio" type="date" class="form-control" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaFin"></label>
+        <input asp-for="FechaFin" type="date" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear Tarea</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

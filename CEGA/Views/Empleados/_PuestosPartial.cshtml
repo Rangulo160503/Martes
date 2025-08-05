@@ -1,0 +1,49 @@
+﻿@model IEnumerable<CEGA.Models.PuestoEmpleado>
+
+<h4 class="mt-4">📌 Puestos de Empleados</h4>
+
+<form asp-action="AsignarPuesto" asp-controller="Empleados" method="post" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <input name="UsuarioID" class="form-control" placeholder="ID del Usuario" required />
+        </div>
+        <div class="col-md-5">
+            <input name="Puesto" class="form-control" placeholder="Puesto" required />
+        </div>
+        <div class="col-md-2">
+            <input name="SalarioAsignado" type="number" step="0.01" class="form-control" placeholder="Salario" required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">📌 Asignar</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Usuario</th>
+                <th>Puesto</th>
+                <th>Salario</th>
+                <th>Fecha Asignación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.UsuarioID</td>
+                    <td>@p.Puesto</td>
+                    <td>@p.SalarioAsignado.ToString("C")</td>
+                    <td>@p.FechaAsignacion.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">No hay puestos asignados.</div>
+}

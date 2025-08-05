@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Buscar Proyecto";
+}
+
+<h2>Buscar Proyecto</h2>
+
+<form method="post" asp-action="Buscar">
+    <label>Nombre del Proyecto:</label>
+    <input type="text" name="nombre" />
+    <button type="submit">Buscar</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="text-danger">@ViewBag.Error</div>
+}

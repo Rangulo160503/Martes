@@ -1,0 +1,58 @@
+﻿@model CEGA.Models.EditProfileViewModel
+@{
+    ViewData["Title"] = "Editar perfil";
+}
+
+<h2 class="text-center">Editar perfil</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+<form asp-action="EditProfile" method="post">
+    <div class="form-group">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Apellido"></label>
+        <input asp-for="Apellido" class="form-control" />
+        <span asp-validation-for="Apellido" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Telefono"></label>
+        <input asp-for="Telefono" class="form-control" placeholder="8888-8888" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Guardar cambios</button>
+</form>
+
+<div class="mt-4">
+    <hr />
+    <p class="text-danger fw-bold">¿Deseas eliminar tu cuenta?</p>
+    <a asp-action="EliminarCuenta" class="btn btn-outline-danger">
+        Eliminar mi cuenta permanentemente
+    </a>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

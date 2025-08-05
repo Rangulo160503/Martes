@@ -1,0 +1,296 @@
+﻿@model CEGA.Models.ViewModels.VerPlanoViewModel
+
+@{
+    ViewData["Title"] = "Ver Plano";
+}
+
+<h2>@Model.Plano.NombreArchivo</h2>
+
+<!-- Botones -->
+<button class="btn btn-secondary mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelLateral">
+    Ver anotaciones y tareas
+</button>
+<button class="btn btn-success mb-3 ms-2" type="button" id="btnCrearAnotacion">
+    Crear anotación
+</button>
+<button class="btn btn-warning mb-3 ms-2" type="button" id="btnCrearTarea">
+    Agregar tarea
+</button>
+
+<!-- Botón de descarga -->
+<a class="btn btn-outline-primary mb-3 ms-2"
+   href="@Url.Action("VerArchivoPlano", "Pdf", new { id = Model.Plano.Id })"
+   download
+   onclick="return confirmarDescarga()">
+    Descargar PDF con anotaciones
+</a>
+
+
+
+<!-- Visor PDF -->
+<div id="pdf-container" style="position: relative; width: 100%; height: 600px;">
+    <embed src="@Url.Action("VerArchivoPlano", "Pdf", new { id = Model.Plano.Id })" type="application/pdf" style="width:100%; height:100%">
+</div>
+
+<!-- Panel lateral -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="panelLateral">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Anotaciones y tareas</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body" id="contenedorPanelLateral">
+        @await Component.InvokeAsync("AnotacionesTareas", new { planoId = Model.Plano.Id })
+    </div>
+</div>
+
+<!-- Modal para crear anotación -->
+<div class="modal fade" id="modalAnotacion" tabindex="-1" aria-labelledby="modalAnotacionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAnotacionLabel">Crear Anotación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label for="inputTextoAnotacion" class="form-label">Texto de la anotación:</label>
+                <input type="text" id="inputTextoAnotacion" class="form-control" placeholder="Escriba su anotación..." />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarAnotacionModal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para crear tarea -->
+<div class="modal fade" id="modalTarea" tabindex="-1" aria-labelledby="modalTareaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTareaLabel">Crear Tarea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2">
+                    <label for="inputDescripcionTarea" class="form-label">Descripción:</label>
+                    <input type="text" id="inputDescripcionTarea" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label for="inputResponsableTarea" class="form-label">Responsable:</label>
+                    <input type="text" id="inputResponsableTarea" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label for="inputFechaTarea" class="form-label">Fecha:</label>
+                    <input type="date" id="inputFechaTarea" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarTareaModal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pdfContainer = document.getElementById("pdf-container");
+
+            document.getElementById("btnCrearAnotacion").addEventListener("click", function () {
+                document.getElementById("inputTextoAnotacion").value = "";
+                const modal = new bootstrap.Modal(document.getElementById("modalAnotacion"));
+                modal.show();
+            });
+
+            document.getElementById("btnGuardarAnotacionModal").addEventListener("click", function () {
+                const texto = document.getElementById("inputTextoAnotacion").value.trim();
+                if (!texto) {
+                    alert("Debe escribir un texto.");
+                    return;
+                }
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalAnotacion"));
+                modal.hide();
+
+                const x = 50; // Centro del contenedor
+                const y = 50;
+
+                capturarPreview(@Model.Plano.Id, x, y, texto);
+            });
+        });
+                document.getElementById("btnCrearTarea").addEventListener("click", function () {
+            document.getElementById("inputDescripcionTarea").value = "";
+            document.getElementById("inputResponsableTarea").value = "";
+            document.getElementById("inputFechaTarea").value = "";
+            const modal = new bootstrap.Modal(document.getElementById("modalTarea"));
+            modal.show();
+        });
+
+        document.getElementById("btnGuardarTareaModal").addEventListener("click", function () {
+            const descripcion = document.getElementById("inputDescripcionTarea").value.trim();
+            const responsable = document.getElementById("inputResponsableTarea").value.trim();
+            const fecha = document.getElementById("inputFechaTarea").value;
+
+            if (!descripcion || !responsable || !fecha) {
+                alert("Debe completar todos los campos.");
+                return;
+            }
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById("modalTarea"));
+            modal.hide();
+
+            const x = 50;
+            const y = 50;
+
+            guardarTarea(@Model.Plano.Id, x, y, descripcion, responsable, fecha);
+        });
+
+
+        function capturarPreview(planoId, x, y, texto) {
+            const container = document.getElementById('pdf-container');
+            const cropSize = 150;
+
+            html2canvas(container, { scale: 1 }).then(canvas => {
+                const canvasX = (x / 100) * container.offsetWidth - cropSize / 2;
+                const canvasY = (y / 100) * container.offsetHeight - cropSize / 2;
+
+                const croppedCanvas = document.createElement('canvas');
+                croppedCanvas.width = cropSize;
+                croppedCanvas.height = cropSize;
+
+                const ctx = croppedCanvas.getContext('2d');
+                ctx.drawImage(canvas, canvasX, canvasY, cropSize, cropSize, 0, 0, cropSize, cropSize);
+
+                const imagenBase64 = croppedCanvas.toDataURL("image/png");
+
+                guardarAnotacion(planoId, x, y, texto, imagenBase64);
+            });
+        }
+
+               function guardarAnotacion(planoId, x, y, texto, imagenBase64) {
+            fetch('/Pdf/GuardarComentario', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PlanoId: planoId,
+                    CoordenadaX: x,
+                    CoordenadaY: y,
+                    Texto: texto,
+                    ImagenBase64: imagenBase64
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    refrescarPanelAnotaciones(planoId);
+                    alert("Anotación creada con éxito.");
+                } else {
+                    alert("Error al guardar la anotación.");
+                }
+            })
+            .catch(err => {
+                console.error("Error al guardar anotación:", err);
+                alert("Ocurrió un error.");
+            });
+        }
+                        function guardarTarea(planoId, x, y, descripcion, responsable, fecha) {
+            fetch('/Pdf/GuardarTarea', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    PlanoId: planoId,
+                    CoordenadaX: x,
+                    CoordenadaY: y,
+                    Descripcion: descripcion,
+                    Responsable: responsable,
+                    Fecha: fecha
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    refrescarPanelAnotaciones(planoId);
+                    alert("Tarea creada con éxito.");
+                } else {
+                    alert("Error al guardar la tarea.");
+                }
+            })
+            .catch(err => {
+                console.error("Error al guardar tarea:", err);
+                alert("Ocurrió un error.");
+            });
+        }
+
+
+        function refrescarPanelAnotaciones(planoId) {
+            fetch(`/Pdf/PanelLateralPartial/${planoId}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("contenedorPanelLateral").innerHTML = html;
+                })
+                .catch(err => {
+                    console.error("Error recargando anotaciones:", err);
+                });
+        }
+
+        function enfocarElemento(elem) {
+            if (!elem) return;
+
+            const container = document.getElementById('pdf-container');
+            const preview = document.createElement('div');
+            preview.className = 'preview-box';
+            preview.style.position = 'absolute';
+            preview.style.left = elem.style.left;
+            preview.style.top = elem.style.top;
+            preview.style.width = '130px';
+            preview.style.height = '130px';
+            preview.style.border = '3px solid #3498db';
+            preview.style.backgroundColor = '#fff';
+            preview.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+            preview.style.zIndex = 9999;
+            preview.style.padding = '4px';
+            preview.innerHTML = elem.outerHTML;
+
+            container.appendChild(preview);
+
+            setTimeout(() => preview.remove(), 4000);
+        }
+
+        function enfocarPorId(id) {
+            const elem = document.getElementById(id);
+            enfocarElemento(elem);
+        }
+                function eliminarTarea(id) {
+            if (confirm("¿Estás seguro de eliminar esta tarea?")) {
+                fetch(`/Pdf/EliminarTarea/${id}`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert("Error al eliminar la tarea.");
+                    }
+                });
+            }
+        }
+        function eliminarComentario(id) {
+            if (confirm("¿Eliminar esta anotación?")) {
+                fetch(`/Pdf/EliminarComentario/${id}`, { method: 'POST' })
+                    .then(res => {
+                        if (res.ok) {
+                            location.reload();
+                        } else {
+                            alert("Error al eliminar anotación.");
+                        }
+                    });
+            }
+        }
+        function confirmarDescarga() {
+            const confirmar = confirm("¿Desea descargar el documento con anotaciones?");
+            return confirmar;
+        }
+
+    </script>
+}

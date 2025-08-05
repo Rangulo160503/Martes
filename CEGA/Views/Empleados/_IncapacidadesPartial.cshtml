@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CEGA.Models.IncapacidadEmpleado>
+
+<h4 class="mt-4">📝 Incapacidades</h4>
+
+<form asp-action="SubirIncapacidad" asp-controller="Empleados" method="post" enctype="multipart/form-data" class="mb-3">
+    <div class="row">
+        <div class="col-md-8">
+            <input name="descripcion" class="form-control" placeholder="Descripción" required />
+        </div>
+        <div class="col-md-2">
+            <input name="archivo" type="file" class="form-control" required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">📤 Subir</button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Usuario</th>
+                <th>Descripción</th>
+                <th>Archivo</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model)
+            {
+                <tr>
+                    <td>@i.UsuarioID</td>
+                    <td>@i.Descripcion</td>
+                    <td>
+                        <a href="@i.ArchivoRuta" target="_blank">📄 Ver</a>
+                    </td>
+                    <td>@i.Estado</td>
+                    <td>@i.FechaPresentacion.ToShortDateString()</td>
+                    <td>
+                        <form asp-action="CambiarEstadoIncapacidad" asp-controller="Empleados" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@i.Id" />
+                            <select name="nuevoEstado" class="form-select d-inline w-auto">
+                                <option>Aprobado</option>
+                                <option>Rechazado</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">💾</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">No hay incapacidades registradas.</div>
+}

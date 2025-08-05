@@ -1,0 +1,13 @@
+﻿@model CEGA.Models.ComentarioProyecto
+
+@{
+    ViewData["Title"] = "Resultado de Comentario";
+}
+
+<h2>Comentario Encontrado</h2>
+
+<p><strong>Nombre:</strong> @Model.NombreComentario</p>
+<p><strong>Detalles:</strong> @Model.Detalles</p>
+<p><strong>Fecha de Creación:</strong> @Model.FechaCreacion.ToShortDateString()</p>
+
+<a asp-action="Buscar" asp-route-proyectoId="@Model.ProyectoId" class="btn btn-secondary">Volver a buscar</a>

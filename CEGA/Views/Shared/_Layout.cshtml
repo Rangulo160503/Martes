@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CEGA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CEGA.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #343a40;
+            color: white;
+            flex-shrink: 0;
+        }
+
+            .sidebar .nav-link {
+                color: #ffffff;
+                padding: 12px 15px;
+                display: block;
+            }
+
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active {
+                    background-color: #495057;
+                    color: #ffc107;
+                }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        footer {
+            background-color: #343a40;
+            color: #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        @@media screen and (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .nav-subitem {
+            padding-left: 30px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar d-flex flex-column p-3">
+        <h4 class="text-white text-center mb-4">CEGA</h4>
+
+        <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
+        <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacidad</a>
+
+        <hr class="bg-light" />
+
+        <a class="nav-link" asp-controller="Account" asp-action="GestionUsuarios">Gestión de Usuarios</a>
+
+        <hr class="bg-light" />
+
+        <a class="nav-link" asp-controller="Empleados" asp-action="Empleados">Empleados</a>
+
+        <hr class="bg-light" />
+
+        <a class="nav-link" asp-controller="Marketing" asp-action="Marketing">Marketing</a>
+
+        <hr class="bg-light" />
+
+        <!-- Módulo de Contabilidad -->
+        <div class="text-white small fw-bold px-3 mt-2">Contabilidad</div>
+        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
+        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
+        <a class="nav-link nav-subitem" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
+        <a class="nav-link nav-subitem" asp-controller="Cierres" asp-action="HistorialCierresRango">Reportes Financieros</a>
+
+        <hr class="bg-light" />
+
+        <!-- Módulo de Reportería -->
+        <div class="text-white small fw-bold px-3 mt-2">Reportería</div>
+        <a class="nav-link nav-subitem" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
+        <a class="nav-link nav-subitem" asp-controller="ReporteIncidente" asp-action="Listar">Incidentes</a>
+        <a class="nav-link nav-subitem" asp-controller="ReporteEntradaSalida" asp-action="Listar">Entradas / Salidas</a>
+
+        <hr class="bg-light" />
+
+        <!-- Módulo de Seguimiento -->
+        <div class="text-white small fw-bold px-3 mt-2">Seguimiento</div>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Crear">Crear Proyecto</a>
+        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Buscar">Buscar Proyecto</a>
+
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Index">Ver Tareas</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Crear">Crear Tarea</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Buscar">Buscar Tarea</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="AsignarEmpleado">Asignar Empleado</a>
+        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="ReporteConsolidado">Reporte Consolidado</a>
+
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Index">Ver Comentarios</a>
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Crear">Agregar Comentario</a>
+        <a class="nav-link nav-subitem" asp-controller="Comentario" asp-action="Buscar">Buscar Comentario</a>
+
+                <hr class="bg-light" />
+
+        <!-- Módulo de Documentos PDF -->
+        <div class="text-white small fw-bold px-3 mt-2">Módulo PDF</div>
+        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="ListaPlanos">Lista de Planos</a>
+        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="SubirPlano">Subir Plano</a>
+        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="CompararPlanos">Comparar Planos</a>
+
+
+
+        <hr class="bg-light" />
+
+        <!-- Cuenta actual -->
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <div class="px-3 text-white small">
+                <div class="fw-bold mb-1">Hola @User.Identity.Name</div>
+                <a class="nav-link nav-subitem" asp-controller="Account" asp-action="EditProfile">Editar Perfil</a>
+                <a class="nav-link nav-subitem" asp-controller="Account" asp-action="ForgotPassword">Recuperar Contraseña</a>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
+                    <button type="submit" class="btn btn-sm btn-warning w-100">Cerrar sesión</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="px-3 text-white small">
+                <a asp-controller="Account" asp-action="Login" class="nav-link">Iniciar sesión</a>
+                <a asp-controller="Account" asp-action="Register" class="nav-link">Registrarse</a>
+            </div>
+        }
+    </div>
+
+    <div class="main-content">
+        <main role="main" class="container pb-3">
+            @RenderBody()
+        </main>
+        <footer class="mt-auto">
+            &copy; 2025 - CEGA - <a asp-controller="Home" asp-action="Privacy" class="text-warning">Política de privacidad</a>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

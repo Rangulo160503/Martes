@@ -1,0 +1,38 @@
+﻿@model CEGA.Models.AsignacionTareaEmpleado
+
+@{
+    ViewData["Title"] = "Asignar Empleado a Tarea";
+    var empleados = ViewBag.Empleados as List<CEGA.Models.ApplicationUser>;
+}
+
+@if (empleados == null)
+{
+    <div class="alert alert-danger">
+        No se pudo cargar la información de los empleados.
+    </div>
+}
+else
+{
+    <h2>Asignar Empleado a la Tarea: @ViewBag.TareaNombre del Proyecto: @ViewBag.ProyectoNombre</h2>
+
+    <form asp-action="AsignarEmpleado" method="post">
+        @* Campo oculto para la tarea *@
+        <input type="hidden" asp-for="TareaId" />
+
+        <div class="form-group">
+            <label asp-for="UsuarioId"></label>
+            <select asp-for="UsuarioId" asp-items='new SelectList(empleados, "Id", "UserName")' class="form-control">
+                <option value="">-- Seleccionar empleado --</option>
+            </select>
+            <span asp-validation-for="UsuarioId" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Asignar</button>
+    </form>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

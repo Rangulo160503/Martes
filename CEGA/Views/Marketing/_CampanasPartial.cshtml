@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CEGA.Models.CampMarketing>
+
+<h4 class="mt-4">📢 Campañas Registradas</h4>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Asunto</th>
+                <th>Descripción</th>
+                <th>Imagen</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var camp in Model)
+            {
+                <tr>
+                    <td>@camp.Nombre</td>
+                    <td>@camp.AsuntoCorreo</td>
+                    <td>@camp.Descripcion</td>
+                    <td>
+                        <img src="@camp.ImagenUrl" alt="Imagen Campaña" width="80" height="80" />
+                    </td>
+                    <td>
+                        <form asp-action="EditarCampaña" asp-controller="Marketing" method="post" class="d-inline">
+                            <input type="hidden" name="Id" value="@camp.Id" />
+                            <button type="submit" class="btn btn-sm btn-primary">✏️ Editar</button>
+                        </form>
+
+                        <form asp-action="EliminarCampaña" asp-controller="Marketing" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta campaña?');">
+                            <input type="hidden" name="id" value="@camp.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">🗑️ Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info mt-3">No hay campañas registradas.</div>
+}

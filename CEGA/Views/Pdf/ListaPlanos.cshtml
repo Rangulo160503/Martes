@@ -1,0 +1,67 @@
+﻿@model List<CEGA.Models.Plano>
+
+@{
+    ViewData["Title"] = "Lista de Planos";
+}
+
+<h2 class="mb-4">Lista de Planos Subidos</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<a asp-controller="Pdf" asp-action="SubirPlano" class="btn btn-primary mb-3">+ Nuevo Plano</a>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Disciplina</th>
+                <th>Nombre del Archivo</th>
+                <th>Fecha de Subida</th>
+                <th>Ver</th>
+                <th>Agregar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var plano = Model[i];
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@plano.Disciplina</td>
+                    <td>@plano.NombreArchivo</td>
+                    <td>@plano.FechaSubida.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="VerPlano" asp-route-id="@plano.Id" class="btn btn-sm btn-info">Ver Plano</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Pdf" asp-action="Comentarios" asp-route-id="@plano.Id" class="btn btn-success">Agregar Comentario</a>
+                    </td>
+                    <td>
+                        <form asp-action="EliminarPlano"
+                              asp-controller="Pdf"
+                              method="post"
+                              onsubmit="return confirm('¿Estás seguro de eliminar este plano y todo su contenido?');"
+                              style="display:inline;">
+                            <input type="hidden" name="id" value="@plano.Id" />
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No hay planos subidos.</div>
+}

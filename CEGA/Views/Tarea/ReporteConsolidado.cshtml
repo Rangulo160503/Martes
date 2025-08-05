@@ -1,0 +1,43 @@
+﻿@model List<CEGA.Models.DTOs.ReporteProyectoDTO>
+
+@{
+    ViewData["Title"] = "Reporte Consolidado por Proyecto";
+}
+
+<h2>Reporte Consolidado por Proyecto</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No hay proyectos registrados.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Total de Tareas</th>
+                <th>Tareas Asignadas</th>
+                <th>Tareas Sin Asignar</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.NombreProyecto</td>
+                    <td>@item.TotalTareas</td>
+                    <td>@item.TareasAsignadas</td>
+                    <td>@item.TareasSinAsignar</td>
+                    <td>
+                        <a asp-action="VerAsignaciones" asp-route-proyectoId="@item.ProyectoId" class="btn btn-sm btn-info">Ver asignaciones</a>
+                        <a asp-action="TareasSinAsignar" asp-route-proyectoId="@item.ProyectoId" class="btn btn-sm btn-warning">Tareas sin asignar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

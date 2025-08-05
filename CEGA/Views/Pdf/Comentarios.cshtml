@@ -1,0 +1,65 @@
+﻿@model List<CEGA.Models.ComentarioPlano>
+@{
+    ViewData["Title"] = "Comentarios del Plano";
+    var plano = ViewBag.Plano as CEGA.Models.Plano;
+}
+
+<h2>Comentarios del Plano: @plano?.NombreArchivo</h2>
+
+@if (TempData["mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["mensaje"]</div>
+}
+
+<!-- Formulario para agregar nuevo comentario -->
+<form asp-action="AgregarComentario" method="post">
+    <input type="hidden" name="PlanoId" value="@plano?.Id" />
+
+    <div class="mb-3">
+        <label for="Texto">Nuevo Comentario:</label>
+        <textarea class="form-control" name="Texto" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="CoordenadaX">Coordenada X:</label>
+        <input type="number" step="any" name="CoordenadaX" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="CoordenadaY">Coordenada Y:</label>
+        <input type="number" step="any" name="CoordenadaY" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+</form>
+
+<hr />
+
+<h4>Comentarios existentes:</h4>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Texto</th>
+                <th>Fecha</th>
+                <th>Coordenadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var comentario in Model)
+            {
+                <tr>
+                    <td>@comentario.Texto</td>
+                    <td>@comentario.FechaCreacion.ToString("g")</td>
+                    <td>(@comentario.CoordenadaX, @comentario.CoordenadaY)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay comentarios para este plano aún.</p>
+}

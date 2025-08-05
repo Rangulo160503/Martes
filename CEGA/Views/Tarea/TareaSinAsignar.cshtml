@@ -1,0 +1,40 @@
+﻿@model List<CEGA.Models.TareaProyecto>
+
+@{
+    ViewData["Title"] = "Tareas sin asignar";
+}
+
+<h2>Tareas sin asignar para el proyecto: @ViewBag.ProyectoNombre</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success">
+        Todas las tareas han sido asignadas.
+    </div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre de la tarea</th>
+                <th>Detalles</th>
+                <th>Fechas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tarea in Model)
+            {
+                <tr>
+                    <td>@tarea.NombreTarea</td>
+                    <td>@tarea.Detalles</td>
+                    <td>@tarea.FechaInicio.ToShortDateString() - @tarea.FechaFin.ToShortDateString()</td>
+                    <td>
+                        <a asp-action="AsignarEmpleado" asp-route-tareaId="@tarea.Id" class="btn btn-sm btn-primary">Asignar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

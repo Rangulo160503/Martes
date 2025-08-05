@@ -1,0 +1,39 @@
+﻿@model List<CEGA.Models.AsignacionTareaEmpleado>
+
+@{
+    ViewData["Title"] = "Asignaciones del Proyecto";
+}
+
+<h2>Asignaciones para el proyecto: @ViewBag.ProyectoNombre</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No hay asignaciones de empleados en este proyecto.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Tarea</th>
+                <th>Empleado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asignacion in Model)
+            {
+                <tr>
+                    <td>@asignacion.Tarea.NombreTarea</td>
+                    <td>@asignacion.Usuario.UserName</td>
+                    <td>
+                        <a asp-action="EditarAsignacion" asp-route-id="@asignacion.Id" class="btn btn-sm btn-primary">Editar</a>
+                        <a asp-action="EliminarAsignacion" asp-route-id="@asignacion.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
