@@ -1,64 +1,92 @@
-﻿using CEGA.Data;
+using CEGA.Data;
 using CEGA.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar la conexión a la base de datos
+//  DB
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        connectionString,
-        sqlOptions => sqlOptions.EnableRetryOnFailure()
-    )
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure())
 );
 
-// Configurar Identity con ApplicationUser y habilitar roles
+//  Identity + Roles
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false; // Opcional: desactiva confirmación por correo
+    options.SignIn.RequireConfirmedAccount = false;
 })
-.AddRoles<IdentityRole>() // Habilita gestión de roles
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Mostrar errores detallados de EF Core en desarrollo
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+//  Cookies de autenticación: rutas de login/denegado
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
-// MVC + Razor Pages
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+//  MVC con política global: requiere usuario autenticado en TODO
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
+
+//  Razor Pages: permitir anónimos SOLO a las páginas de autenticación
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
+    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResendEmailConfirmation");
+});
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 var app = builder.Build();
 
-// Middleware HTTP
+//  Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint(); // Página de errores de migración
+    app.UseMigrationsEndPoint();
 }
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts(); // Seguridad HTTPS
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.UseAuthentication(); // Login, cookies, tokens
-app.UseAuthorization();  // Roles y acceso
+//  Redirección raíz: si no hay sesión → Login; si hay sesión → Home
+app.MapGet("/", context =>
+{
+    if (context.User?.Identity?.IsAuthenticated == true)
+        context.Response.Redirect("/Home/Index");
+    else
+        context.Response.Redirect("/Identity/Account/Login");
+    return Task.CompletedTask;
+});
 
-// Rutas por defecto
+// Rutas MVC y Razor Pages
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Ejecutar el seeding para crear usuario admin y roles si no existen
+//  Seeding (roles/usuario admin si aplica)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

@@ -1,22 +1,238 @@
+/* ===== CEGA Global Styles - Gris + Verde Bosque ===== */
+
+/* Paleta */
+:root {
+    --bg: #f0f0f0; /* fondo general gris claro */
+    --text: #212529; /* texto principal */
+    --muted: #6c757d; /* texto secundario */
+
+    --brand-dark: #1B4332; /* verde bosque oscuro */
+    --brand-mid: #2D6A4F; /* verde intermedio */
+    --brand-light: #52B788; /* verde claro para hover */
+
+    --accent: #F4A261; /* naranja suave para acentos y botones */
+    --accent-hover: #E76F51; /* naranja más intenso para hover */
+
+    --border: #dcdfe3; /* bordes suaves */
+    --surface: #ffffff; /* superficies (cards, tablas, etc) */
+    --shadow: 0 8px 20px rgba(0,0,0,.06);
+}
+
+/* Tipografía base */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+@media (min-width:768px) {
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol",sans-serif;
+}
+
+/* Layout general */
+.sidebar {
+    width: 240px;
+    background: var(--brand-dark);
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+    .sidebar .nav-link {
+        color: #fff;
+        padding: .65rem .85rem;
+        border-radius: .5rem;
+        display: block;
+        transition: all .15s ease;
+    }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: var(--brand-mid);
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+    .sidebar .nav-subitem {
+        padding-left: 1.5rem;
+        font-size: .95rem;
+        opacity: .95;
+    }
+
+    .sidebar hr {
+        border-color: rgba(255,255,255,.15);
+        margin: .75rem 0 1rem;
+    }
+
+    .sidebar h4 {
+        margin: 0 0 .75rem 0;
+        letter-spacing: .5px;
+    }
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+main.container {
+    background: transparent;
+}
+
+footer {
+    margin-top: auto;
+    background: var(--brand-dark);
+    color: #ccc;
+    text-align: center;
+    padding: .75rem;
+}
+
+    footer a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        padding-left: 0;
+    }
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--shadow);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+    .card .card-header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-weight: 600;
+    }
+
+/* Botones */
+.btn {
+    border-radius: .7rem;
+}
+
+.btn-primary {
+    background: var(--brand-mid);
+    border-color: var(--brand-mid);
+}
+
+    .btn-primary:hover {
+        background: var(--brand-light);
+        border-color: var(--brand-light);
+    }
+
+.btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+    .btn-accent:hover {
+        background: var(--accent-hover);
+        border-color: var(--accent-hover);
+    }
+
+.btn-outline-primary {
+    color: var(--brand-mid);
+    border-color: var(--brand-mid);
+}
+
+    .btn-outline-primary:hover {
+        background: var(--brand-mid);
+        border-color: var(--brand-mid);
+        color: #fff;
+    }
+
+/* Inputs y focus */
+.form-control, .form-select {
+    border-radius: .6rem;
+    border: 1px solid #dcdfe3;
+}
+
+    .form-control:focus, .form-select:focus, .form-check-input:focus, .btn:focus, .btn:active:focus, .btn-link.nav-link:focus {
+        outline: none;
+        box-shadow: 0 0 0 .15rem rgba(27,67,50,.15), 0 0 0 .3rem rgba(82,183,136,.15);
+        border-color: var(--brand-light);
+    }
+
+/* Enlaces */
+a {
+    color: var(--brand-mid);
+}
+
+    a:hover {
+        color: var(--brand-light);
+    }
+
+/* Badges */
+.badge {
+    border-radius: 999px;
+    padding: .4rem .65rem;
+    font-weight: 600;
+}
+
+.bg-success {
+    background: var(--brand-mid) !important;
+}
+
+.bg-danger {
+    background: #dc3545 !important;
+}
+
+.bg-warning {
+    background: var(--accent) !important;
+    color: #1f2937;
+}
+
+/* Tablas */
+.table {
+    --bs-table-color: var(--text);
+    --bs-table-striped-bg: #f3f5f7;
+    --bs-table-hover-bg: #eef1f4;
+    border-color: var(--border);
+}
+
+    .table thead th {
+        background: #fff;
+        border-bottom: 2px solid var(--border);
+        font-weight: 600;
+    }
+
+/* Alertas */
+.alert {
+    border-radius: .75rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
 }

@@ -76,13 +76,12 @@ namespace CEGA.Controllers
         public async Task<IActionResult> VerArchivoPlano(int id)
         {
             var plano = await _context.Planos.FindAsync(id);
-            if (plano == null || plano.Archivo == null)
-            {
+            if (plano == null || plano.Archivo == null || plano.Archivo.Length == 0)
                 return NotFound();
-            }
 
             return File(plano.Archivo, "application/pdf");
         }
+
 
 
         // GET: Pdf/ListaPlanos
@@ -135,8 +134,8 @@ namespace CEGA.Controllers
                 return RedirectToAction("CompararPlanos");
             }
 
-            var p1 = await _context.Planos.FindAsync(plano1);
-            var p2 = await _context.Planos.FindAsync(plano2);
+            var p1 = await _context.Planos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == plano1);
+            var p2 = await _context.Planos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == plano2);
 
             if (p1 == null || p2 == null)
             {
@@ -144,11 +143,21 @@ namespace CEGA.Controllers
                 return RedirectToAction("CompararPlanos");
             }
 
-            ViewData["Plano1"] = p1;
-            ViewData["Plano2"] = p2;
+            // endpoint que sirve el PDF inline
+            var src1 = Url.Action(nameof(VerArchivoPlano), new { id = plano1 })!;
+            var src2 = Url.Action(nameof(VerArchivoPlano), new { id = plano2 })!;
 
-            return View("ResultadoComparacion");
+            var vm = new ResultadoComparacionVM
+            {
+                Titulo1 = p1.NombreArchivo,
+                Titulo2 = p2.NombreArchivo,
+                Src1 = src1,
+                Src2 = src2
+            };
+
+            return View("ResultadoComparacion", vm);
         }
+
 
         // GET: Pdf/Comentarios/5
         public async Task<IActionResult> Comentarios(int id)

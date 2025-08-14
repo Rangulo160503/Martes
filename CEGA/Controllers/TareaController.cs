@@ -255,23 +255,35 @@ namespace CEGA.Controllers
         [HttpGet]
         public IActionResult ReporteConsolidado()
         {
-            var proyectos = _context.Proyectos.ToList();
-            var tareas = _context.TareasProyecto.ToList();
-            var asignaciones = _context.AsignacionesTareaEmpleado.ToList();
-
-            var reporte = proyectos.Select(p => new ReporteProyectoDTO
-            {
-                ProyectoId = p.Id,
-                NombreProyecto = p.Nombre,
-                TotalTareas = tareas.Count(t => t.ProyectoId == p.Id),
-                TareasAsignadas = asignaciones
-                    .Where(a => a.Tarea != null && a.Tarea.ProyectoId == p.Id)
-                    .Select(a => a.TareaId)
-                    .Distinct()
-                    .Count()
-            }).ToList();
+            var reporte = _context.Proyectos
+                .GroupJoin(
+                    _context.TareasProyecto,
+                    p => p.Id,
+                    t => t.ProyectoId,
+                    (p, tareas) => new { p, tareas }
+                )
+                .Select(x => new ReporteProyectoDTO
+                {
+                    ProyectoId = x.p.Id,
+                    NombreProyecto = x.p.Nombre,
+                    TotalTareas = x.tareas.Count(),
+                    TareasAsignadas = x.tareas
+                        .GroupJoin(
+                            _context.AsignacionesTareaEmpleado,
+                            t => t.Id,
+                            a => a.TareaId,
+                            (t, asigns) => asigns.Select(a => a.TareaId)
+                        )
+                        .SelectMany(ids => ids)
+                        .Distinct()
+                        .Count()
+                })
+                .OrderBy(r => r.NombreProyecto)
+                .ToList();
 
             return View(reporte);
         }
+
+
     }
 }
