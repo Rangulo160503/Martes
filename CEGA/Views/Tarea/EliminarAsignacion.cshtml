@@ -7,11 +7,16 @@
 <h2>Eliminar Asignación</h2>
 
 <div class="alert alert-warning">
-    <p>¿Estás seguro que querés eliminar la asignación del empleado <strong>@Model.Usuario.UserName</strong> a la tarea <strong>@Model.Tarea.NombreTarea</strong>?</p>
+    <p>
+        ¿Estás seguro que querés eliminar la asignación del empleado
+        <strong>@Model.Usuario.UserName</strong> a la tarea
+        <strong>@Model.Tarea.NombreTarea</strong>?
+    </p>
 </div>
 
 <form asp-action="EliminarAsignacionConfirmado" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
     <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-    <a asp-action="Index" asp-controller="Proyecto" class="btn btn-secondary">Cancelar</a>
+    <a asp-action="VerAsignaciones" asp-route-proyectoId="@Model.Tarea.ProyectoId" class="btn btn-secondary">Cancelar</a>
 </form>

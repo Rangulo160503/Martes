@@ -15,24 +15,34 @@ else
 {
     <h2>Asignar Empleado a la Tarea: @ViewBag.TareaNombre del Proyecto: @ViewBag.ProyectoNombre</h2>
 
-    <form asp-action="AsignarEmpleado" method="post">
-        @* Campo oculto para la tarea *@
+    <form asp-action="AsignarEmpleado" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="TareaId" />
 
-        <div class="form-group">
-            <label asp-for="UsuarioId"></label>
-            <select asp-for="UsuarioId" asp-items='new SelectList(empleados, "Id", "UserName")' class="form-control">
+        <div class="col-md-6">
+            <label asp-for="UsuarioId" class="form-label"></label>
+            <select asp-for="UsuarioId"
+                    asp-items='new SelectList(empleados, "Id", "UserName")'
+                    class="form-select">
                 <option value="">-- Seleccionar empleado --</option>
             </select>
             <span asp-validation-for="UsuarioId" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Asignar</button>
+        <div class="col-12">
+            <label asp-for="Comentario" class="form-label">Comentario</label>
+            <textarea asp-for="Comentario" class="form-control" rows="3"
+                      placeholder="Instrucciones o notas para el empleado"></textarea>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Asignar</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+        </div>
     </form>
 }
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

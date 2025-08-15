@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Seleccionar proyecto";
+}
+<h2>Seleccionar proyecto para crear tarea</h2>
+
+<form asp-action="Crear" method="get" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Proyecto</label>
+        <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos" required>
+            <option value="">— Seleccione —</option>
+        </select>
+    </div>
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">Continuar</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>

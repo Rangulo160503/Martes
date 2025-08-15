@@ -20,41 +20,43 @@ namespace CEGA.Controllers
         public IActionResult Index()
         {
             var tareas = _context.TareasProyecto.Include(t => t.Proyecto).ToList();
+
+            ViewBag.Proyectos = new SelectList(_context.Proyectos.OrderBy(p => p.Nombre), "Id", "Nombre");
+            ViewBag.Empleados = new SelectList(_context.Users.OrderBy(u => u.UserName), "Id", "UserName");
+
+
             return View(tareas);
         }
 
         [HttpGet]
         public IActionResult Crear(int? proyectoId)
         {
-            if (proyectoId == null || !_context.Proyectos.Any(p => p.Id == proyectoId))
+            // Si viene desde el menú (sin proyecto), mostrar selector
+            if (!proyectoId.HasValue || !_context.Proyectos.Any(p => p.Id == proyectoId.Value))
             {
-                TempData["error"] = "Proyecto no válido.";
-                return RedirectToAction("Index", "Proyecto");
+                ViewBag.Proyectos = new SelectList(_context.Proyectos.OrderBy(p => p.Nombre), "Id", "Nombre");
+                return View("SeleccionarProyectoParaTarea");
             }
 
-            var tarea = new TareaProyecto
-            {
-                ProyectoId = proyectoId.Value
-            };
-
-            ViewBag.NombreProyecto = _context.Proyectos.FirstOrDefault(p => p.Id == proyectoId)?.Nombre;
-            return View(tarea);
+            var tarea = new TareaProyecto { ProyectoId = proyectoId.Value };
+            ViewBag.NombreProyecto = _context.Proyectos.Where(p => p.Id == proyectoId).Select(p => p.Nombre).FirstOrDefault();
+            return View(tarea); // Views/Tarea/Crear.cshtml
         }
 
-
         [HttpPost]
-        public IActionResult Crear(TareaProyecto tarea)
+        [ValidateAntiForgeryToken]
+        public IActionResult Crear(TareaProyecto tarea, bool asignar = false)
         {
             var proyecto = _context.Proyectos.FirstOrDefault(p => p.Id == tarea.ProyectoId);
             if (proyecto == null)
             {
                 TempData["error"] = "Proyecto inválido.";
-                return RedirectToAction("Index", "Proyecto");
+                return RedirectToAction(nameof(Crear)); // vuelve al selector
             }
 
             if (!ModelState.IsValid)
             {
-                ViewBag.ProyectoNombre = proyecto.Nombre;
+                ViewBag.NombreProyecto = proyecto.Nombre;
                 return View(tarea);
             }
 
@@ -62,12 +64,13 @@ namespace CEGA.Controllers
             _context.SaveChanges();
 
             TempData["mensaje"] = "Tarea creada correctamente.";
-            return RedirectToAction("Index", "Proyecto");
+
+            // Botón "Crear y asignar empleado"
+            if (asignar)
+                return RedirectToAction(nameof(AsignarEmpleado), new { tareaId = tarea.Id });
+
+            return RedirectToAction(nameof(Index));
         }
-
-
-
-
 
         [HttpGet]
         public IActionResult Editar(int id)
@@ -108,21 +111,33 @@ namespace CEGA.Controllers
             return RedirectToAction("Index");
         }
 
+        // using CEGA.Models.ViewModels;
+        // using Microsoft.AspNetCore.Mvc.Rendering;
+
         [HttpGet]
         public IActionResult AsignarEmpleado(int? tareaId)
         {
             if (tareaId == null)
             {
-                TempData["mensaje"] = "No se proporcionó la tarea a asignar.";
-                return RedirectToAction("Index");
+                var tareas = _context.TareasProyecto
+                    .Include(t => t.Proyecto)
+                    .Select(t => new
+                    {
+                        t.Id,
+                        Nombre = t.NombreTarea + " — " + (t.Proyecto != null ? t.Proyecto.Nombre : "Sin proyecto")
+                    })
+                    .OrderBy(x => x.Nombre)
+                    .ToList();
+
+                ViewBag.Tareas = new SelectList(tareas, "Id", "Nombre");
+                return View("SeleccionarTareaParaAsignar", new CEGA.Models.ViewModels.SeleccionarTareaVM());
             }
 
             var tarea = _context.TareasProyecto
                 .Include(t => t.Proyecto)
                 .FirstOrDefault(t => t.Id == tareaId.Value);
 
-            if (tarea == null)
-                return NotFound();
+            if (tarea == null) return NotFound();
 
             ViewBag.Tarea = tarea;
             ViewBag.TareaId = tarea.Id;
@@ -131,6 +146,29 @@ namespace CEGA.Controllers
             ViewBag.Empleados = _context.Users.ToList();
 
             return View(new AsignacionTareaEmpleado { TareaId = tarea.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SeleccionarTareaParaAsignar(CEGA.Models.ViewModels.SeleccionarTareaVM vm)
+        {
+            if (!ModelState.IsValid || !_context.TareasProyecto.Any(t => t.Id == vm.TareaId))
+            {
+                var tareas = _context.TareasProyecto
+                    .Include(t => t.Proyecto)
+                    .Select(t => new
+                    {
+                        t.Id,
+                        Nombre = t.NombreTarea + " — " + (t.Proyecto != null ? t.Proyecto.Nombre : "Sin proyecto")
+                    })
+                    .OrderBy(x => x.Nombre)
+                    .ToList();
+
+                ViewBag.Tareas = new SelectList(tareas, "Id", "Nombre");
+                return View("SeleccionarTareaParaAsignar", vm);
+            }
+
+            return RedirectToAction(nameof(AsignarEmpleado), new { tareaId = vm.TareaId });
         }
 
         [HttpPost]
@@ -194,22 +232,36 @@ namespace CEGA.Controllers
         }
 
         [HttpGet]
-        public IActionResult VerAsignaciones(int proyectoId)
+        public IActionResult VerAsignaciones(int? proyectoId)
         {
-            var proyecto = _context.Proyectos.FirstOrDefault(p => p.Id == proyectoId);
-            if (proyecto == null)
-                return NotFound();
+            // Filtro (dropdown) de proyectos
+            var proyectos = _context.Proyectos
+                .OrderBy(p => p.Nombre)
+                .ToList();
+            ViewBag.Proyectos = new SelectList(proyectos, "Id", "Nombre", proyectoId);
 
-            var asignaciones = _context.AsignacionesTareaEmpleado
-                .Include(a => a.Tarea)
+            // Query base
+            var query = _context.AsignacionesTareaEmpleado
+                .Include(a => a.Tarea).ThenInclude(t => t.Proyecto)
                 .Include(a => a.Usuario)
-                .Where(a => a.Tarea.ProyectoId == proyectoId)
+                .AsQueryable();
+
+            if (proyectoId.HasValue)
+            {
+                query = query.Where(a => a.Tarea.ProyectoId == proyectoId.Value);
+                ViewBag.ProyectoNombre = proyectos.FirstOrDefault(p => p.Id == proyectoId.Value)?.Nombre;
+            }
+            else
+            {
+                ViewBag.ProyectoNombre = "Todos los proyectos";
+            }
+
+            var asignaciones = query
+                .OrderByDescending(a => a.FechaAsignacion)
+                .ThenByDescending(a => a.Id)
                 .ToList();
 
-            ViewBag.ProyectoNombre = proyecto.Nombre;
-            ViewBag.ProyectoId = proyecto.Id;
-
-            return View(asignaciones);
+            return View(asignaciones); // usa tu misma vista VerAsignaciones.cshtml
         }
 
         [HttpGet]
@@ -281,7 +333,74 @@ namespace CEGA.Controllers
             return View(reporte);
         }
 
+        // GET: Eliminar asignación (muestra la confirmación)
+        [HttpGet]
+        public IActionResult EliminarAsignacion(int id)
+        {
+            var asign = _context.AsignacionesTareaEmpleado
+                                .Include(a => a.Tarea).ThenInclude(t => t.Proyecto)
+                                .Include(a => a.Usuario)
+                                .FirstOrDefault(a => a.Id == id);
+            if (asign == null) return NotFound();
 
+            return View(asign);
+        }
 
+        // POST: confirmar eliminación (coincide con tu asp-action="EliminarAsignacionConfirmado")
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EliminarAsignacionConfirmado(int id)
+        {
+            var asign = _context.AsignacionesTareaEmpleado
+                                .Include(a => a.Tarea)
+                                .FirstOrDefault(a => a.Id == id);
+            if (asign == null) return NotFound();
+
+            var proyectoId = asign.Tarea.ProyectoId;
+
+            _context.AsignacionesTareaEmpleado.Remove(asign);
+            _context.SaveChanges();
+
+            TempData["mensaje"] = "Asignación eliminada.";
+            return RedirectToAction(nameof(VerAsignaciones), new { proyectoId });
+        }
+        [HttpGet]
+        public IActionResult Buscar(string q)
+        {
+            q = (q ?? "").Trim();
+
+            var query = _context.TareasProyecto
+                .Include(t => t.Proyecto)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                // Busca en nombre de tarea, detalles y nombre de proyecto
+                query = query.Where(t =>
+                    EF.Functions.Like(t.NombreTarea, $"%{q}%") ||
+                    EF.Functions.Like(t.Detalles ?? "", $"%{q}%") ||
+                    EF.Functions.Like(t.Proyecto.Nombre, $"%{q}%"));
+            }
+
+            var resultados = query
+                .OrderBy(t => t.Proyecto.Nombre)
+                .ThenBy(t => t.NombreTarea)
+                .Take(200)
+                .ToList();
+
+            ViewBag.Q = q;
+            // (opcional) combos si quieres reusar botones en esta pantalla
+            ViewBag.Proyectos = new SelectList(_context.Proyectos.OrderBy(p => p.Nombre), "Id", "Nombre");
+            ViewBag.Empleados = new SelectList(_context.Users.OrderBy(u => u.UserName), "Id", "UserName");
+
+            return View(resultados); // -> Views/Tarea/Buscar.cshtml
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Buscar(int? proyectoId, string? nombreTarea)
+        {
+            // Redirige al GET para evitar reenvío de formularios y soportar tu vista antigua
+            return RedirectToAction(nameof(Buscar), new { q = nombreTarea, proyectoId });
+        }
     }
 }

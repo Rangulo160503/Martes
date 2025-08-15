@@ -94,11 +94,26 @@ namespace CEGA.Controllers
             return RedirectToAction("Listar");
         }
         [HttpGet]
-        public IActionResult Listar()
+        public IActionResult Listar(int? mes, int? anio)
         {
-            var reportes = _context.ReportesEntradasSalidas.ToList();
+            var hoy = DateTime.Now;
+            int m = mes ?? 8;                // por defecto agosto
+            int y = anio ?? hoy.Year;        // por defecto año actual
+
+            var inicioMes = new DateTime(y, m, 1);
+            var finMesExcl = inicioMes.AddMonths(1); // [inicio, fin)
+
+            // Trae registros cuyo intervalo [FechaInicio, FechaFin] se cruza con el mes
+            var reportes = _context.ReportesEntradasSalidas
+                .Where(r => r.FechaInicio < finMesExcl && r.FechaFin >= inicioMes)
+                .OrderBy(r => r.FechaInicio)
+                .ToList();
+
+            ViewBag.Mes = m;
+            ViewBag.Anio = y;
             return View(reportes);
         }
+
 
     }
 }

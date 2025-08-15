@@ -9,12 +9,11 @@ namespace CEGA.Models
 
         [Required]
         public int TareaId { get; set; }
-
         public TareaProyecto Tarea { get; set; }
-
         [Required(ErrorMessage = "Se necesita seleccionar un empleado")]
-        public string UsuarioId { get; set; } // Suponiendo que usás Identity
-
-        public ApplicationUser Usuario { get; set; } // Relación con tabla de usuarios
+        public string UsuarioId { get; set; }
+        public ApplicationUser Usuario { get; set; }
+        public string? Comentario { get; set; }
+        public DateTime FechaAsignacion { get; set; } = DateTime.Now;
     }
 }

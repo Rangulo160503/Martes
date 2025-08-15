@@ -11,7 +11,9 @@
     <div class="alert alert-success">@TempData["Mensaje"]</div>
 }
 
-<a asp-action="Crear" class="btn btn-primary mb-3">Agregar nueva incapacidad</a>
+<a asp-controller="ReporteIncapacidad" asp-action="Crear" class="btn btn-primary mb-3">
+    Agregar nueva incapacidad
+</a>
 
 <table class="table table-striped">
     <thead>

@@ -1,36 +1,34 @@
 ﻿@model CEGA.Models.ComentarioProyecto
 
-@{
-    ViewData["Title"] = "Agregar Comentario";
-}
+<h2>Agregar comentario al proyecto</h2>
 
-<h2>Agregar Comentario al Proyecto: @ViewBag.ProyectoNombre</h2>
+<form asp-action="Crear" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProyectoId" value="@ViewBag.ProyectoId" />
 
-<form asp-action="Crear" method="post">
-    <input type="hidden" asp-for="ProyectoId" />
+    <div class="col-12">
+        <label class="form-label">Proyecto</label>
+        <input class="form-control" value="@ViewBag.ProyectoNombre" disabled />
+    </div>
 
-    <div>
-        <label>Nombre del Comentario</label>
-        <input asp-for="NombreComentario" />
+    <div class="col-12">
+        <label asp-for="NombreComentario" class="form-label"></label>
+        <input asp-for="NombreComentario" class="form-control" />
         <span asp-validation-for="NombreComentario" class="text-danger"></span>
     </div>
 
-    <div>
-        <label>Detalles</label>
-        <textarea asp-for="Detalles"></textarea>
+    <div class="col-12">
+        <label asp-for="Detalles" class="form-label"></label>
+        <textarea asp-for="Detalles" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Detalles" class="text-danger"></span>
     </div>
 
-    <button type="submit">Agregar Comentario</button>
+    <div class="col-12">
+        <button class="btn btn-success" type="submit">Guardar</button>
+        <a asp-controller="Proyecto" asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
 </form>
 
-@if (!ViewData.ModelState.IsValid && ViewData.ModelState[""].Errors.Count > 0)
-{
-    <p class="text-danger">@ViewData.ModelState[""].Errors[0].ErrorMessage</p>
-}
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

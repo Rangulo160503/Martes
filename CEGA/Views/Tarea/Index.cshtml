@@ -6,15 +6,39 @@
 
 <h2>Listado de Tareas</h2>
 
-<div class="mb-3">
-    <a class="btn btn-success btn-sm" asp-action="Crear">Crear Tarea</a>
-    <a class="btn btn-info btn-sm" asp-action="Buscar">Buscar Tarea</a>
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <!-- Crear Tarea (elige proyecto) -->
+    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearTarea">
+        Crear Tarea
+    </button>
+
+    <!-- Buscar Tarea (texto libre) -->
+    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalBuscarTarea">
+        Buscar Tarea
+    </button>
+
+    <!-- Asignar Empleado (si quieres puedes seguir directo, pero aquí lo ponemos con selector de tarea) -->
     <a class="btn btn-secondary btn-sm" asp-action="AsignarEmpleado">Asignar Empleado</a>
+
+    <!-- Reporte Consolidado (no requiere parámetros) -->
     <a class="btn btn-dark btn-sm" asp-action="ReporteConsolidado">Reporte Consolidado</a>
-    <a class="btn btn-primary btn-sm" asp-action="TareaSinAsignar">Tareas Sin Asignar</a>
-    <a class="btn btn-primary btn-sm" asp-action="TareasPorEmpleado">Tareas por Empleado</a>
-    <a class="btn btn-primary btn-sm" asp-action="VerAsignaciones">Ver Asignaciones</a>
+
+    <!-- Tareas Sin Asignar (elige proyecto) -->
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasSinAsignar">
+        Tareas Sin Asignar
+    </button>
+
+    <!-- Tareas por Empleado (elige empleado) -->
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasPorEmpleado">
+        Tareas por Empleado
+    </button>
+
+    <!-- Ver Asignaciones (opcionalmente filtrar por proyecto) -->
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerAsignaciones">
+        Ver Asignaciones
+    </button>
 </div>
+
 
 <table class="table table-striped">
     <thead>
@@ -44,3 +68,121 @@
         }
     </tbody>
 </table>
+
+@* CREAR TAREA: pide Proyecto *@
+<div class="modal fade" id="modalCrearTarea" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" asp-action="Crear">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Proyecto</label>
+                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
+                        <option value="">— Seleccione —</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-success" type="submit">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* BUSCAR TAREA: texto libre *@
+<div class="modal fade" id="modalBuscarTarea" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" asp-action="Buscar">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buscar Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Texto a buscar</label>
+                    <input name="q" class="form-control" placeholder="Nombre, detalles o proyecto..." />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-info" type="submit">Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* TAREAS SIN ASIGNAR: pide Proyecto *@
+<div class="modal fade" id="modalTareasSinAsignar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" asp-action="TareasSinAsignar">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tareas Sin Asignar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Proyecto</label>
+                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
+                        <option value="">— Seleccione —</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Ver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* TAREAS POR EMPLEADO: pide Empleado *@
+<div class="modal fade" id="modalTareasPorEmpleado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" asp-action="TareasPorEmpleado">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tareas por Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Empleado</label>
+                    <select name="usuarioId" class="form-select" asp-items="ViewBag.Empleados">
+                        <option value="">— Seleccione —</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Ver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* VER ASIGNACIONES: opcional Proyecto *@
+<div class="modal fade" id="modalVerAsignaciones" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="get" asp-action="VerAsignaciones">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ver Asignaciones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Proyecto (opcional)</label>
+                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Ver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,8 @@
 ﻿using CEGA.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CEGA.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace CEGA.Controllers
 {
@@ -16,28 +17,49 @@ namespace CEGA.Controllers
 
         // GET: Comentario/Crear?proyectoId=5
         [HttpGet]
-        public IActionResult Crear(int proyectoId)
+        public IActionResult Crear(int? proyectoId)   // <-- ahora nullable
         {
-            var proyecto = _context.Proyectos.Find(proyectoId);
+            // Si no viene proyectoId, muestra selector
+            if (!proyectoId.HasValue || !_context.Proyectos.Any(p => p.Id == proyectoId.Value))
+            {
+                var proyectos = _context.Proyectos
+                                        .OrderBy(p => p.Nombre)
+                                        .ToList();
+                ViewBag.Proyectos = new SelectList(proyectos, "Id", "Nombre");
+                return View("SeleccionarProyectoParaComentario"); // nueva vista (abajo)
+            }
+
+            var proyecto = _context.Proyectos.Find(proyectoId.Value);
             if (proyecto == null) return NotFound();
 
             ViewBag.ProyectoId = proyecto.Id;
             ViewBag.ProyectoNombre = proyecto.Nombre;
-            return View();
+            return View(); // Views/Comentario/Crear.cshtml
         }
 
         // POST: Comentario/Crear
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Crear(ComentarioProyecto comentario)
         {
-            if (string.IsNullOrWhiteSpace(comentario.NombreComentario) && string.IsNullOrWhiteSpace(comentario.Detalles))
+            if (string.IsNullOrWhiteSpace(comentario.NombreComentario) &&
+                string.IsNullOrWhiteSpace(comentario.Detalles))
             {
                 ModelState.AddModelError(string.Empty, "Se necesita llenar todo el formulario");
+                // Volver a poner datos de proyecto por si hubo error
+                var proyecto = _context.Proyectos.Find(comentario.ProyectoId);
+                ViewBag.ProyectoId = proyecto?.Id;
+                ViewBag.ProyectoNombre = proyecto?.Nombre;
                 return View(comentario);
             }
 
             if (!ModelState.IsValid)
+            {
+                var proyecto = _context.Proyectos.Find(comentario.ProyectoId);
+                ViewBag.ProyectoId = proyecto?.Id;
+                ViewBag.ProyectoNombre = proyecto?.Nombre;
                 return View(comentario);
+            }
 
             _context.ComentariosProyecto.Add(comentario);
             _context.SaveChanges();

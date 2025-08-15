@@ -8,17 +8,18 @@
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        No hay asignaciones de empleados en este proyecto.
-    </div>
+    <div class="alert alert-info">No hay asignaciones para el criterio seleccionado.</div>
 }
 else
 {
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Proyecto</th>
                 <th>Tarea</th>
                 <th>Empleado</th>
+                <th>Comentario</th>
+                <th>Fecha asignación</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -26,9 +27,12 @@ else
             @foreach (var asignacion in Model)
             {
                 <tr>
-                    <td>@asignacion.Tarea.NombreTarea</td>
-                    <td>@asignacion.Usuario.UserName</td>
-                    <td>
+                    <td>@asignacion.Tarea?.Proyecto?.Nombre</td>
+                    <td>@asignacion.Tarea?.NombreTarea</td>
+                    <td>@asignacion.Usuario?.UserName</td>
+                    <td>@(string.IsNullOrWhiteSpace(asignacion.Comentario) ? "—" : asignacion.Comentario)</td>
+                    <td>@asignacion.FechaAsignacion.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td class="d-flex gap-1">
                         <a asp-action="EditarAsignacion" asp-route-id="@asignacion.Id" class="btn btn-sm btn-primary">Editar</a>
                         <a asp-action="EliminarAsignacion" asp-route-id="@asignacion.Id" class="btn btn-sm btn-danger">Eliminar</a>
                     </td>

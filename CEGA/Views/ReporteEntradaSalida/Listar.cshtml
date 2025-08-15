@@ -1,4 +1,36 @@
 ﻿@model List<CEGA.Models.ReporteEntradaSalida>
+@{
+    var mesSel = (int)(ViewBag.Mes ?? 8);
+    var anioSel = (int)(ViewBag.Anio ?? DateTime.Now.Year);
+}
+
+<form method="get" asp-action="Listar" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="mes" class="form-select">
+            @for (int i = 1; i <= 12; i++)
+            {
+                var nombreMes = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i);
+                <option value="@i" selected="@(i == mesSel)">@nombreMes</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="number" name="anio" class="form-control" value="@anioSel" min="2000" max="2100" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a class="btn btn-outline-secondary"
+           asp-action="Listar"
+           asp-route-mes="8"
+           asp-route-anio="@DateTime.Now.Year">
+            Agosto @DateTime.Now.Year
+        </a>
+    </div>
+    <div class="col-auto align-self-center">
+        <span class="text-muted">(@Model?.Count ?? 0) resultados</span>
+    </div>
+</form>
+
 
 <table class="table table-striped">
     <thead>
@@ -12,19 +44,32 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var reporte in Model)
+        @if (Model == null || !Model.Any())
         {
             <tr>
-                <td>@reporte.NombreReporte</td>
-                <td>@reporte.RolSeleccionado</td>
-                <td>@reporte.Movimiento</td>
-                <td>@reporte.FechaInicio.ToShortDateString()</td>
-                <td>@reporte.FechaFin.ToShortDateString()</td>
-                <td>
-                    <a asp-action="Editar" asp-route-id="@reporte.Id" class="btn btn-warning btn-sm">Editar</a>
-                    <a asp-action="Eliminar" asp-route-id="@reporte.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                <td colspan="6" class="text-center text-muted">
+                    No hay registros para el rango seleccionado.
                 </td>
             </tr>
+        }
+        else
+        {
+            @foreach (var reporte in Model)
+            {
+                <tr>
+                    <td>@reporte.NombreReporte</td>
+                    <td>@reporte.RolSeleccionado</td>
+                    <td>
+                        <span class="badge bg-info">@reporte.Movimiento</span>
+                    </td>
+                    <td>@reporte.FechaInicio.ToString("dd/MM/yyyy")</td>
+                    <td>@reporte.FechaFin.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@reporte.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <a asp-action="Eliminar" asp-route-id="@reporte.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>

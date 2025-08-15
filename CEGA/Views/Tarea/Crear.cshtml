@@ -2,48 +2,50 @@
 
 <h2>Crear Tarea</h2>
 
-@if (TempData["error"] != null)
-{
-    <div class="alert alert-danger">@TempData["error"]</div>
-}
-
 <form asp-action="Crear" method="post">
-    <input type="hidden" asp-for="ProyectoId" />
+    @Html.AntiForgeryToken()
 
-    <div class="form-group">
-        <label>Proyecto:</label>
+    <input type="hidden" asp-for="ProyectoId" />
+    <input type="hidden" name="asignar" id="asignar" value="false" />
+
+    <div class="mb-3">
+        <label class="form-label">Proyecto</label>
         <input class="form-control" value="@ViewBag.NombreProyecto" disabled />
     </div>
 
-    <div class="form-group">
-        <label asp-for="NombreTarea"></label>
+    <div class="mb-3">
+        <label asp-for="NombreTarea" class="form-label"></label>
         <input asp-for="NombreTarea" class="form-control" />
         <span asp-validation-for="NombreTarea" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Detalles"></label>
+    <div class="mb-3">
+        <label asp-for="Detalles" class="form-label"></label>
         <textarea asp-for="Detalles" class="form-control"></textarea>
         <span asp-validation-for="Detalles" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="FechaInicio"></label>
-        <input asp-for="FechaInicio" type="date" class="form-control" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="FechaInicio" class="form-label"></label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="FechaFin" class="form-label"></label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+            <span asp-validation-for="FechaFin" class="text-danger"></span>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="FechaFin"></label>
-        <input asp-for="FechaFin" type="date" class="form-control" />
-        <span asp-validation-for="FechaFin" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Crear Tarea</button>
+    <button type="submit" class="btn btn-primary">Crear</button>
+    <button type="submit" class="btn btn-success"
+            onclick="document.getElementById('asignar').value='true'">
+        Crear y asignar empleado
+    </button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
