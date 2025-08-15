@@ -255,34 +255,32 @@ namespace CEGA.Controllers
         [HttpGet]
         public IActionResult ReporteConsolidado()
         {
-            var reporte = _context.Proyectos
+            var reporte = _context.TareasProyecto
+                .Include(t => t.Proyecto)
                 .GroupJoin(
-                    _context.TareasProyecto,
-                    p => p.Id,
-                    t => t.ProyectoId,
-                    (p, tareas) => new { p, tareas }
+                    _context.AsignacionesTareaEmpleado,   // une asignaciones por tarea
+                    t => t.Id,
+                    a => a.TareaId,
+                    (t, asigns) => new { t, asigns }
                 )
-                .Select(x => new ReporteProyectoDTO
+                .GroupBy(x => new { x.t.ProyectoId, x.t.Proyecto.Nombre })
+                .Select(g => new ReporteProyectoDTO
                 {
-                    ProyectoId = x.p.Id,
-                    NombreProyecto = x.p.Nombre,
-                    TotalTareas = x.tareas.Count(),
-                    TareasAsignadas = x.tareas
-                        .GroupJoin(
-                            _context.AsignacionesTareaEmpleado,
-                            t => t.Id,
-                            a => a.TareaId,
-                            (t, asigns) => asigns.Select(a => a.TareaId)
-                        )
-                        .SelectMany(ids => ids)
-                        .Distinct()
-                        .Count()
+                    ProyectoId = g.Key.ProyectoId,
+                    NombreProyecto = g.Key.Nombre,
+                    TotalTareas = g.Count(),
+                    // tareas con al menos una asignación (distinct para evitar duplicados)
+                    TareasAsignadas = g.SelectMany(x => x.asigns)
+                                       .Select(a => a.TareaId)
+                                       .Distinct()
+                                       .Count()
                 })
                 .OrderBy(r => r.NombreProyecto)
                 .ToList();
 
             return View(reporte);
         }
+
 
 
     }
