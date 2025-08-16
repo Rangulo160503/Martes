@@ -1,5 +1,4 @@
-﻿@model CEGA.Models.ReporteFinancieroViewModel
-
+﻿@model CEGA.Models.ViewModels.ReporteFinancieroViewModel
 @{
     ViewData["Title"] = "Reporte Financiero";
 }
@@ -12,24 +11,50 @@
 }
 
 <form asp-action="ReporteFinanciero" method="post" class="row g-3 mb-4">
-    <div class="col-md-4">
-        <label>Fecha Inicio</label>
-        <input asp-for="FechaInicio" class="form-control" type="date" />
+    <div class="col-md-3">
+        <label class="form-label">Periodo</label>
+        <select asp-for="Periodo" class="form-select" id="periodo">
+            <option value="0">Rango manual</option>
+            <option value="1">Semana actual</option>
+            <option value="2">Mes actual</option>
+            <option value="3">Año actual</option>
+        </select>
     </div>
-    <div class="col-md-4">
-        <label>Fecha Fin</label>
-        <input asp-for="FechaFin" class="form-control" type="date" />
+    <div class="col-md-3">
+        <label class="form-label">Fecha Inicio</label>
+        <input asp-for="FechaInicio" class="form-control" type="date" id="ini" />
     </div>
-    <div class="col-md-4 align-self-end">
+    <div class="col-md-3">
+        <label class="form-label">Fecha Fin</label>
+        <input asp-for="FechaFin" class="form-control" type="date" id="fin" />
+    </div>
+    <div class="col-md-3 align-self-end">
         <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
     </div>
 </form>
 
 @if (Model.Ingresos.Any() || Model.Egresos.Any())
 {
-    <div class="mb-3">
-        <button class="btn btn-outline-success me-2">📄 Exportar PDF</button>
-        <button class="btn btn-outline-info">📊 Exportar Excel</button>
+    <div class="mb-3 d-flex gap-2">
+        <form asp-action="ExportarPDF" method="post" class="d-inline">
+            <input type="hidden" name="fechaInicio" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="fechaFin" value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+            <button class="btn btn-outline-success">📄 Exportar PDF</button>
+        </form>
+
+        <button class="btn btn-outline-info" disabled title="Pendiente">📊 Exportar Excel</button>
+    </div>
+
+    <div class="mb-2">
+        <strong>Desde:</strong> @Model.FechaInicio:dd/MM/yyyy
+        &nbsp;|&nbsp;
+        <strong>Hasta:</strong> @Model.FechaFin.AddDays(-1):dd/MM/yyyy
+        &nbsp;|&nbsp;
+        <strong>Total Ingresos:</strong> @Model.Ingresos.Sum(x => x.Monto).ToString("C")
+        &nbsp;|&nbsp;
+        <strong>Total Egresos:</strong> @Model.Egresos.Sum(x => x.Monto).ToString("C")
+        &nbsp;|&nbsp;
+        <strong>Balance:</strong> @(Model.Ingresos.Sum(x => x.Monto) - Model.Egresos.Sum(x => x.Monto)).ToString("C")
     </div>
 
     <h4>💰 Ingresos</h4>
@@ -83,4 +108,16 @@ else if (Model.FechaInicio != default && Model.FechaFin != default)
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const periodo = document.getElementById('periodo');
+        const ini = document.getElementById('ini');
+        const fin = document.getElementById('fin');
+        function toggleFechas() {
+            const esRango = periodo.value === "0";
+            ini.disabled = !esRango;
+            fin.disabled = !esRango;
+        }
+        periodo.addEventListener('change', toggleFechas);
+        toggleFechas();
+    </script>
 }

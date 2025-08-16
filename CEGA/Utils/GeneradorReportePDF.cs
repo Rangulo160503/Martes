@@ -1,4 +1,5 @@
 ﻿using CEGA.Models;
+using CEGA.Models.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;

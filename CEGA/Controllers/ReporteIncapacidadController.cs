@@ -20,6 +20,38 @@ namespace CEGA.Controllers
             var reportes = _context.ReportesIncapacidades.ToList();
             return View(reportes);
         }
+        [HttpGet]
+        public IActionResult Crear()
+        {
+            var hoy = DateTime.Today;
+            var modelo = new ReporteIncapacidad
+            {
+                FechaInicio = hoy,
+                FechaFin = hoy
+            };
+            return View(modelo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Crear(ReporteIncapacidad modelo)
+        {
+            if (modelo.FechaInicio > DateTime.Today)
+                ModelState.AddModelError(nameof(modelo.FechaInicio), "No se pueden seleccionar fechas futuras");
+            if (modelo.FechaFin > DateTime.Today)
+                ModelState.AddModelError(nameof(modelo.FechaFin), "No se pueden seleccionar fechas futuras");
+            if (modelo.FechaFin < modelo.FechaInicio)
+                ModelState.AddModelError(nameof(modelo.FechaFin), "La fecha final no puede ser menor que la fecha de inicio");
+
+            if (!ModelState.IsValid) return View(modelo);
+
+            _context.ReportesIncapacidades.Add(modelo);
+            _context.SaveChanges();
+
+            TempData["Mensaje"] = "Incapacidad creada correctamente";
+            return RedirectToAction(nameof(Index));
+        }
+
 
         // Vista para editar
         public IActionResult Editar(int id)

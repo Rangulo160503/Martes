@@ -24,7 +24,7 @@
 
     <div class="mb-3">
         <label asp-for="NuevoIngreso.Monto" class="form-label"></label>
-        <input asp-for="NuevoIngreso.Monto" class="form-control" />
+        <input asp-for="NuevoIngreso.Monto" type="number" step="0.01" inputmode="decimal" class="form-control" />
         <span asp-validation-for="NuevoIngreso.Monto" class="text-danger"></span>
     </div>
 

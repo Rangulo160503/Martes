@@ -1,10 +1,11 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels;
+using CEGA.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using CEGA.Utils;
-
+using System;
 
 namespace CEGA.Controllers
 {
@@ -17,6 +18,7 @@ namespace CEGA.Controllers
             _context = context;
         }
 
+        // ---------------- Ingresos ----------------
         [HttpGet]
         public IActionResult Ingresos()
         {
@@ -24,27 +26,33 @@ namespace CEGA.Controllers
             {
                 ListaIngresos = _context.Ingresos.OrderByDescending(i => i.Fecha).ToList()
             };
-            return View("Ingresos", modelo); // Usa la vista Ingresos.cshtml
+            return View("Ingresos", modelo);
         }
 
-
-        // INGRESOS
         [HttpPost]
-        public IActionResult CrearIngreso(ContabilidadViewModel modelo)
+        [ValidateAntiForgeryToken]
+        public IActionResult CrearIngreso([Bind(Prefix = "NuevoIngreso")] Ingreso ingreso)
         {
             if (!ModelState.IsValid)
             {
-                modelo.ListaIngresos = _context.Ingresos.ToList();
-                modelo.ListaEgresos = _context.Egresos.ToList();
-                TempData["Error"] = "Error al registrar el ingreso.";
-                return View("Index", modelo);
+                var errores = string.Join(" | ",
+                    ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+
+                TempData["Error"] = "Error al registrar el ingreso: " + errores;
+
+                var vm = new ContabilidadViewModel
+                {
+                    ListaIngresos = _context.Ingresos.OrderByDescending(i => i.Fecha).ToList()
+                };
+                return View("Ingresos", vm);
             }
 
-            _context.Ingresos.Add(modelo.NuevoIngreso);
+            _context.Ingresos.Add(ingreso);
             _context.SaveChanges();
             TempData["Mensaje"] = "Ingreso registrado correctamente.";
-            return RedirectToAction("Index");
+            return RedirectToAction("Ingresos");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> EditarIngreso(int id)
@@ -53,7 +61,7 @@ namespace CEGA.Controllers
             if (ingreso == null)
             {
                 TempData["Error"] = "Ingreso no encontrado.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Ingresos");
             }
             return View("EditarIngreso", ingreso);
         }
@@ -67,7 +75,7 @@ namespace CEGA.Controllers
             _context.Ingresos.Update(ingreso);
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "Ingreso actualizado.";
-            return RedirectToAction("Index");
+            return RedirectToAction("Ingresos");
         }
 
         [HttpGet]
@@ -80,9 +88,10 @@ namespace CEGA.Controllers
                 await _context.SaveChangesAsync();
                 TempData["Mensaje"] = "Ingreso eliminado.";
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Ingresos");
         }
 
+        // ---------------- Egresos ----------------
         [HttpGet]
         public IActionResult Egresos()
         {
@@ -108,6 +117,7 @@ namespace CEGA.Controllers
             TempData["Mensaje"] = "Egreso registrado correctamente.";
             return RedirectToAction("Egresos");
         }
+
         [HttpGet]
         public async Task<IActionResult> EditarEgreso(int id)
         {
@@ -149,48 +159,42 @@ namespace CEGA.Controllers
                 await _context.SaveChangesAsync();
                 TempData["Mensaje"] = "Egreso eliminado correctamente.";
             }
-
             return RedirectToAction("Egresos");
         }
-        [HttpGet]
 
-        //Reporte
+        // ---------------- Reporte Financiero ----------------
+        [HttpGet]
         public IActionResult ReporteFinanciero()
         {
+            // Por defecto: Rango manual sin datos
             return View(new ReporteFinancieroViewModel());
         }
 
         [HttpPost]
         public IActionResult ReporteFinanciero(ReporteFinancieroViewModel modelo)
         {
-            if (modelo.FechaInicio == default || modelo.FechaFin == default)
+            var (ini, fin) = Rango(modelo.Periodo, modelo.FechaInicio, modelo.FechaFin);
+
+            if (ini == default || fin == default || ini >= fin)
             {
-                TempData["Error"] = "Debe seleccionar ambas fechas.";
+                ModelState.AddModelError("", "Rango de fechas inválido.");
+                return View(modelo);
+            }
+            if (ini > DateTime.Today || fin > DateTime.Today.AddDays(1))
+            {
+                ModelState.AddModelError("", "No se permiten fechas futuras.");
                 return View(modelo);
             }
 
-            if (modelo.FechaInicio > DateTime.Now || modelo.FechaFin > DateTime.Now)
-            {
-                ModelState.AddModelError("", "No se pueden seleccionar fechas futuras.");
-                return View(modelo);
-            }
+            modelo.FechaInicio = ini;
+            modelo.FechaFin = fin;
 
-            if (modelo.FechaInicio > modelo.FechaFin)
-            {
-                ModelState.AddModelError("", "La fecha de inicio no puede ser mayor a la fecha final.");
-                return View(modelo);
-            }
-
-            modelo.Ingresos = _context.Ingresos
-                .Where(i => i.Fecha >= modelo.FechaInicio && i.Fecha <= modelo.FechaFin)
-                .ToList();
-
-            modelo.Egresos = _context.Egresos
-                .Where(e => e.Fecha >= modelo.FechaInicio && e.Fecha <= modelo.FechaFin)
-                .ToList();
+            modelo.Ingresos = _context.Ingresos.Where(i => i.Fecha >= ini && i.Fecha < fin).ToList();
+            modelo.Egresos = _context.Egresos.Where(e => e.Fecha >= ini && e.Fecha < fin).ToList();
 
             return View(modelo);
         }
+
         [HttpPost]
         public IActionResult ExportarPDF(DateTime fechaInicio, DateTime fechaFin)
         {
@@ -200,27 +204,33 @@ namespace CEGA.Controllers
                 return RedirectToAction("ReporteFinanciero");
             }
 
-            var ingresos = _context.Ingresos
-                .Where(i => i.Fecha >= fechaInicio && i.Fecha <= fechaFin)
-                .ToList();
-
-            var egresos = _context.Egresos
-                .Where(e => e.Fecha >= fechaInicio && e.Fecha <= fechaFin)
-                .ToList();
-
             var modelo = new ReporteFinancieroViewModel
             {
                 FechaInicio = fechaInicio,
                 FechaFin = fechaFin,
-                Ingresos = ingresos,
-                Egresos = egresos
+                Ingresos = _context.Ingresos.Where(i => i.Fecha >= fechaInicio && i.Fecha < fechaFin).ToList(),
+                Egresos = _context.Egresos.Where(e => e.Fecha >= fechaInicio && e.Fecha < fechaFin).ToList()
             };
 
             var pdfBytes = GeneradorReportePDF.CrearReporte(modelo);
-
             return File(pdfBytes, "application/pdf", $"ReporteFinanciero_{DateTime.Now:yyyyMMdd}.pdf");
         }
 
+        // Helper de rangos (dentro del controller)
+        private (DateTime ini, DateTime fin) Rango(PeriodoReporte periodo, DateTime ini, DateTime fin)
+        {
+            var hoy = DateTime.Today;
 
+            return periodo switch
+            {
+                PeriodoReporte.SemanaActual =>
+                    (hoy.AddDays(-(int)hoy.DayOfWeek), hoy.AddDays(1)), // dom..hoy(+1 exclusivo)
+                PeriodoReporte.MesActual =>
+                    (new DateTime(hoy.Year, hoy.Month, 1), new DateTime(hoy.Year, hoy.Month, 1).AddMonths(1)),
+                PeriodoReporte.AnioActual =>
+                    (new DateTime(hoy.Year, 1, 1), new DateTime(hoy.Year + 1, 1, 1)),
+                _ => (ini, fin == default ? ini.AddDays(1) : fin) // Rango manual
+            };
+        }
     }
 }
