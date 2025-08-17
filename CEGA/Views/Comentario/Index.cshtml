@@ -4,43 +4,74 @@
     ViewData["Title"] = "Listado de Comentarios";
 }
 
-<h2>Listado de Comentarios</h2>
-
+<!-- Header de página -->
 <div class="mb-3">
-    <a class="btn btn-success" asp-action="Crear">Agregar Comentario</a>
-    <a class="btn btn-info" asp-action="Buscar">Buscar Comentario</a>
+    <h2 class="mb-0">Listado de Comentarios</h2>
+    <p class="text-muted mb-0">Administra y busca comentarios asociados a proyectos.</p>
+</div>
+
+<!-- Barra de acciones -->
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <!-- Ir primero a Seleccionar proyecto -->
+    <a class="btn btn-accent"
+       asp-controller="Comentario" asp-action="SeleccionarProyecto">
+        + Agregar Comentario
+    </a>
+
+    <a class="btn btn-outline-primary"
+       asp-controller="Comentario" asp-action="Buscar">
+        Buscar Comentario
+    </a>
 </div>
 
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Proyecto</th>
-                <th>Nombre Comentario</th>
-                <th>Detalles</th>
-                <th>Fecha de Creación</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var comentario in Model)
-            {
-                <tr>
-                    <td>@comentario.Proyecto?.Nombre</td>
-                    <td>@comentario.NombreComentario</td>
-                    <td>@comentario.Detalles</td>
-                    <td>@comentario.FechaCreacion.ToString("yyyy-MM-dd")</td>
-                    <td>
-                        <a class="btn btn-sm btn-warning" asp-action="Editar" asp-route-id="@comentario.Id">Editar</a>
-                        <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@comentario.Id">Eliminar</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-header">
+            Comentarios registrados
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Nombre del Comentario</th>
+                            <th>Detalles</th>
+                            <th style="min-width:150px;">Fecha de Creación</th>
+                            <th style="width:180px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var comentario in Model)
+                        {
+                            <tr>
+                                <td>@comentario.Proyecto?.Nombre</td>
+                                <td>@comentario.NombreComentario</td>
+                                <td class="text-truncate" style="max-width: 420px;">@comentario.Detalles</td>
+                                <td>@comentario.FechaCreacion.ToString("yyyy-MM-dd")</td>
+                                <td class="d-flex gap-2">
+                                    <a class="btn btn-sm btn-primary"
+                                       asp-controller="Comentario" asp-action="Editar" asp-route-id="@comentario.Id">
+                                        Editar
+                                    </a>
+                                    <a class="btn btn-sm btn-danger"
+                                       asp-controller="Comentario" asp-action="Eliminar" asp-route-id="@comentario.Id">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <p>No hay comentarios registrados.</p>
+    <div class="alert alert-warning">
+        No hay comentarios registrados.
+        <a class="ms-2" asp-controller="Comentario" asp-action="SeleccionarProyecto">Crear uno ahora</a>.
+    </div>
 }

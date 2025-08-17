@@ -4,72 +4,89 @@
     ViewData["Title"] = "Lista de Tareas";
 }
 
-<h2>Listado de Tareas</h2>
-
-<div class="mb-3 d-flex flex-wrap gap-2">
-    <!-- Crear Tarea (elige proyecto) -->
-    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearTarea">
-        Crear Tarea
-    </button>
-
-    <!-- Buscar Tarea (texto libre) -->
-    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalBuscarTarea">
-        Buscar Tarea
-    </button>
-
-    <!-- Asignar Empleado (si quieres puedes seguir directo, pero aquí lo ponemos con selector de tarea) -->
-    <a class="btn btn-secondary btn-sm" asp-action="AsignarEmpleado">Asignar Empleado</a>
-
-    <!-- Reporte Consolidado (no requiere parámetros) -->
-    <a class="btn btn-dark btn-sm" asp-action="ReporteConsolidado">Reporte Consolidado</a>
-
-    <!-- Tareas Sin Asignar (elige proyecto) -->
-    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasSinAsignar">
-        Tareas Sin Asignar
-    </button>
-
-    <!-- Tareas por Empleado (elige empleado) -->
-    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasPorEmpleado">
-        Tareas por Empleado
-    </button>
-
-    <!-- Ver Asignaciones (opcionalmente filtrar por proyecto) -->
-    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerAsignaciones">
-        Ver Asignaciones
-    </button>
+<!-- Header -->
+<div class="mb-3">
+    <h2 class="mb-0">Listado de Tareas</h2>
+    <p class="text-muted mb-0">Gestión de tareas por proyecto, asignaciones y estados.</p>
 </div>
 
+<div class="card">
+    <div class="card-header d-flex flex-wrap gap-2">
+        <!-- Crear Tarea (elige proyecto) -->
+        <button type="button" class="btn btn-accent btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearTarea">
+            Crear Tarea
+        </button>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Proyecto</th>
-            <th>Nombre Tarea</th>
-            <th>Detalles</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var tarea in Model)
+        <!-- Buscar Tarea -->
+        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalBuscarTarea">
+            Buscar Tarea
+        </button>
+
+        <!-- Asignar Empleado -->
+        <a class="btn btn-outline-primary btn-sm" asp-action="AsignarEmpleado">Asignar Empleado</a>
+
+        <!-- Reporte Consolidado -->
+        <a class="btn btn-dark btn-sm" asp-action="ReporteConsolidado">Reporte Consolidado</a>
+
+        <!-- Tareas Sin Asignar -->
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasSinAsignar">
+            Tareas Sin Asignar
+        </button>
+
+        <!-- Tareas por Empleado -->
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasPorEmpleado">
+            Tareas por Empleado
+        </button>
+
+        <!-- Ver Asignaciones -->
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerAsignaciones">
+            Ver Asignaciones
+        </button>
+    </div>
+
+    <div class="card-body p-0">
+        @if (Model == null || !Model.Any())
         {
-            <tr>
-                <td>@tarea.Proyecto?.Nombre</td>
-                <td>@tarea.NombreTarea</td>
-                <td>@tarea.Detalles</td>
-                <td>@tarea.FechaInicio.ToString("yyyy-MM-dd")</td>
-                <td>@tarea.FechaFin.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <a class="btn btn-sm btn-warning" asp-action="Editar" asp-route-id="@tarea.Id">Editar</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@tarea.Id">Eliminar</a>
-                </td>
-            </tr>
+            <div class="alert alert-warning m-3">No se encontraron tareas registradas.</div>
         }
-    </tbody>
-</table>
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Nombre Tarea</th>
+                            <th>Detalles</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th style="width:180px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarea in Model)
+                        {
+                            <tr>
+                                <td>@tarea.Proyecto?.Nombre</td>
+                                <td>@tarea.NombreTarea</td>
+                                <td class="text-truncate" style="max-width:420px;">@tarea.Detalles</td>
+                                <td>@tarea.FechaInicio.ToString("yyyy-MM-dd")</td>
+                                <td>@tarea.FechaFin.ToString("yyyy-MM-dd")</td>
+                                <td class="d-flex flex-wrap gap-2">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-id="@tarea.Id">Editar</a>
+                                    <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@tarea.Id">Eliminar</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
 
-@* CREAR TAREA: pide Proyecto *@
+<!-- ========== MODALES ========== -->
+@* CREAR TAREA *@
 <div class="modal fade" id="modalCrearTarea" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -85,15 +102,15 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-success" type="submit">Continuar</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-accent" type="submit">Continuar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@* BUSCAR TAREA: texto libre *@
+@* BUSCAR TAREA *@
 <div class="modal fade" id="modalBuscarTarea" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -107,15 +124,15 @@
                     <input name="q" class="form-control" placeholder="Nombre, detalles o proyecto..." />
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-info" type="submit">Buscar</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit">Buscar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@* TAREAS SIN ASIGNAR: pide Proyecto *@
+@* TAREAS SIN ASIGNAR *@
 <div class="modal fade" id="modalTareasSinAsignar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -131,7 +148,7 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
                     <button class="btn btn-primary" type="submit">Ver</button>
                 </div>
             </form>
@@ -139,7 +156,7 @@
     </div>
 </div>
 
-@* TAREAS POR EMPLEADO: pide Empleado *@
+@* TAREAS POR EMPLEADO *@
 <div class="modal fade" id="modalTareasPorEmpleado" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -155,7 +172,7 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
                     <button class="btn btn-primary" type="submit">Ver</button>
                 </div>
             </form>
@@ -163,7 +180,7 @@
     </div>
 </div>
 
-@* VER ASIGNACIONES: opcional Proyecto *@
+@* VER ASIGNACIONES *@
 <div class="modal fade" id="modalVerAsignaciones" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -179,7 +196,7 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
                     <button class="btn btn-primary" type="submit">Ver</button>
                 </div>
             </form>

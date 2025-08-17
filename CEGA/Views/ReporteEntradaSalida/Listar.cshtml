@@ -1,75 +1,107 @@
 ﻿@model List<CEGA.Models.ReporteEntradaSalida>
 @{
+    ViewData["Title"] = "Entradas y Salidas";
     var mesSel = (int)(ViewBag.Mes ?? 8);
     var anioSel = (int)(ViewBag.Anio ?? DateTime.Now.Year);
 }
 
-<form method="get" asp-action="Listar" class="row g-2 mb-3">
-    <div class="col-auto">
-        <select name="mes" class="form-select">
-            @for (int i = 1; i <= 12; i++)
-            {
-                var nombreMes = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i);
-                <option value="@i" selected="@(i == mesSel)">@nombreMes</option>
-            }
-        </select>
-    </div>
-    <div class="col-auto">
-        <input type="number" name="anio" class="form-control" value="@anioSel" min="2000" max="2100" />
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-        <a class="btn btn-outline-secondary"
-           asp-action="Listar"
-           asp-route-mes="8"
-           asp-route-anio="@DateTime.Now.Year">
-            Agosto @DateTime.Now.Year
-        </a>
-    </div>
-    <div class="col-auto align-self-center">
-        <span class="text-muted">(@Model?.Count ?? 0) resultados</span>
-    </div>
-</form>
+<!-- Header -->
+<div class="mb-3">
+    <h2 class="mb-0">Reporte de Entradas y Salidas</h2>
+    <p class="text-muted mb-0">Filtra por mes y año para consultar movimientos.</p>
+</div>
 
+<!-- Filtros -->
+<div class="card card-lg mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Parámetros</span>
+        <span class="text-muted small">(@(Model?.Count ?? 0) resultados)</span>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Listar" class="row g-2" novalidate>
+            <div class="col-md-3">
+                <label class="form-label">Mes</label>
+                <select name="mes" class="form-select">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        var nombreMes = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i);
+                        <option value="@i" selected="@(i == mesSel)">@nombreMes</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Año</label>
+                <input type="number" name="anio" class="form-control" value="@anioSel" min="2000" max="2100" />
+            </div>
+            <div class="col-md-6 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-accent">Filtrar</button>
+                <a class="btn btn-outline-primary"
+                   asp-action="Listar"
+                   asp-route-mes="8"
+                   asp-route-anio="@DateTime.Now.Year">
+                    Agosto @DateTime.Now.Year
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Rol</th>
-            <th>Movimiento</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Final</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model == null || !Model.Any())
-        {
-            <tr>
-                <td colspan="6" class="text-center text-muted">
-                    No hay registros para el rango seleccionado.
-                </td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var reporte in Model)
-            {
-                <tr>
-                    <td>@reporte.NombreReporte</td>
-                    <td>@reporte.RolSeleccionado</td>
-                    <td>
-                        <span class="badge bg-info">@reporte.Movimiento</span>
-                    </td>
-                    <td>@reporte.FechaInicio.ToString("dd/MM/yyyy")</td>
-                    <td>@reporte.FechaFin.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a asp-action="Editar" asp-route-id="@reporte.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <a asp-action="Eliminar" asp-route-id="@reporte.Id" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+<!-- Resultados -->
+<div class="card">
+    <div class="card-header">Resultados</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Movimiento</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Final</th>
+                        <th style="width:180px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                No hay registros para el rango seleccionado.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var reporte in Model)
+                        {
+                            <tr>
+                                <td>@reporte.NombreReporte</td>
+                                <td>@reporte.RolSeleccionado</td>
+                                <td>
+                                    <span class="badge bg-info">@reporte.Movimiento</span>
+                                </td>
+                                <td>@reporte.FechaInicio.ToString("dd/MM/yyyy")</td>
+                                <td>@reporte.FechaFin.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a asp-action="Editar"
+                                           asp-route-id="@reporte.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Editar
+                                        </a>
+                                        <a asp-action="Eliminar"
+                                           asp-route-id="@reporte.Id"
+                                           class="btn btn-sm btn-danger">
+                                            Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

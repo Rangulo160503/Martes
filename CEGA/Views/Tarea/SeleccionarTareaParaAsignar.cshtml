@@ -2,19 +2,31 @@
 @{
     ViewData["Title"] = "Seleccionar tarea para asignar";
 }
-<h2>Seleccionar tarea para asignar</h2>
 
-<form asp-action="SeleccionarTareaParaAsignar" method="post" class="row g-3">
-    @Html.AntiForgeryToken()
-    <div class="col-md-6">
-        <label asp-for="TareaId" class="form-label">Tarea</label>
-        <select asp-for="TareaId" class="form-select" asp-items="ViewBag.Tareas">
-            <option value="">— Selecciona una tarea —</option>
-        </select>
-        <span asp-validation-for="TareaId" class="text-danger"></span>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Seleccionar tarea para asignar</h2>
+    <p class="text-muted mb-0">Elija la tarea que desea asignar a un empleado.</p>
+</div>
+
+<div class="card card-lg">
+    <div class="card-header">Parámetros</div>
+    <div class="card-body">
+        <form asp-action="SeleccionarTareaParaAsignar" method="post" class="row g-3" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="col-md-6">
+                <label asp-for="TareaId" class="form-label">Tarea</label>
+                <select asp-for="TareaId" class="form-select" asp-items="ViewBag.Tareas" required>
+                    <option value="">— Selecciona una tarea —</option>
+                </select>
+                <span asp-validation-for="TareaId" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-accent" type="submit">Continuar</button>
+                <a asp-action="Index" class="btn btn-outline-primary">Cancelar</a>
+            </div>
+        </form>
     </div>
-    <div class="col-12">
-        <button class="btn btn-primary" type="submit">Continuar</button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-    </div>
-</form>
+</div>

@@ -5,31 +5,24 @@ namespace CEGA.Models
 {
     public class ReporteIncidente
     {
+        [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [Display(Name = "Nombre del Reporte")]
-        public string NombreReporte { get; set; }
+        [Required, StringLength(200)]
+        public string NombreReporte { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [Display(Name = "ID del Usuario")]
-        public string UsuarioID { get; set; }
+        [StringLength(100)]
+        public string? UsuarioID { get; set; }   // <- CAMBIO
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [DataType(DataType.Date)]
-        [Display(Name = "Fecha del Accidente")]
-        public DateTime FechaAccidente { get; set; }
+        [Required]
+        public DateTime FechaAccidente { get; set; } = DateTime.Today;
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [StringLength(2000, ErrorMessage = "Máximo 2000 caracteres")]
-        [Display(Name = "Descripción del Accidente")]
-        public string Descripcion { get; set; }
+        [Required, StringLength(2000)]
+        public string Descripcion { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [RegularExpression("Sí|No", ErrorMessage = "Debe seleccionar Sí o No")]
-        [Display(Name = "¿Hubo Incapacidad?")]
-        public string Incapacidad { get; set; } // "Sí" o "No"
+        [Required, StringLength(10)]
+        public string Incapacidad { get; set; } = string.Empty;
 
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
     }
 }

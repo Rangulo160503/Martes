@@ -27,11 +27,14 @@
         <h4 class="text-white text-center mb-4">CEGA</h4>
 
         <a class="nav-link @active("home", "index")" asp-controller="Home" asp-action="Index">Inicio</a>
-        <a class="nav-link @active("home", "privacy")" asp-controller="Home" asp-action="Privacy">Privacidad</a>
 
         <hr class="bg-light" />
 
-        <a class="nav-link @active("account", null)" asp-controller="Account" asp-action="GestionUsuarios">Gestión de Usuarios</a>
+        <!-- Después -->
+        <a class="nav-link @active("account", "listausuarios")"
+           asp-controller="Account" asp-action="ListaUsuarios">
+            Gestión de Usuarios
+        </a>
 
         <hr class="bg-light" />
 

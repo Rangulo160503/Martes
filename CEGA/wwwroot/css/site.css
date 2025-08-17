@@ -76,7 +76,8 @@ body {
     }
 
     .sidebar hr {
-        border-color: rgba(255,255,255,.15);
+        border-top: 1px solid rgba(255,255,255,0.35); /* más visible */
+        opacity: 1; /* evita que bootstrap lo atenúe */
         margin: .75rem 0 1rem;
     }
 

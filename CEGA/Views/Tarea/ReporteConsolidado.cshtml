@@ -4,40 +4,76 @@
     ViewData["Title"] = "Reporte Consolidado por Proyecto";
 }
 
-<h2>Reporte Consolidado por Proyecto</h2>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Reporte Consolidado por Proyecto</h2>
+    <p class="text-muted mb-0">Resumen de tareas por proyecto: asignadas vs sin asignar.</p>
+</div>
 
-@if (!Model.Any())
+@if (Model == null || !Model.Any())
 {
-    <div class="alert alert-info">
-        No hay proyectos registrados.
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-info mb-0">
+                No hay proyectos registrados.
+            </div>
+        </div>
     </div>
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Proyecto</th>
-                <th>Total de Tareas</th>
-                <th>Tareas Asignadas</th>
-                <th>Tareas Sin Asignar</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.NombreProyecto</td>
-                    <td>@item.TotalTareas</td>
-                    <td>@item.TareasAsignadas</td>
-                    <td>@item.TareasSinAsignar</td>
-                    <td>
-                        <a asp-action="VerAsignaciones" asp-route-proyectoId="@item.ProyectoId" class="btn btn-sm btn-info">Ver asignaciones</a>
-                        <a asp-action="TareasSinAsignar" asp-route-proyectoId="@item.ProyectoId" class="btn btn-sm btn-warning">Tareas sin asignar</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Proyectos y estado de tareas</span>
+            <!-- Espacio para filtros/descargas si luego agregas -->
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th class="text-center">Total de Tareas</th>
+                            <th class="text-center">Tareas Asignadas</th>
+                            <th class="text-center">Tareas Sin Asignar</th>
+                            <th style="width: 260px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@item.NombreProyecto</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning">@item.TotalTareas</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">@item.TareasAsignadas</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger">@item.TareasSinAsignar</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a asp-action="VerAsignaciones"
+                                           asp-route-proyectoId="@item.ProyectoId"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Ver asignaciones
+                                        </a>
+                                        <a asp-action="TareasSinAsignar"
+                                           asp-route-proyectoId="@item.ProyectoId"
+                                           class="btn btn-sm btn-primary">
+                                            Tareas sin asignar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }

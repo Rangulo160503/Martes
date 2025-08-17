@@ -3,33 +3,45 @@
     ViewData["Title"] = "Comparar Planos";
 }
 
-<h2>Comparar Planos</h2>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Comparar Planos</h2>
+    <p class="text-muted mb-0">Seleccione dos planos distintos para generar la comparación.</p>
+</div>
 
-<form method="post" asp-action="VerComparacion">
-    <div class="mb-3">
-        <label for="plano1">Seleccione el primer plano:</label>
-        <select name="plano1" class="form-control" required>
-            <option value="">-- Seleccione uno --</option>
-            @foreach (var plano in Model)
-            {
-                <option value="@plano.Id">@plano.NombreArchivo</option>
-            }
-        </select>
+<div class="card card-lg">
+    <div class="card-header">Selección de planos</div>
+    <div class="card-body">
+        <form method="post" asp-action="VerComparacion" novalidate>
+            <div class="mb-3">
+                <label for="plano1" class="form-label">Primer plano</label>
+                <select name="plano1" id="plano1" class="form-select" required>
+                    <option value="">-- Seleccione uno --</option>
+                    @foreach (var plano in Model)
+                    {
+                        <option value="@plano.Id">@plano.NombreArchivo</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="plano2" class="form-label">Segundo plano</label>
+                <select name="plano2" id="plano2" class="form-select" required>
+                    <option value="">-- Seleccione uno --</option>
+                    @foreach (var plano in Model)
+                    {
+                        <option value="@plano.Id">@plano.NombreArchivo</option>
+                    }
+                </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-accent">Comparar</button>
+                <a asp-controller="Pdf" asp-action="ListaPlanos" class="btn btn-outline-primary">Volver</a>
+            </div>
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label for="plano2">Seleccione el segundo plano:</label>
-        <select name="plano2" class="form-control" required>
-            <option value="">-- Seleccione uno --</option>
-            @foreach (var plano in Model)
-            {
-                <option value="@plano.Id">@plano.NombreArchivo</option>
-            }
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Comparar</button>
-</form>
+</div>
 
 @if (TempData["Error"] != null)
 {

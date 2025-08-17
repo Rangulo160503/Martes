@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -25,5 +25,13 @@
   <ItemGroup>
     <Folder Include="wwwroot\docs\planos\" />
   </ItemGroup>
+	<ItemGroup>
+		<!-- Evita claves duplicadas del task DiscoverPrecompressedAssets -->
+		<StaticWebAsset Remove="wwwroot/**/*.gz" />
+		<StaticWebAsset Remove="wwwroot/**/*.br" />
+
+		<!-- Defensivo: si más adelante aparece un wwwroot dentro de Areas, no lo publiques -->
+		<StaticWebAsset Remove="Areas/**/wwwroot/**" />
+	</ItemGroup>
 
 </Project>

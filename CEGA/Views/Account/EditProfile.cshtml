@@ -3,55 +3,76 @@
     ViewData["Title"] = "Editar perfil";
 }
 
-<h2 class="text-center">Editar perfil</h2>
+<!-- Header -->
+<div class="mb-3 text-center">
+    <h2 class="mb-0">Editar perfil</h2>
+    <p class="text-muted mb-0">Actualiza tu información personal y de contacto.</p>
+</div>
 
+<!-- Alertas -->
 @if (TempData["Mensaje"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
 }
-
-@if (!ViewData.ModelState.IsValid)
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
 {
-    <div class="alert alert-danger">
+    <div class="alert alert-danger mb-3">
         @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
         {
-            <p>@error.ErrorMessage</p>
+            <p class="mb-0">@error.ErrorMessage</p>
         }
     </div>
 }
 
-<form asp-action="EditProfile" method="post">
-    <div class="form-group">
-        <label asp-for="Nombre"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Apellido"></label>
-        <input asp-for="Apellido" class="form-control" />
-        <span asp-validation-for="Apellido" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Telefono"></label>
-        <input asp-for="Telefono" class="form-control" placeholder="8888-8888" />
-        <span asp-validation-for="Telefono" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary mt-3">Guardar cambios</button>
-</form>
+<!-- Formulario -->
+<div class="card card-lg mb-3">
+    <div class="card-header">Datos de perfil</div>
+    <div class="card-body">
+        <form asp-action="EditProfile" method="post" class="row g-3" novalidate>
+            @Html.AntiForgeryToken()
 
-<div class="mt-4">
-    <hr />
-    <p class="text-danger fw-bold">¿Deseas eliminar tu cuenta?</p>
-    <a asp-action="EliminarCuenta" class="btn btn-outline-danger">
-        Eliminar mi cuenta permanentemente
-    </a>
+            <div class="col-md-6">
+                <label asp-for="Nombre" class="form-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" placeholder="Tu nombre" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Apellido" class="form-label">Apellido</label>
+                <input asp-for="Apellido" class="form-control" placeholder="Tus apellidos" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label">Correo electrónico</label>
+                <input asp-for="Email" class="form-control" placeholder="correo@empresa.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Telefono" class="form-label">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" placeholder="8888-8888" inputmode="tel" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button type="submit" class="btn btn-accent">Guardar cambios</button>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Volver</a>
+            </div>
+        </form>
+    </div>
 </div>
 
+<!-- Zona de riesgo -->
+<div class="card">
+    <div class="card-header">Zona de riesgo</div>
+    <div class="card-body">
+        <p class="text-muted mb-2">Eliminar tu cuenta es una acción permanente y no se puede deshacer.</p>
+        <a asp-action="EliminarCuenta" class="btn btn-outline-danger">
+            Eliminar mi cuenta permanentemente
+        </a>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

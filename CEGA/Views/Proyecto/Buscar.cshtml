@@ -2,15 +2,29 @@
     ViewData["Title"] = "Buscar Proyecto";
 }
 
-<h2>Buscar Proyecto</h2>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Buscar Proyecto</h2>
+    <p class="text-muted mb-0">Ingrese el nombre del proyecto para localizarlo en el sistema.</p>
+</div>
 
-<form method="post" asp-action="Buscar">
-    <label>Nombre del Proyecto:</label>
-    <input type="text" name="nombre" />
-    <button type="submit">Buscar</button>
-</form>
+<div class="card card-lg">
+    <div class="card-header">Parámetros de búsqueda</div>
+    <div class="card-body">
+        <form method="post" asp-action="Buscar" novalidate class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="nombre">Nombre del Proyecto</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Centro Comercial Atenas" />
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-accent">Buscar</button>
+                <a asp-action="Index" class="btn btn-outline-primary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @if (ViewBag.Error != null)
 {
-    <div class="text-danger">@ViewBag.Error</div>
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
 }

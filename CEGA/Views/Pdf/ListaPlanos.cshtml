@@ -4,62 +4,97 @@
     ViewData["Title"] = "Lista de Planos";
 }
 
-<h2 class="mb-4">Lista de Planos Subidos</h2>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Lista de Planos Subidos</h2>
+    <p class="text-muted mb-0">Gestiona planos, comentarios y visualizaciones.</p>
+</div>
 
+<!-- Alertas (mantienen estilo global del theme) -->
 @if (TempData["Mensaje"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
 }
 
-<a asp-controller="Pdf" asp-action="SubirPlano" class="btn btn-primary mb-3">+ Nuevo Plano</a>
+<!-- Acciones principales -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-controller="Pdf" asp-action="SubirPlano" class="btn btn-accent">
+        + Nuevo Plano
+    </a>
+</div>
 
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Disciplina</th>
-                <th>Nombre del Archivo</th>
-                <th>Fecha de Subida</th>
-                <th>Ver</th>
-                <th>Agregar</th>
-                <th>Eliminar</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                var plano = Model[i];
-                <tr>
-                    <td>@(i + 1)</td>
-                    <td>@plano.Disciplina</td>
-                    <td>@plano.NombreArchivo</td>
-                    <td>@plano.FechaSubida.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a asp-action="VerPlano" asp-route-id="@plano.Id" class="btn btn-sm btn-info">Ver Plano</a>
-                    </td>
-                    <td>
-                        <a asp-controller="Pdf" asp-action="Comentarios" asp-route-id="@plano.Id" class="btn btn-success">Agregar Comentario</a>
-                    </td>
-                    <td>
-                        <form asp-action="EliminarPlano"
-                              asp-controller="Pdf"
-                              method="post"
-                              onsubmit="return confirm('¿Estás seguro de eliminar este plano y todo su contenido?');"
-                              style="display:inline;">
-                            <input type="hidden" name="id" value="@plano.Id" />
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Planos cargados</span>
+            <!-- Acciones secundarias del listado (opcional) -->
+            <div class="d-none d-md-flex gap-2">
+                <!-- Espacio para filtros/búsqueda si luego los agregas -->
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:64px">#</th>
+                            <th>Disciplina</th>
+                            <th>Nombre del Archivo</th>
+                            <th style="min-width:140px">Fecha de Subida</th>
+                            <th style="width:110px">Ver</th>
+                            <th style="width:170px">Agregar</th>
+                            <th style="width:130px">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var plano = Model[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@plano.Disciplina</td>
+                                <td>@plano.NombreArchivo</td>
+                                <td>@plano.FechaSubida.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a asp-action="VerPlano"
+                                       asp-route-id="@plano.Id"
+                                       class="btn btn-sm btn-outline-primary w-100">
+                                        Ver
+                                    </a>
+                                </td>
+                                <td>
+                                    <a asp-controller="Pdf"
+                                       asp-action="Comentarios"
+                                       asp-route-id="@plano.Id"
+                                       class="btn btn-sm btn-primary w-100">
+                                        Agregar Comentario
+                                    </a>
+                                </td>
+                                <td>
+                                    <form asp-action="EliminarPlano"
+                                          asp-controller="Pdf"
+                                          method="post"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar este plano y todo su contenido?');"
+                                          class="m-0">
+                                        <input type="hidden" name="id" value="@plano.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger w-100">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
 else
 {

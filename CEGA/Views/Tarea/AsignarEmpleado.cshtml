@@ -7,40 +7,53 @@
 
 @if (empleados == null)
 {
-    <div class="alert alert-danger">
+    <div class="alert alert-danger mb-3">
         No se pudo cargar la información de los empleados.
     </div>
 }
 else
 {
-    <h2>Asignar Empleado a la Tarea: @ViewBag.TareaNombre del Proyecto: @ViewBag.ProyectoNombre</h2>
+    <!-- Header de página -->
+    <div class="mb-3">
+        <h2 class="mb-0">Asignar Empleado a Tarea</h2>
+        <p class="text-muted mb-0">
+            Proyecto: <strong>@ViewBag.ProyectoNombre</strong> · Tarea: <strong>@ViewBag.TareaNombre</strong>
+        </p>
+    </div>
 
-    <form asp-action="AsignarEmpleado" method="post" class="row g-3">
-        @Html.AntiForgeryToken()
+    <div class="card card-lg">
+        <div class="card-header">Detalles de la asignación</div>
+        <div class="card-body">
+            <form asp-action="AsignarEmpleado" method="post" class="row g-3" novalidate>
+                @Html.AntiForgeryToken()
 
-        <input type="hidden" asp-for="TareaId" />
+                <input type="hidden" asp-for="TareaId" />
 
-        <div class="col-md-6">
-            <label asp-for="UsuarioId" class="form-label"></label>
-            <select asp-for="UsuarioId"
-                    asp-items='new SelectList(empleados, "Id", "UserName")'
-                    class="form-select">
-                <option value="">-- Seleccionar empleado --</option>
-            </select>
-            <span asp-validation-for="UsuarioId" class="text-danger"></span>
+                <div class="col-12 col-md-6">
+                    <label asp-for="UsuarioId" class="form-label">Empleado</label>
+                    <select asp-for="UsuarioId"
+                            asp-items='new SelectList(empleados, "Id", "UserName")'
+                            class="form-select" required>
+                        <option value="">-- Seleccionar empleado --</option>
+                    </select>
+                    <span asp-validation-for="UsuarioId" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Comentario" class="form-label">Comentario</label>
+                    <textarea asp-for="Comentario"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Instrucciones o notas para el empleado"></textarea>
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-accent">Asignar</button>
+                    <a asp-action="Index" class="btn btn-outline-primary">Cancelar</a>
+                </div>
+            </form>
         </div>
-
-        <div class="col-12">
-            <label asp-for="Comentario" class="form-label">Comentario</label>
-            <textarea asp-for="Comentario" class="form-control" rows="3"
-                      placeholder="Instrucciones o notas para el empleado"></textarea>
-        </div>
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Asignar</button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-        </div>
-    </form>
+    </div>
 }
 
 @section Scripts {

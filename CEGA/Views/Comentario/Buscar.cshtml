@@ -2,18 +2,32 @@
     ViewData["Title"] = "Buscar Comentario";
 }
 
-<h2>Buscar Comentario en Proyecto</h2>
+<!-- Header de página -->
+<div class="mb-3">
+    <h2 class="mb-0">Buscar Comentario en Proyecto</h2>
+    <p class="text-muted mb-0">Ingrese el nombre del comentario para localizarlo dentro del proyecto.</p>
+</div>
 
-<form asp-action="Buscar" method="post">
-    <input type="hidden" name="proyectoId" value="@ViewBag.ProyectoId" />
-    <div>
-        <label>Nombre del Comentario:</label>
-        <input type="text" name="nombreComentario" />
-        <button type="submit">Buscar</button>
+<div class="card card-lg">
+    <div class="card-header">Parámetros de búsqueda</div>
+    <div class="card-body">
+        <form asp-action="Buscar" method="post" novalidate>
+            <input type="hidden" name="proyectoId" value="@ViewBag.ProyectoId" />
+
+            <div class="mb-3">
+                <label for="nombreComentario" class="form-label">Nombre del Comentario</label>
+                <input type="text" name="nombreComentario" id="nombreComentario" class="form-control" placeholder="Ej: Revisión de planos eléctricos" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-accent">Buscar</button>
+                <a asp-controller="Comentario" asp-action="Index" class="btn btn-outline-primary">Volver</a>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 @if (ViewBag.Mensaje != null)
 {
-    <div class="text-danger">@ViewBag.Mensaje</div>
+    <div class="alert alert-danger mt-3">@ViewBag.Mensaje</div>
 }

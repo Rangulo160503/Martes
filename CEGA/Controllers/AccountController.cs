@@ -148,7 +148,10 @@ namespace CEGA.Controllers
         }
 
         [HttpGet]
-        public IActionResult GestionUsuarios() => View();
+        public IActionResult GestionUsuarios()
+        {
+            return RedirectToAction(nameof(ListaUsuarios));
+        }
 
         [HttpGet]
         public async Task<IActionResult> ListaUsuarios(string? filtroTexto, string? rolSeleccionado)

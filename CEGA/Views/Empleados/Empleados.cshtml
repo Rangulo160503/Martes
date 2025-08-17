@@ -1,54 +1,107 @@
-﻿@{
+﻿@model dynamic
+@{
     ViewData["Title"] = "Gestión de Empleados";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
     var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadoSalario>;
     var vacaciones = ViewBag.Vacaciones as IEnumerable<CEGA.Models.VacacionesEmpleado>;
     var puestos = ViewBag.Puestos as IEnumerable<CEGA.Models.PuestoEmpleado>;
     var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
+
+    var salCount = salarios?.Count() ?? 0;
+    var vacCount = vacaciones?.Count() ?? 0;
+    var pueCount = puestos?.Count() ?? 0;
+    var incCount = incapacidades?.Count() ?? 0;
 }
 
+<!-- Header -->
+<div class="mb-3 text-center">
+    <h2 class="mb-0">👥 Módulo de Empleados</h2>
+    <p class="text-muted mb-0">Administra salarios, vacaciones, puestos e incapacidades.</p>
+</div>
 
-<h2 class="text-center mb-4">👥 Módulo de Empleados</h2>
-
+<!-- Alertas -->
 @if (TempData["Mensaje"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
 }
 
-<ul class="nav nav-tabs" id="empleadosTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="salario-tab" data-bs-toggle="tab" data-bs-target="#salario" type="button" role="tab">💰 Salarios</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="vacaciones-tab" data-bs-toggle="tab" data-bs-target="#vacaciones" type="button" role="tab">🌴 Vacaciones</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="puesto-tab" data-bs-toggle="tab" data-bs-target="#puesto" type="button" role="tab">📌 Puestos</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="incapacidad-tab" data-bs-toggle="tab" data-bs-target="#incapacidad" type="button" role="tab">📝 Incapacidades</button>
-    </li>
-</ul>
+<!-- Tabs dentro de card -->
+<div class="card card-lg">
+    <div class="card-header p-0">
+        <ul class="nav nav-tabs card-header-tabs" id="empleadosTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="salario-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#salario"
+                        type="button"
+                        role="tab"
+                        aria-controls="salario"
+                        aria-selected="true">
+                    💰 Salarios <span class="badge bg-success ms-1">@salCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="vacaciones-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#vacaciones"
+                        type="button"
+                        role="tab"
+                        aria-controls="vacaciones"
+                        aria-selected="false">
+                    🌴 Vacaciones <span class="badge bg-success ms-1">@vacCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="puesto-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#puesto"
+                        type="button"
+                        role="tab"
+                        aria-controls="puesto"
+                        aria-selected="false">
+                    📌 Puestos <span class="badge bg-success ms-1">@pueCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="incapacidad-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#incapacidad"
+                        type="button"
+                        role="tab"
+                        aria-controls="incapacidad"
+                        aria-selected="false">
+                    📝 Incapacidades <span class="badge bg-success ms-1">@incCount</span>
+                </button>
+            </li>
+        </ul>
+    </div>
 
-<div class="tab-content mt-4">
-    <div class="tab-pane fade show active" id="salario" role="tabpanel">
-        @await Html.PartialAsync("_SalariosPartial", salarios)
-    </div>
-    <div class="tab-pane fade" id="vacaciones" role="tabpanel">
-        @await Html.PartialAsync("_VacacionesPartial", vacaciones)
-    </div>
-    <div class="tab-pane fade" id="puesto" role="tabpanel">
-        @await Html.PartialAsync("_PuestosPartial", puestos)
-    </div>
-    <div class="tab-pane fade" id="incapacidad" role="tabpanel">
-        @await Html.PartialAsync("_IncapacidadesPartial", incapacidades)
+    <div class="card-body">
+        <div class="tab-content mt-2">
+            <div class="tab-pane fade show active" id="salario" role="tabpanel" aria-labelledby="salario-tab">
+                @await Html.PartialAsync("_SalariosPartial", salarios)
+            </div>
+            <div class="tab-pane fade" id="vacaciones" role="tabpanel" aria-labelledby="vacaciones-tab">
+                @await Html.PartialAsync("_VacacionesPartial", vacaciones)
+            </div>
+            <div class="tab-pane fade" id="puesto" role="tabpanel" aria-labelledby="puesto-tab">
+                @await Html.PartialAsync("_PuestosPartial", puestos)
+            </div>
+            <div class="tab-pane fade" id="incapacidad" role="tabpanel" aria-labelledby="incapacidad-tab">
+                @await Html.PartialAsync("_IncapacidadesPartial", incapacidades)
+            </div>
+        </div>
     </div>
 </div>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
