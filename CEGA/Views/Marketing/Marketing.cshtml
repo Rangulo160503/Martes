@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CEGA.Models.ViewModels.MarketingPageVM
+@{
     ViewData["Title"] = "Marketing";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -16,42 +17,41 @@
 
 <ul class="nav nav-tabs" id="marketingTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="camp-tab" data-bs-toggle="tab" data-bs-target="#camp" type="button" role="tab">Campañas</button>
+        <button class="nav-link active" id="camp-tab" data-bs-toggle="tab" data-bs-target="#camp" type="button" role="tab">
+            Campañas
+        </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pool-tab" data-bs-toggle="tab" data-bs-target="#pool" type="button" role="tab">Pools de Correos</button>
+        <button class="nav-link" id="pool-tab" data-bs-toggle="tab" data-bs-target="#pool" type="button" role="tab">
+            Pools de Correos
+        </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="dist-tab" data-bs-toggle="tab" data-bs-target="#dist" type="button" role="tab">Distribuciones</button>
+        <button class="nav-link" id="dist-tab" data-bs-toggle="tab" data-bs-target="#dist" type="button" role="tab">
+            Distribuciones
+        </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">Clientes</button>
+        <button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">
+            Clientes
+        </button>
     </li>
 </ul>
 
 <div class="tab-content mt-4">
-    <div class="tab-pane fade show active" id="camp" role="tabpanel">
-        @await Html.PartialAsync("_CampanasPartial", ViewBag.Campanias as IEnumerable<CEGA.Models.CampMarketing>)
+    <div class="tab-pane fade show active" id="camp" role="tabpanel" aria-labelledby="camp-tab">
+        @await Html.PartialAsync("_CampanasPartial", Model.Campanias)
     </div>
-    <div class="tab-pane fade" id="pool" role="tabpanel">
-        @await Html.PartialAsync("_PoolsPartial", ViewBag.Pools as IEnumerable<CEGA.Models.PoolCorreo>)
+    <div class="tab-pane fade" id="pool" role="tabpanel" aria-labelledby="pool-tab">
+        @await Html.PartialAsync("_PoolsPartial", Model.Pools)
     </div>
-    <div class="tab-pane fade" id="dist" role="tabpanel">
-        @await Html.PartialAsync("_DistribucionesPartial", ViewBag.Distribuciones as IEnumerable<CEGA.Models.DistribucionMarketing>)
+    <div class="tab-pane fade" id="dist" role="tabpanel" aria-labelledby="dist-tab">
+        @await Html.PartialAsync("_DistribucionesPartial", Model.Programaciones)
     </div>
-    <div class="tab-pane fade" id="clientes" role="tabpanel">
-        @await Html.PartialAsync("_ClientesPartial", ViewBag.Clientes as IEnumerable<CEGA.Models.ClienteMarketing>)
+    <div class="tab-pane fade" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
+        @await Html.PartialAsync("_ClientesPartial", Model.Clientes)
     </div>
 </div>
-
-@if (TempData["Mensaje"] != null)
-{
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

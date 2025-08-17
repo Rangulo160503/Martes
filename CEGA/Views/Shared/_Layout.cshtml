@@ -48,7 +48,11 @@
         <a class="nav-link nav-subitem @active("contabilidad", "ingresos")" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
         <a class="nav-link nav-subitem @active("contabilidad", "egresos")" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
         <a class="nav-link nav-subitem @active("cierrediario", "index")" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
-        <a class="nav-link nav-subitem @active("cierres", "historialcierresrango")" asp-controller="Cierres" asp-action="HistorialCierresRango">Reportes Financieros</a>
+        <a class="nav-link nav-subitem @active("cierres", "historialcierresrango")"
+           asp-controller="CierreDiario"
+           asp-action="HistorialCierresRango">
+            Reportes Financieros
+        </a>
 
         <hr class="bg-light" />
 

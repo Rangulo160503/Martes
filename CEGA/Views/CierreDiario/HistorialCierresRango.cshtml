@@ -1,0 +1,59 @@
+﻿@model CEGA.Models.ViewModels.CierresRangoViewModel
+@{
+    ViewData["Title"] = "Historial de Cierres por Rango";
+}
+
+<h3> Historial de Cierres por Rango</h3>
+
+<form asp-action="HistorialCierresRango" method="post" class="row g-2 mb-3">
+    @Html.AntiForgeryToken()
+    <div class="col-auto">
+        <label class="form-label">Desde</label>
+        <input asp-for="FechaInicio" type="date" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Hasta</label>
+        <input asp-for="FechaFin" type="date" class="form-control" />
+    </div>
+    <div class="col-auto align-self-end">
+        <button class="btn btn-primary">Buscar</button>
+    </div>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-warning"><div asp-validation-summary="All"></div></div>
+}
+
+@if (Model?.Cierres?.Any() == true)
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Total Ingresos</th>
+                <th>Total Egresos</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Cierres)
+            {
+                <tr>
+                    <td>@c.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@c.TotalIngresos.ToString("C")</td>
+                    <td>@c.TotalEgresos.ToString("C")</td>
+                    <td>@c.BalanceFinal.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="text-muted">No hay cierres en el rango.</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,6 +1,8 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,5 +65,61 @@ namespace CEGA.Controllers
             TempData["Mensaje"] = "Cierre registrado correctamente.";
             return RedirectToAction("Index");
         }
+        // using CEGA.Models.ViewModels;
+        // using Microsoft.EntityFrameworkCore;
+
+        [HttpGet]
+        public async Task<IActionResult> HistorialCierresRango()
+        {
+            var hoy = DateTime.Today;
+            var ini = hoy.AddDays(-6);
+            var finExcl = hoy.AddDays(1); // exclusivo
+
+            var vm = new CierresRangoViewModel
+            {
+                FechaInicio = ini,
+                FechaFin = hoy,
+                // Lee de CierresDiarios; si quieres leer de CierresRango, ajusta aquí
+                Cierres = await _context.CierresDiarios
+                    .Where(c => c.Fecha >= ini && c.Fecha < finExcl)
+                    .OrderBy(c => c.Fecha)
+                    .Select(c => new CierreItem
+                    {
+                        Fecha = c.Fecha,
+                        TotalIngresos = c.TotalIngresos,
+                        TotalEgresos = c.TotalEgresos
+                    })
+                    .ToListAsync()
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HistorialCierresRango(CierresRangoViewModel modelo)
+        {
+            if (modelo.FechaInicio is null || modelo.FechaFin is null)
+            {
+                ModelState.AddModelError("", "Selecciona ambas fechas.");
+                return View(modelo);
+            }
+
+            var ini = modelo.FechaInicio.Value.Date;
+            var finExcl = modelo.FechaFin.Value.Date.AddDays(1);
+
+            modelo.Cierres = await _context.CierresDiarios
+                .Where(c => c.Fecha >= ini && c.Fecha < finExcl)
+                .OrderBy(c => c.Fecha)
+                .Select(c => new CierreItem
+                {
+                    Fecha = c.Fecha,
+                    TotalIngresos = c.TotalIngresos,
+                    TotalEgresos = c.TotalEgresos
+                })
+                .ToListAsync();
+
+            return View(modelo);
+        }
     }
-}
+    }

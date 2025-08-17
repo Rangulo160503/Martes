@@ -7,15 +7,16 @@ namespace CEGA.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public required string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public required string AsuntoCorreo { get; set; }
+        public string AsuntoCorreo { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public required string Descripcion { get; set; }
+        public string Descripcion { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public required string ImagenUrl { get; set; }
+        [Url(ErrorMessage = "Debe ser una URL válida")]
+        public string ImagenUrl { get; set; } = string.Empty;
     }
 }

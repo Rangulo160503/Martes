@@ -24,6 +24,7 @@ namespace CEGA.Controllers
         {
             var modelo = new ContabilidadViewModel
             {
+                NuevoIngreso = new Ingreso { Fecha = DateTime.Today },
                 ListaIngresos = _context.Ingresos.OrderByDescending(i => i.Fecha).ToList()
             };
             return View("Ingresos", modelo);
@@ -33,6 +34,9 @@ namespace CEGA.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CrearIngreso([Bind(Prefix = "NuevoIngreso")] Ingreso ingreso)
         {
+            if (ingreso.Fecha == default)
+                ingreso.Fecha = DateTime.Today;
+
             if (!ModelState.IsValid)
             {
                 var errores = string.Join(" | ",
@@ -42,8 +46,10 @@ namespace CEGA.Controllers
 
                 var vm = new ContabilidadViewModel
                 {
+                    NuevoIngreso = new Ingreso { Fecha = DateTime.Today },
                     ListaIngresos = _context.Ingresos.OrderByDescending(i => i.Fecha).ToList()
                 };
+                TempData["Error"] = "Error al registrar el ingreso.";
                 return View("Ingresos", vm);
             }
 
@@ -97,26 +103,35 @@ namespace CEGA.Controllers
         {
             var modelo = new EgresoViewModel
             {
+                NuevoEgreso = new Egreso { Fecha = DateTime.Today },
                 ListaEgresos = _context.Egresos.OrderByDescending(e => e.Fecha).ToList()
             };
             return View(modelo);
         }
 
         [HttpPost]
-        public IActionResult CrearEgreso(EgresoViewModel modelo)
+        [ValidateAntiForgeryToken]
+        public IActionResult CrearEgreso([Bind(Prefix = "NuevoEgreso")] Egreso egreso)
         {
+            if (egreso.Fecha == default) egreso.Fecha = DateTime.Today; 
+
             if (!ModelState.IsValid)
             {
-                modelo.ListaEgresos = _context.Egresos.OrderByDescending(e => e.Fecha).ToList();
+                var vm = new EgresoViewModel
+                {
+                    NuevoEgreso = new Egreso { Fecha = DateTime.Today },
+                    ListaEgresos = _context.Egresos.OrderByDescending(e => e.Fecha).ToList()
+                };
                 TempData["Error"] = "Error al registrar el egreso.";
-                return View("Egresos", modelo);
+                return View("Egresos", vm);
             }
 
-            _context.Egresos.Add(modelo.NuevoEgreso);
+            _context.Egresos.Add(egreso);
             _context.SaveChanges();
             TempData["Mensaje"] = "Egreso registrado correctamente.";
             return RedirectToAction("Egresos");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> EditarEgreso(int id)
