@@ -1,6 +1,7 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace CEGA.Controllers
@@ -15,10 +16,16 @@ namespace CEGA.Controllers
         }
 
         // Listar todos los reportes creados
+        [HttpGet]
         public IActionResult Index()
         {
-            var reportes = _context.ReportesIncapacidades.ToList();
-            return View(reportes);
+            var incapacidades = _context.IncapacidadesEmpleado
+                .AsNoTracking()
+                .OrderByDescending(x => x.FechaPresentacion)
+                .ToList();
+
+            // La vista Index.cshtml ya tiene: @model IEnumerable<CEGA.Models.IncapacidadEmpleado>
+            return View(incapacidades);
         }
         [HttpGet]
         public IActionResult Crear()
