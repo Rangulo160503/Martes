@@ -20,5 +20,7 @@ namespace CEGA.Models
         [Required(ErrorMessage = "Campo obligatorio")]
         [DataType(DataType.Date)]
         public DateTime FechaFin { get; set; }
+        public ICollection<TareasProyecto> Tareas { get; set; } = new List<TareasProyecto>();
+        public ICollection<ComentariosProyecto> Comentarios { get; set; } = new List<ComentariosProyecto>();
     }
 }

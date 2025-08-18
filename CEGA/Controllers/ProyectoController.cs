@@ -1,6 +1,7 @@
 ﻿using CEGA.Data;
-using Microsoft.AspNetCore.Mvc;
 using CEGA.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CEGA.Controllers
 {
@@ -150,10 +151,16 @@ namespace CEGA.Controllers
             return RedirectToAction("Index", "Home");
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var proyectos = _context.Proyectos.ToList();
-            return View(proyectos);
+            var vm = new CEGA.Models.ViewModels.ProyectoPageVM
+            {
+                Proyectos = await _context.Proyectos.AsNoTracking().ToListAsync(),
+                Tareas = await _context.TareaProyectos.AsNoTracking().ToListAsync(),        // ajusta nombres
+                Comentarios = await _context.ComentarioProyectos.AsNoTracking().ToListAsync()    // ajusta nombres
+            };
+
+            return View(vm);
         }
 
     }

@@ -1,50 +1,167 @@
 ﻿@model IEnumerable<CEGA.Models.VacacionesEmpleado>
+@using System.Globalization
 
-<h4 class="mt-4">🌴 Solicitudes de Vacaciones</h4>
+@{
+    ViewData["Title"] = "Vacaciones";
 
-<form asp-action="SolicitarVacaciones" asp-controller="Empleados" method="post" class="mb-3">
-    <div class="row">
-        <div class="col-md-4">
-            <input name="FechaInicio" type="date" class="form-control" required />
-        </div>
-        <div class="col-md-4">
-            <input name="DiasSolicitados" type="number" class="form-control" placeholder="Días Solicitados" required />
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-success w-100">➕ Solicitar</button>
-        </div>
+    // Para el dropdown de empleados (igual que en otras vistas)
+    var empleados = ViewBag.Empleados as IEnumerable<CEGA.Models.ApplicationUser>;
+
+    Func<string, string> BadgeClase = estado =>
+    {
+        if (string.IsNullOrWhiteSpace(estado)) return "bg-warning";
+        return estado.Equals("Aprobado", StringComparison.OrdinalIgnoreCase) ? "bg-success"
+             : estado.Equals("Rechazado", StringComparison.OrdinalIgnoreCase) ? "bg-danger"
+             : "bg-warning"; // Pendiente / otros
+    };
+}
+
+<h4 class="mt-2 mb-2">Solicitudes de vacaciones</h4>
+
+<!-- Solicitar vacaciones: selecciona empleado + rango de fechas -->
+<div class="card card-lg">
+    <div class="card-header">Nueva solicitud</div>
+    <div class="card-body">
+        <form asp-action="SolicitarVacaciones" asp-controller="Empleados" method="post" class="row g-2" novalidate>
+            @Html.AntiForgeryToken()
+
+            <!-- Empleado -->
+            <div class="col-md-4">
+                <label class="form-label" for="UsuarioID">Empleado</label>
+                <select id="UsuarioID" name="UsuarioID" class="form-select" required>
+                    <option value="">— Seleccione —</option>
+                    @if (empleados != null && empleados.Any())
+                    {
+                        foreach (var emp in empleados.OrderBy(e => e.UserName))
+                        {
+                            <option value="@emp.Id">@emp.UserName</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>— No hay empleados disponibles —</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Rango de fechas -->
+            <div class="col-md-5">
+                <label class="form-label d-block">Periodo solicitado</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="date" id="vac_ini" name="FechaInicio" class="form-control" required />
+                        <div class="form-text">Inicio</div>
+                    </div>
+                    <div class="col-6">
+                        <input type="date" id="vac_fin" class="form-control" />
+                        <div class="form-text">Fin</div>
+                    </div>
+                </div>
+                <div class="small text-muted mt-2">Total: <span id="vac_dias_txt">0</span> día(s)</div>
+            </div>
+
+            <!-- Días solicitados (se calcula automáticamente; se envía al backend) -->
+            <div class="col-md-2">
+                <label class="form-label" for="DiasSolicitados">Días</label>
+                <input id="DiasSolicitados" name="DiasSolicitados" type="number" class="form-control" value="0" readonly />
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-accent w-100">Solicitar</button>
+            </div>
+
+            <div class="col-12">
+                <div class="form-text">
+                    El total de días se calcula en base al rango seleccionado (incluye fecha de inicio y fin).
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
+<!-- Listado -->
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Usuario</th>
-                <th>Fecha Inicio</th>
-                <th>Días Solicitados</th>
-                <th>Días Disponibles</th>
-                <th>Estado</th>
-                <th>Fecha Solicitud</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var vac in Model)
-            {
-                <tr>
-                    <td>@vac.UsuarioID</td>
-                    <td>@vac.FechaInicio.ToShortDateString()</td>
-                    <td>@vac.DiasSolicitados</td>
-                    <td>@vac.DiasDisponibles</td>
-                    <td>@vac.Estado</td>
-                    <td>@vac.FechaSolicitud.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card mt-3">
+        <div class="card-header">Solicitudes registradas</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Fecha inicio</th>
+                            <th>Días solicitados</th>
+                            <th>Días disponibles</th>
+                            <th>Estado</th>
+                            <th>Fecha solicitud</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vac in Model)
+                        {
+                            var badge = BadgeClase(vac.Estado);
+                            <tr>
+                                <td class="fw-semibold">@vac.UsuarioID</td>
+                                <td>@vac.FechaInicio.ToShortDateString()</td>
+                                <td>@vac.DiasSolicitados</td>
+                                <td>@vac.DiasDisponibles</td>
+                                <td><span class="badge @badge">@(!string.IsNullOrWhiteSpace(vac.Estado) ? vac.Estado : "—")</span></td>
+                                <td>@vac.FechaSolicitud.ToShortDateString()</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <div class="alert alert-info mt-3">No hay solicitudes de vacaciones registradas.</div>
+    <div class="alert alert-warning mt-3 mb-0">No hay solicitudes de vacaciones registradas.</div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const ini = document.getElementById('vac_ini');
+            const fin = document.getElementById('vac_fin');
+            const diasInput = document.getElementById('DiasSolicitados');
+            const diasTxt = document.getElementById('vac_dias_txt');
+
+            function toDate(v) {
+                // v = "YYYY-MM-DD"
+                const d = new Date(v + 'T00:00:00');
+                return isNaN(d.getTime()) ? null : d;
+            }
+
+            function calcDias() {
+                const d1 = toDate(ini?.value || '');
+                const d2 = toDate(fin?.value || '');
+                let dias = 0;
+
+                if (d1 && d2) {
+                    // Diferencia en días, inclusiva (ej: 2025-08-01 a 2025-08-01 -> 1 día)
+                    const ms = d2.getTime() - d1.getTime();
+                    if (ms >= 0) {
+                        dias = Math.floor(ms / 86400000) + 1;
+                    } else {
+                        // Si fin es antes que inicio, invertimos o dejamos 0
+                        dias = 0;
+                    }
+                } else if (d1 && !d2) {
+                    dias = 1; // Si solo hay inicio, contamos 1 día
+                }
+
+                if (diasInput) diasInput.value = dias;
+                if (diasTxt) diasTxt.textContent = dias.toString();
+            }
+
+            document.addEventListener('input', function (e) {
+                if (e.target === ini || e.target === fin) {
+                    calcDias();
+                }
+            });
+        })();
+    </script>
 }

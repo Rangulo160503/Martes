@@ -1,55 +1,159 @@
 ﻿@model IEnumerable<CEGA.Models.ClienteMarketing>
 
-<h4 class="mt-5">👥 Clientes Registrados</h4>
+@{
+    var count = Model?.Count() ?? 0;
+}
 
-<!-- Botón para agregar -->
-<form asp-action="CrearCliente" asp-controller="Marketing" method="post" class="mb-3">
-    <div class="row">
-        <div class="col-md-3">
-            <input name="Nombre" class="form-control" placeholder="Nombre Cliente" required />
-        </div>
-        <div class="col-md-3">
-            <input name="Correo" class="form-control" placeholder="Correo Electrónico" required />
-        </div>
-        <div class="col-md-3">
-            <input name="Telefono" class="form-control" placeholder="Teléfono" required />
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-success w-100">➕ Agregar Cliente</button>
-        </div>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+    <h4 class="mb-0">Clientes registrados</h4>
+    <span class="text-muted small">@count registro(s)</span>
+</div>
+
+<!-- Alta de cliente (SIEMPRE ARRIBA) -->
+<div class="card card-lg mb-3">
+    <div class="card-header">Agregar cliente</div>
+    <div class="card-body">
+        <form asp-action="CrearCliente"
+              asp-controller="Marketing"
+              method="post"
+              class="row g-2"
+              novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="col-md-5">
+                <label class="form-label" for="nuevoNombre">Nombre</label>
+                <input id="nuevoNombre" name="Nombre" class="form-control" placeholder="Nombre del cliente" required />
+            </div>
+
+            <div class="col-md-5">
+                <label class="form-label" for="nuevoCorreo">Correo electrónico</label>
+                <input id="nuevoCorreo" name="Correo" type="email" class="form-control" placeholder="correo@dominio.com" required />
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-accent w-100">Agregar</button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
+<!-- Listado (ABAJO) -->
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var cli in Model)
-            {
-                <tr>
-                    <td>@cli.Nombre</td>
-                    <td>@cli.Correo</td>
-                    <td>@cli.Telefono</td>
-                    <td>
-                        <form asp-action="EditarCliente" asp-controller="Marketing" method="post" class="d-inline">
-                            <input type="hidden" name="Id" value="@cli.Id" />
-                            <button type="submit" class="btn btn-sm btn-primary">✏️</button>
-                        </form>
-                        <form asp-action="EliminarCliente" asp-controller="Marketing" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este cliente?');">
-                            <input type="hidden" name="id" value="@cli.Id" />
-                            <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card mb-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="min-width:220px;">Nombre</th>
+                            <th style="min-width:280px;">Correo</th>
+                            <th style="width:280px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cli in Model)
+                        {
+                            var rowId = $"row_{cli.Id}";
+                            <tr id="@rowId">
+                                <td>
+                                    <input class="form-control form-control-sm"
+                                           name="Nombre"
+                                           value="@cli.Nombre"
+                                           disabled
+                                           data-field="nombre" />
+                                </td>
+                                <td>
+                                    <input class="form-control form-control-sm"
+                                           name="Correo"
+                                           type="email"
+                                           value="@cli.Correo"
+                                           disabled
+                                           data-field="correo" />
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <!-- Modificar: habilita inputs -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                data-action="edit"
+                                                data-target="@rowId">
+                                            Modificar
+                                        </button>
+
+                                        <!-- Guardar: postea a EditarCliente (mismo flujo) -->
+                                        <form asp-action="EditarCliente"
+                                              asp-controller="Marketing"
+                                              method="post"
+                                              class="m-0 d-inline"
+                                              data-form="save"
+                                              data-target="@rowId">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="Id" value="@cli.Id" />
+                                            <input type="hidden" name="Nombre" value="@cli.Nombre" data-sync="nombre" />
+                                            <input type="hidden" name="Correo" value="@cli.Correo" data-sync="correo" />
+                                            <button type="submit" class="btn btn-sm btn-accent" disabled>Guardar</button>
+                                        </form>
+
+                                        <!-- Eliminar -->
+                                        <form asp-action="EliminarCliente"
+                                              asp-controller="Marketing"
+                                              method="post"
+                                              class="m-0 d-inline"
+                                              onsubmit="return confirm('¿Eliminar este cliente?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@cli.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
+else
+{
+    <div class="alert alert-warning">No hay clientes registrados.</div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            // Habilita edición en línea y sincroniza valores para el submit
+            function enableEdit(rowId) {
+                const row = document.getElementById(rowId);
+                if (!row) return;
+
+                const inputs = row.querySelectorAll('input[data-field]');
+                inputs.forEach(i => i.removeAttribute('disabled'));
+
+                const saveForm = row.querySelector('form[data-form="save"]');
+                const saveBtn  = saveForm?.querySelector('button[type="submit"]');
+                if (saveBtn) saveBtn.removeAttribute('disabled');
+
+                // Copia cambios de inputs visibles a los hidden del form de guardar
+                inputs.forEach(inp => {
+                    inp.addEventListener('input', () => {
+                        const key = inp.getAttribute('data-field'); // nombre | correo
+                        const hidden = saveForm?.querySelector(`input[data-sync="${key}"]`);
+                        if (hidden) hidden.value = inp.value;
+                    });
+                });
+            }
+
+            // Delegación: click en "Modificar"
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('button[data-action="edit"]');
+                if (!btn) return;
+                const rowId = btn.getAttribute('data-target');
+                enableEdit(rowId);
+            });
+        })();
+    </script>
+}
+    

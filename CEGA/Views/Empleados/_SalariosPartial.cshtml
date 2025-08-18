@@ -1,60 +1,306 @@
 ﻿@model IEnumerable<CEGA.Models.EmpleadoSalario>
+@using System.Globalization
+@using System.Linq
 
-<h4 class="mt-4">💰 Salarios Registrados</h4>
+@{
+    ViewData["Title"] = "Resumen de Empleados";
 
-<!-- Formulario para agregar salario -->
-<form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="mb-3">
-    <div class="row">
-        <div class="col-md-5">
-            <input name="usuarioId" class="form-control" placeholder="ID del Usuario" required />
+    // Datos auxiliares para el resumen (opcionales)
+    var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
+    var puestos       = ViewBag.Puestos       as IEnumerable<CEGA.Models.PuestoEmpleado>;
+    var vacaciones    = ViewBag.Vacaciones    as IEnumerable<CEGA.Models.VacacionesEmpleado>;
+
+    // "Departamentos": si el controlador no manda ViewBag.Departamentos,
+    // tomamos valores distintos de Puesto (sirve como "área").
+    var depBag = ViewBag.Departamentos as IEnumerable<string>;
+    var deptos = (depBag != null && depBag.Any())
+        ? depBag
+        : (puestos?.Where(p => !string.IsNullOrWhiteSpace(p.Puesto))
+                   .Select(p => p.Puesto)
+                   .Distinct(StringComparer.OrdinalIgnoreCase)
+                   .OrderBy(p => p)
+           ?? Enumerable.Empty<string>());
+
+    int totalUsuarios = Model?.Select(m => m.UsuarioId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().Count() ?? 0;
+
+    Func<string, string> BadgeClase = estado =>
+    {
+        if (string.IsNullOrWhiteSpace(estado)) return "bg-warning";
+        return estado.Equals("Aprobado", StringComparison.OrdinalIgnoreCase) ? "bg-success"
+             : estado.Equals("Rechazado", StringComparison.OrdinalIgnoreCase) ? "bg-danger"
+             : "bg-warning";
+    };
+}
+
+<!-- Header + filtros -->
+<div class="mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2">
+        <div>
+            <h4 class="mb-1">Resumen de empleados</h4>
+            <p class="text-muted mb-0">Explora salario, puesto, vacaciones e incapacidades por empleado.</p>
         </div>
-        <div class="col-md-5">
-            <input name="salario" type="number" step="0.01" class="form-control" placeholder="Salario Mensual" required />
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-success w-100">➕ Agregar</button>
+
+        <div class="text-muted small">Total empleados: <strong id="countTotal">@totalUsuarios</strong></div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label" for="fDepto">Departamento / Área</label>
+                    <select id="fDepto" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach (var d in deptos)
+                        {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="fTexto">Buscar</label>
+                    <input id="fTexto" class="form-control" placeholder="Usuario, puesto, estado..." />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button" id="btnLimpiar" class="btn btn-outline-secondary ms-auto">Limpiar filtros</button>
+                </div>
+            </div>
         </div>
     </div>
-</form>
+</div>
 
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Usuario</th>
-                <th>Salario Mensual</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model)
-            {
-                <tr>
-                    <td>@s.UsuarioId</td>
-                    <td>@s.SalarioMensual.ToString("C")</td>
-                    <td>@s.FechaRegistro.ToShortDateString()</td>
-                    <td>
-                        <!-- Formulario Editar (reutiliza mismo formulario de agregar) -->
-                        <form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="d-inline">
-                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
-                            <input type="hidden" name="salario" value="@s.SalarioMensual" />
-                            <button type="submit" class="btn btn-sm btn-primary">✏️ Editar</button>
-                        </form>
+    <div class="card">
+        <div class="card-header">Listado</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0" id="tablaResumen">
+                    <thead>
+                        <tr>
+                            <th style="min-width:220px;">Usuario</th>
+                            <th>Salario mensual</th>
+                            <th>Fecha registro</th>
+                            <th style="width:320px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model)
+                        {
+                            var uid   = s.UsuarioId ?? "";
+                            var rid   = $"res_{uid}_{s.FechaRegistro.Ticks}".Replace(" ", "_");
 
-                        <!-- Botón eliminar -->
-                        <form asp-action="EliminarSalario" asp-controller="Empleados" method="post" class="d-inline" onsubmit="return confirm('¿Desea eliminar este salario?');">
-                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
-                            <button type="submit" class="btn btn-sm btn-danger">🗑️ Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                            var lastInc = incapacidades?
+                                .Where(x => x.UsuarioID == uid)
+                                .OrderByDescending(x => x.FechaPresentacion)
+                                .FirstOrDefault();
+
+                            var lastPuesto = puestos?
+                                .Where(x => x.UsuarioID == uid)
+                                .OrderByDescending(x => x.FechaAsignacion)
+                                .FirstOrDefault();
+
+                            var lastVac = vacaciones?
+                                .Where(x => x.UsuarioID == uid)
+                                .OrderByDescending(x => x.FechaSolicitud)
+                                .FirstOrDefault();
+
+                            // Usaremos el "puesto" como etiqueta de área/departamento para filtrar
+                            var area = lastPuesto?.Puesto ?? "General";
+
+                            <tr class="emp-row"
+                                data-usuario="@uid"
+                                data-area="@area"
+                                data-text="@($"{uid} {area} {lastVac?.Estado} {lastInc?.Estado}")">
+                                <td class="fw-semibold">@uid</td>
+                                <td>@s.SalarioMensual.ToString("C", CultureInfo.GetCultureInfo("es-CR"))</td>
+                                <td>@s.FechaRegistro.ToShortDateString()</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#@rid"
+                                                aria-expanded="false"
+                                                aria-controls="@rid">
+                                            Ver resumen
+                                        </button>
+
+                                        <form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="m-0 d-inline">
+                                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
+                                            <input type="hidden" name="salario" value="@s.SalarioMensual" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Editar</button>
+                                        </form>
+
+                                        <form asp-action="EliminarSalario"
+                                              asp-controller="Empleados"
+                                              method="post"
+                                              class="m-0 d-inline"
+                                              onsubmit="return confirm('¿Desea eliminar este salario?');">
+                                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Resumen colapsable -->
+                            <tr class="emp-detail collapse" id="@rid" data-area="@area">
+                                <td colspan="4" class="bg-light">
+                                    <div class="p-3">
+                                        <div class="row g-3">
+                                            <!-- Puesto -->
+                                            <div class="col-md-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header">Puesto</div>
+                                                    <div class="card-body">
+                                                        <div><span class="text-muted">Puesto actual:</span><br /><span class="fw-semibold">@((lastPuesto?.Puesto) ?? "—")</span></div>
+                                                        <div class="mt-2"><span class="text-muted">Salario asignado:</span><br />@((lastPuesto?.SalarioAsignado).HasValue ? lastPuesto.SalarioAsignado.ToString("C", CultureInfo.GetCultureInfo("es-CR")) : "—")</div>
+                                                        <div class="mt-2"><span class="text-muted">Asignado:</span><br />@((lastPuesto?.FechaAsignacion).HasValue ? lastPuesto.FechaAsignacion.ToShortDateString() : "—")</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Vacaciones -->
+                                            <div class="col-md-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header">Vacaciones</div>
+                                                    <div class="card-body">
+                                                        <div><span class="text-muted">Días disponibles:</span><br /><span class="fw-semibold">@((lastVac?.DiasDisponibles).HasValue ? lastVac.DiasDisponibles.ToString() : "—")</span></div>
+                                                        <div class="mt-2"><span class="text-muted">Última solicitud:</span><br />@((lastVac?.FechaSolicitud).HasValue ? lastVac.FechaSolicitud.ToShortDateString() : "—")</div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Estado:</span><br />
+                                                            @{
+                                                                var estVac = lastVac?.Estado ?? "—";
+                                                                var badgeVac = BadgeClase(estVac);
+                                                            }
+                                                            <span class="badge @badgeVac">@estVac</span>
+                                                        </div>
+                                                        <div class="mt-2"><span class="text-muted">Días solicitados (última):</span><br />@((lastVac?.DiasSolicitados).HasValue ? lastVac.DiasSolicitados.ToString() : "—")</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Incapacidades -->
+                                            <div class="col-md-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header">Incapacidades</div>
+                                                    <div class="card-body">
+                                                        <div>
+                                                            <span class="text-muted">Estado último:</span><br />
+                                                            @{
+                                                                var estInc = lastInc?.Estado ?? "—";
+                                                                var badgeInc = BadgeClase(estInc);
+                                                            }
+                                                            <span class="badge @badgeInc">@estInc</span>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Fecha:</span><br />@((lastInc?.FechaPresentacion).HasValue ? lastInc.FechaPresentacion.ToShortDateString() : "—")
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Descripción:</span>
+                                                            <div class="text-truncate" style="max-width: 100%;">@((lastInc?.Descripcion) ?? "—")</div>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            @if (!string.IsNullOrWhiteSpace(lastInc?.ArchivoRuta))
+                                                            {
+                                                                <a href="@lastInc.ArchivoRuta" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">Ver archivo</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="text-muted">Sin archivo</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Salario -->
+                                            <div class="col-md-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header">Salario</div>
+                                                    <div class="card-body">
+                                                        <div><span class="text-muted">Actual:</span><br /><span class="fw-semibold">@s.SalarioMensual.ToString("C", CultureInfo.GetCultureInfo("es-CR"))</span></div>
+                                                        <div class="mt-2"><span class="text-muted">Registrado:</span><br />@s.FechaRegistro.ToShortDateString()</div>
+                                                        <div class="mt-2 text-muted small">Este bloque muestra el salario correspondiente a esta fila.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <!-- row -->
+                                    </div> <!-- p-3 -->
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive -->
+        </div> <!-- card-body -->
+    </div> <!-- card -->
 }
 else
 {
-    <div class="alert alert-info mt-3">No hay salarios registrados.</div>
+    <div class="alert alert-warning mt-3">No hay salarios registrados.</div>
+}
+
+@section Scripts {
+<script>
+(function () {
+    const fDepto   = document.getElementById('fDepto');
+    const fTexto   = document.getElementById('fTexto');
+    const btnClear = document.getElementById('btnLimpiar');
+    const rows     = Array.from(document.querySelectorAll('#tablaResumen tbody tr.emp-row'));
+    const details  = new Map(); // rid -> detail <tr>
+
+    // Relacionar filas de detalle por id de collapse (aria-controls) o nextElementSibling con .emp-detail
+    document.querySelectorAll('#tablaResumen tbody tr.emp-detail').forEach(d => {
+        details.set(d.id, d);
+    });
+
+    function match(text, q) {
+        return text.toLowerCase().includes(q.toLowerCase());
+    }
+
+    function applyFilters() {
+        const dVal = (fDepto?.value || '').trim();
+        const qVal = (fTexto?.value || '').trim();
+
+        let visibleCount = 0;
+
+        rows.forEach(r => {
+            const area = (r.getAttribute('data-area') || '').trim();
+            const text = (r.getAttribute('data-text') || '').trim() + ' ' + (r.getAttribute('data-usuario') || '');
+            let ok = true;
+
+            if (dVal) ok = ok && (area.toLowerCase() === dVal.toLowerCase());
+            if (qVal) ok = ok && match(text, qVal);
+
+            // Mostrar/ocultar fila base
+            r.style.display = ok ? '' : 'none';
+
+            // Ocultar también su fila de detalle (si existe) cuando no coincide
+            const btn = r.querySelector('[data-bs-target]');
+            const rid = btn ? btn.getAttribute('data-bs-target')?.replace('#', '') : null;
+            if (rid && details.has(rid)) {
+                details.get(rid).style.display = ok ? '' : 'none';
+            }
+
+            if (ok) visibleCount++;
+        });
+
+        // Actualizar contador visible (opcional)
+        const countEl = document.getElementById('countTotal');
+        if (countEl) countEl.textContent = visibleCount.toString();
+    }
+
+    fDepto?.addEventListener('change', applyFilters);
+    fTexto?.addEventListener('input', applyFilters);
+    btnClear?.addEventListener('click', function () {
+        if (fDepto) fDepto.value = '';
+        if (fTexto) fTexto.value = '';
+        applyFilters();
+    });
+
+    // Primera pasada
+    applyFilters();
+})();
+</script>
 }

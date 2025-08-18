@@ -1,42 +1,88 @@
 ﻿@model List<CEGA.Models.Plano>
 @{
     ViewData["Title"] = "Comparar Planos";
+    var total = Model?.Count ?? 0;
+    var grupos = (Model ?? new List<CEGA.Models.Plano>())
+        .GroupBy(p => string.IsNullOrWhiteSpace(p.Disciplina) ? "Sin disciplina" : p.Disciplina)
+        .OrderBy(g => g.Key);
 }
 
 <!-- Header de página -->
-<div class="mb-3">
-    <h2 class="mb-0">Comparar Planos</h2>
-    <p class="text-muted mb-0">Seleccione dos planos distintos para generar la comparación.</p>
+<div class="mb-3 d-flex flex-wrap align-items-end justify-content-between gap-2">
+    <div>
+        <h2 class="mb-0">Comparar Planos</h2>
+        <p class="text-muted mb-0">Seleccione dos planos distintos para generar la comparación.</p>
+    </div>
+    <span class="badge bg-success align-self-start">@(total) plano(s)</span>
 </div>
 
 <div class="card card-lg">
-    <div class="card-header">Selección de planos</div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Selección de planos</span>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="btnLimpiar">Limpiar</button>
+    </div>
+
     <div class="card-body">
-        <form method="post" asp-action="VerComparacion" novalidate>
-            <div class="mb-3">
-                <label for="plano1" class="form-label">Primer plano</label>
-                <select name="plano1" id="plano1" class="form-select" required>
-                    <option value="">-- Seleccione uno --</option>
-                    @foreach (var plano in Model)
-                    {
-                        <option value="@plano.Id">@plano.NombreArchivo</option>
-                    }
-                </select>
+        <form method="post" asp-action="VerComparacion" novalidate id="formComparar">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3">
+                <!-- Columna 1 -->
+                <div class="col-12 col-md-6">
+                    <label for="plano1" class="form-label">Primer plano</label>
+                    <select name="plano1" id="plano1" class="form-select" required>
+                        <option value="">— Seleccione —</option>
+                        @foreach (var g in grupos)
+                        {
+                            <optgroup label="@($"{g.Key} ({g.Count()})")">
+                                @foreach (var p in g.OrderByDescending(x => x.FechaSubida))
+                                {
+                                    <option value="@p.Id"
+                                            data-disc="@p.Disciplina"
+                                            data-fecha="@p.FechaSubida.ToString("yyyy-MM-dd")">
+                                        @p.NombreArchivo — @p.FechaSubida.ToString("dd/MM/yyyy")
+                                    </option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                    <div class="form-text">Sugerencia: elija la versión más reciente.</div>
+                </div>
+
+                <!-- Columna 2 -->
+                <div class="col-12 col-md-6">
+                    <label for="plano2" class="form-label">Segundo plano</label>
+                    <select name="plano2" id="plano2" class="form-select" required>
+                        <option value="">— Seleccione —</option>
+                        @foreach (var g in grupos)
+                        {
+                            <optgroup label="@($"{g.Key} ({g.Count()})")">
+                                @foreach (var p in g.OrderByDescending(x => x.FechaSubida))
+                                {
+                                    <option value="@p.Id"
+                                            data-disc="@p.Disciplina"
+                                            data-fecha="@p.FechaSubida.ToString("yyyy-MM-dd")">
+                                        @p.NombreArchivo — @p.FechaSubida.ToString("dd/MM/yyyy")
+                                    </option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                    <div class="invalid-feedback" id="errMismoPlano">Debe seleccionar dos planos distintos.</div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="plano2" class="form-label">Segundo plano</label>
-                <select name="plano2" id="plano2" class="form-select" required>
-                    <option value="">-- Seleccione uno --</option>
-                    @foreach (var plano in Model)
-                    {
-                        <option value="@plano.Id">@plano.NombreArchivo</option>
-                    }
-                </select>
+            <!-- Resumen de selección -->
+            <div class="mt-3 p-3 border rounded" style="border-color: var(--border);">
+                <div class="small text-muted mb-2">Resumen</div>
+                <div id="resumenSel" class="d-flex flex-column gap-1">
+                    <span class="text-muted">Seleccione ambos planos para ver el resumen aquí.</span>
+                </div>
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-accent">Comparar</button>
+            <!-- Acciones -->
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-accent" id="btnComparar" disabled>Comparar</button>
                 <a asp-controller="Pdf" asp-action="ListaPlanos" class="btn btn-outline-primary">Volver</a>
             </div>
         </form>
@@ -46,4 +92,93 @@
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const sel1 = document.getElementById('plano1');
+            const sel2 = document.getElementById('plano2');
+            const btn = document.getElementById('btnComparar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const err = document.getElementById('errMismoPlano');
+            const resumen = document.getElementById('resumenSel');
+
+            function infoTexto(opt) {
+                if (!opt || !opt.value) return null;
+                const nombre = opt.textContent.trim();
+                const disc = opt.getAttribute('data-disc') || '';
+                const fecha = opt.getAttribute('data-fecha') || '';
+                return { nombre, disc, fecha };
+            }
+
+            function chip(texto) {
+                const span = document.createElement('span');
+                span.className = 'badge bg-warning text-dark';
+                span.textContent = texto;
+                return span;
+            }
+
+            function actualizarResumen() {
+                resumen.innerHTML = '';
+                const i1 = infoTexto(sel1.options[sel1.selectedIndex]);
+                const i2 = infoTexto(sel2.options[sel2.selectedIndex]);
+
+                if (!i1 && !i2) {
+                    resumen.innerHTML = '<span class="text-muted">Seleccione ambos planos para ver el resumen aquí.</span>';
+                    return;
+                }
+
+                if (i1) {
+                    const row1 = document.createElement('div');
+                    row1.className = 'd-flex align-items-center gap-2';
+                    row1.append(chip('Plano 1'), document.createTextNode(' ' + i1.nombre));
+                    if (i1.disc) row1.appendChild(chip(i1.disc));
+                    if (i1.fecha) row1.appendChild(chip(i1.fecha));
+                    resumen.appendChild(row1);
+                }
+
+                if (i2) {
+                    const row2 = document.createElement('div');
+                    row2.className = 'd-flex align-items-center gap-2';
+                    row2.append(chip('Plano 2'), document.createTextNode(' ' + i2.nombre));
+                    if (i2.disc) row2.appendChild(chip(i2.disc));
+                    if (i2.fecha) row2.appendChild(chip(i2.fecha));
+                    resumen.appendChild(row2);
+                }
+            }
+
+            function validar() {
+                const v1 = sel1.value;
+                const v2 = sel2.value;
+
+                // Mismo plano seleccionado -> inválido
+                const mismo = v1 && v2 && v1 === v2;
+                if (mismo) {
+                    sel2.classList.add('is-invalid');
+                    err.style.display = 'block';
+                } else {
+                    sel2.classList.remove('is-invalid');
+                    err.style.display = '';
+                }
+
+                // Habilitar comparar sólo si hay dos distintos
+                btn.disabled = !(v1 && v2 && !mismo);
+            }
+
+            sel1.addEventListener('change', () => { validar(); actualizarResumen(); });
+            sel2.addEventListener('change', () => { validar(); actualizarResumen(); });
+
+            btnLimpiar.addEventListener('click', function () {
+                sel1.value = '';
+                sel2.value = '';
+                validar();
+                actualizarResumen();
+            });
+
+            // Estado inicial
+            validar();
+            actualizarResumen();
+        })();
+    </script>
 }

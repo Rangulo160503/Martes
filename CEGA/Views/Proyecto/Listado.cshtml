@@ -1,0 +1,89 @@
+﻿@model IEnumerable<CEGA.Models.Proyecto>
+
+@{
+    ViewData["Title"] = "Listado de Proyectos";
+}
+
+<!-- Header -->
+<div class="mb-3">
+    <h2 class="mb-0">Listado de Proyectos</h2>
+    <p class="text-muted mb-0">Administra proyectos, crea tareas o reportes de incidentes asociados.</p>
+</div>
+
+@if (TempData["mensaje"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["mensaje"]</div>
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Proyectos registrados</span>
+        <a asp-action="Crear" class="btn btn-accent btn-sm">+ Crear nuevo proyecto</a>
+    </div>
+    <div class="card-body p-0">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-warning m-3">
+                No hay proyectos registrados actualmente.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Detalles</th>
+                            <th style="min-width:120px;">Fecha Inicio</th>
+                            <th style="min-width:160px;">Fecha Finalización</th>
+                            <th style="width:300px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var proyecto in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@proyecto.Nombre</td>
+                                <td class="text-truncate" style="max-width:400px;">@proyecto.Detalles</td>
+                                <td>@proyecto.FechaInicio.ToShortDateString()</td>
+                                <td>@proyecto.FechaFin.ToShortDateString()</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a asp-action="Editar"
+                                           asp-route-id="@proyecto.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Editar
+                                        </a>
+
+                                        <form asp-action="Eliminar" method="post" class="m-0">
+                                            <input type="hidden" name="nombre" value="@proyecto.Nombre" />
+                                            <input type="hidden" name="confirmar" value="true" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                Eliminar
+                                            </button>
+                                        </form>
+
+                                        <a asp-controller="Tarea"
+                                           asp-action="Crear"
+                                           asp-route-proyectoId="@proyecto.Id"
+                                           class="btn btn-sm btn-primary">
+                                            Crear Tarea
+                                        </a>
+
+                                        <a asp-controller="ReporteIncidente"
+                                           asp-action="Crear"
+                                           asp-route-proyectoId="@proyecto.Id"
+                                           class="btn btn-sm btn-warning">
+                                            Crear Incidente
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

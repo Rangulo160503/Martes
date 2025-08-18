@@ -15,18 +15,92 @@ namespace CEGA.Controllers
         {
             _context = context;
         }
-
         [HttpGet]
         public IActionResult Index()
         {
-            var tareas = _context.TareasProyecto.Include(t => t.Proyecto).ToList();
+            // ===== TAREAS (Proyecto) =====
+            var tareas = _context.TareasProyecto
+                .Include(t => t.Proyecto)
+                .AsNoTracking()
+                .OrderByDescending(t => t.Id)
+                .ToList();
 
-            ViewBag.Proyectos = new SelectList(_context.Proyectos.OrderBy(p => p.Nombre), "Id", "Nombre");
-            ViewBag.Empleados = new SelectList(_context.Users.OrderBy(u => u.UserName), "Id", "UserName");
+            // ===== ASIGNACIONES RAW (para "Por empleado" y "Sin asignar") =====
+            // Proyectamos SOLO columnas reales (Id, TareaId, UsuarioId) para evitar columnas inexistentes
+            var asignacionesRaw = _context.AsignacionesTareaEmpleado
+                .AsNoTracking()
+                .Select(a => new { a.Id, a.TareaId, a.UsuarioId })
+                .OrderByDescending(a => a.Id)
+                .ToList();
 
+            // ===== SIN ASIGNAR (respecto a TareasProyecto) =====
+            var sinAsignar = tareas
+                .Where(t => !asignacionesRaw.Any(a => a.TareaId == t.Id))
+                .ToList();
 
-            return View(tareas);
+            // ===== Usuarios (para mostrar nombre amigable) =====
+            var usuariosDisplay = _context.Users.AsNoTracking()
+                .Select(u => new {
+                    u.Id,
+                    Nombre = (((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim() != string.Empty)
+                                ? ((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim()
+                                : (u.UserName ?? u.Email ?? u.Id)
+                })
+                .ToList()
+                .ToDictionary(x => x.Id, x => x.Nombre);
+
+            // ===== POR EMPLEADO =====
+            var porEmpleado = asignacionesRaw
+                .GroupBy(a => a.UsuarioId)
+                .Select(g => new CEGA.Models.ViewModels.EmpleadoTareasVM
+                {
+                    UsuarioId = g.Key,
+                    Nombre = usuariosDisplay.ContainsKey(g.Key) ? usuariosDisplay[g.Key] : g.Key,
+                    Tareas = tareas.Where(t => g.Any(ax => ax.TareaId == t.Id)).Distinct().ToList()
+                })
+                .OrderBy(x => x.Nombre)
+                .ToList();
+
+            // ===== COMENTARIOS DE PROYECTO =====
+            var comentarios = _context.ComentariosProyecto
+                .Include(c => c.Proyecto)
+                .AsNoTracking()
+                .OrderByDescending(c => c.FechaCreacion)
+                .ToList();
+
+            // ===== COMBOS =====
+            ViewBag.Proyectos = new SelectList(
+                _context.Proyectos.AsNoTracking().OrderBy(p => p.Nombre),
+                "Id", "Nombre"
+            );
+
+            var empleadosCombo = _context.Users
+                .AsNoTracking()
+                .OrderBy(u => u.UserName)
+                .Select(u => new
+                {
+                    u.Id,
+                    Nombre = (((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim() != string.Empty)
+                                ? ((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim()
+                                : (u.UserName ?? u.Email ?? u.Id)
+                })
+                .ToList();
+
+            ViewBag.Empleados = new SelectList(empleadosCombo, "Id", "Nombre");
+
+            // ===== VM =====
+            var vm = new CEGA.Models.ViewModels.TareasPageVM
+            {
+                Tareas = tareas,
+                TareasSinAsignar = sinAsignar,
+                TareasPorEmpleado = porEmpleado,
+                Comentarios = comentarios   // <-- NUEVO
+            };
+
+            return View(vm);
         }
+
+
 
         [HttpGet]
         public IActionResult Crear(int? proyectoId)
@@ -38,14 +112,14 @@ namespace CEGA.Controllers
                 return View("SeleccionarProyectoParaTarea");
             }
 
-            var tarea = new TareaProyecto { ProyectoId = proyectoId.Value };
+            var tarea = new TareasProyecto { ProyectoId = proyectoId.Value };
             ViewBag.NombreProyecto = _context.Proyectos.Where(p => p.Id == proyectoId).Select(p => p.Nombre).FirstOrDefault();
             return View(tarea); // Views/Tarea/Crear.cshtml
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Crear(TareaProyecto tarea, bool asignar = false)
+        public IActionResult Crear(TareasProyecto tarea, bool asignar = false)
         {
             var proyecto = _context.Proyectos.FirstOrDefault(p => p.Id == tarea.ProyectoId);
             if (proyecto == null)
@@ -87,7 +161,7 @@ namespace CEGA.Controllers
         }
 
         [HttpPost]
-        public IActionResult Editar(TareaProyecto tarea)
+        public IActionResult Editar(TareasProyecto tarea)
         {
             if (!ModelState.IsValid)
             {
@@ -145,7 +219,7 @@ namespace CEGA.Controllers
             ViewBag.ProyectoNombre = tarea.Proyecto?.Nombre ?? "Sin proyecto";
             ViewBag.Empleados = _context.Users.ToList();
 
-            return View(new AsignacionTareaEmpleado { TareaId = tarea.Id });
+            return View(new AsignacionesTareaEmpleado { TareaId = tarea.Id });
         }
 
         [HttpPost]
@@ -172,7 +246,7 @@ namespace CEGA.Controllers
         }
 
         [HttpPost]
-        public IActionResult AsignarEmpleado(AsignacionTareaEmpleado asignacion)
+        public IActionResult AsignarEmpleado(AsignacionesTareaEmpleado asignacion)
         {
             if (string.IsNullOrWhiteSpace(asignacion.UsuarioId))
                 ModelState.AddModelError("UsuarioId", "Se necesita seleccionar un empleado");

@@ -1,49 +1,111 @@
 ﻿@model IEnumerable<CEGA.Models.PuestoEmpleado>
+@using System.Globalization
 
-<h4 class="mt-4">📌 Puestos de Empleados</h4>
+@{
+    ViewData["Title"] = "Puestos";
 
-<form asp-action="AsignarPuesto" asp-controller="Empleados" method="post" class="mb-3">
-    <div class="row">
-        <div class="col-md-3">
-            <input name="UsuarioID" class="form-control" placeholder="ID del Usuario" required />
-        </div>
-        <div class="col-md-5">
-            <input name="Puesto" class="form-control" placeholder="Puesto" required />
-        </div>
-        <div class="col-md-2">
-            <input name="SalarioAsignado" type="number" step="0.01" class="form-control" placeholder="Salario" required />
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-success w-100">📌 Asignar</button>
-        </div>
+    // Para dropdown de empleados y sugerir salario (opcional)
+    var empleados = ViewBag.Empleados as IEnumerable<CEGA.Models.ApplicationUser>;
+}
+
+<h4 class="mt-2 mb-2">Puestos de empleados</h4>
+
+<!-- Asignar puesto + (opcional) registrar salario -->
+<div class="card card-lg">
+    <div class="card-header">Asignar puesto</div>
+    <div class="card-body">
+        <form asp-action="AsignarPuesto" asp-controller="Empleados" method="post" class="row g-2">
+            <!-- Empleado -->
+            <div class="col-md-3">
+                <label class="form-label" for="UsuarioID">Empleado</label>
+                <select id="UsuarioID" name="UsuarioID" class="form-select" required>
+                    <option value="">— Seleccione —</option>
+                    @if (empleados != null && empleados.Any())
+                    {
+                        foreach (var emp in empleados.OrderBy(e => e.UserName))
+                        {
+                            <option value="@emp.Id">@emp.UserName</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>— No hay empleados disponibles —</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Puesto -->
+            <div class="col-md-3">
+                <label class="form-label" for="Puesto">Puesto</label>
+                <input id="Puesto" name="Puesto" class="form-control" placeholder="Ej. Contador(a)" required />
+            </div>
+
+            <!-- Salario asignado (también se usará para crear salario si se marca el switch) -->
+            <div class="col-md-2">
+                <label class="form-label" for="SalarioAsignado">Salario</label>
+                <input id="SalarioAsignado" name="SalarioAsignado" type="number" step="0.01" class="form-control" placeholder="0.00" required />
+            </div>
+
+            <!-- Fecha de asignación -->
+            <div class="col-md-2">
+                <label class="form-label" for="FechaAsignacion">Fecha</label>
+                <input id="FechaAsignacion" name="FechaAsignacion" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <!-- Switch: crear salario en EmpleadosSalarios (arte; el backend puede ignorarlo si no lo usa) -->
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="crearSalario" name="crearSalario" checked>
+                    <label class="form-check-label" for="crearSalario">Registrar salario</label>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-accent">Asignar</button>
+            </div>
+
+            <div class="col-12">
+                <div class="form-text">
+                    Al activar <strong>Registrar salario</strong>, además del puesto se registrará un salario actual con el monto indicado.
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
+<!-- Listado -->
 @if (Model != null && Model.Any())
 {
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Usuario</th>
-                <th>Puesto</th>
-                <th>Salario</th>
-                <th>Fecha Asignación</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model)
-            {
-                <tr>
-                    <td>@p.UsuarioID</td>
-                    <td>@p.Puesto</td>
-                    <td>@p.SalarioAsignado.ToString("C")</td>
-                    <td>@p.FechaAsignacion.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card mt-3">
+        <div class="card-header">Puestos asignados</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Puesto</th>
+                            <th>Salario</th>
+                            <th>Fecha asignación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@p.UsuarioID</td>
+                                <td>@p.Puesto</td>
+                                <td>@p.SalarioAsignado.ToString("C", CultureInfo.GetCultureInfo("es-CR"))</td>
+                                <td>@p.FechaAsignacion.ToShortDateString()</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <div class="alert alert-info mt-3">No hay puestos asignados.</div>
+    <div class="alert alert-warning mt-3 mb-0">No hay puestos asignados.</div>
 }

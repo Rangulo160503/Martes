@@ -10,6 +10,16 @@
         return (matchCtrl && matchAct) ? "active" : "";
     };
 }
+
+@functions{
+    // Abre automáticamente el colapsable si el controller actual pertenece al módulo
+    bool IsAny(params string[] ctrls)
+    {
+        var curr = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
+        return ctrls.Any(c => string.Equals(curr, c.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
+    }
+}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,6 +30,32 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CEGA.styles.css" asp-append-version="true" />
+
+    <style>
+        /* Opcional: estilos para los toggles tipo "hamburguesa" por módulo */
+        .menu-toggle {
+            background: transparent;
+            border: 0;
+            text-align: left;
+            padding: .65rem .85rem;
+            color: #fff;
+            width: 100%;
+            border-radius: .5rem;
+        }
+        .menu-toggle:hover { background: var(--brand-mid); color: var(--accent); }
+        .menu-toggle .caret {
+            display: inline-block;
+            width: .6rem; height: .6rem;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(-45deg);
+            transition: transform .2s ease;
+            margin-left: .5rem;
+        }
+        .menu-toggle[aria-expanded="true"] .caret {
+            transform: rotate(45deg);
+        }
+    </style>
 </head>
 <body>
     <!-- SIDEBAR -->
@@ -30,7 +66,7 @@
 
         <hr class="bg-light" />
 
-        <!-- Después -->
+        <!-- Gestión de Usuarios (simple) -->
         <a class="nav-link @active("account", "listausuarios")"
            asp-controller="Account" asp-action="ListaUsuarios">
             Gestión de Usuarios
@@ -38,71 +74,156 @@
 
         <hr class="bg-light" />
 
+        <!-- Empleados (simple) -->
         <a class="nav-link @active("empleados", null)" asp-controller="Empleados" asp-action="Empleados">Empleados</a>
 
         <hr class="bg-light" />
 
+        <!-- Marketing (simple) -->
         <a class="nav-link @active("marketing", null)" asp-controller="Marketing" asp-action="Marketing">Marketing</a>
 
         <hr class="bg-light" />
 
-        <!-- Módulo de Contabilidad -->
-        <div class="text-white small fw-bold px-3 mt-2">Contabilidad</div>
-        <a class="nav-link nav-subitem @active("contabilidad", "ingresos")" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
-        <a class="nav-link nav-subitem @active("contabilidad", "egresos")" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
-        <a class="nav-link nav-subitem @active("cierrediario", "index")" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
-        <a class="nav-link nav-subitem @active("cierres", "historialcierresrango")"
-           asp-controller="CierreDiario"
-           asp-action="HistorialCierresRango">
-            Reportes Financieros
-        </a>
+        <!-- Contabilidad (COLLAPSE) -->
+        @{
+            var openConta = IsAny("contabilidad", "cierrediario", "cierres");
+        }
+        <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mod-conta"
+                aria-expanded="@(openConta.ToString().ToLower())"
+                aria-controls="mod-conta">
+            <span>Contabilidad</span>
+            <span class="caret"></span>
+        </button>
+        <div id="mod-conta" class="collapse @(openConta ? "show" : "")">
+            <nav class="nav flex-column ps-3">
+                <a class="nav-link nav-subitem @active("contabilidad", "ingresos")" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
+                <a class="nav-link nav-subitem @active("contabilidad", "egresos")" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
+                <a class="nav-link nav-subitem @active("cierrediario", "index")" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
+                <a class="nav-link nav-subitem @active("cierres", "historialcierresrango")"
+                   asp-controller="CierreDiario" asp-action="HistorialCierresRango">
+                    Reportes Financieros
+                </a>
+            </nav>
+        </div>
 
         <hr class="bg-light" />
 
-        <!-- Módulo de Reportería -->
-        <div class="text-white small fw-bold px-3 mt-2">Reportería</div>
-        <a class="nav-link nav-subitem @active("reporteincapacidad", "index")" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
-        <a class="nav-link nav-subitem @active("reporteincidente", "index")" asp-controller="ReporteIncidente" asp-action="Index">Incidentes</a>
-        <a class="nav-link nav-subitem @active("reporteentradasalida", "listar")" asp-controller="ReporteEntradaSalida" asp-action="Listar">Entradas / Salidas</a>
+        <!-- Reportería (COLLAPSE) -->
+        @{
+            var openReport = IsAny("reporteincapacidad","reporteincidente","reporteentradasalida");
+        }
+        <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mod-reporte"
+                aria-expanded="@(openReport.ToString().ToLower())"
+                aria-controls="mod-reporte">
+            <span>Reportería</span>
+            <span class="caret"></span>
+        </button>
+        <div id="mod-reporte" class="collapse @(openReport ? "show" : "")">
+            <nav class="nav flex-column ps-3">
+                <a class="nav-link nav-subitem @active("reporteincapacidad", "index")" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
+                <a class="nav-link nav-subitem @active("reporteincidente", "index")" asp-controller="ReporteIncidente" asp-action="Index">Incidentes</a>
+                <a class="nav-link nav-subitem @active("reporteentradasalida", "listar")" asp-controller="ReporteEntradaSalida" asp-action="Listar">Entradas / Salidas</a>
+            </nav>
+        </div>
+
+        <hr class="bg-light" />
+        <!-- Seguimiento (COLLAPSE con submenús) -->
+        @{
+            var openSegProy = currentController == "proyecto"
+            && new[] { "index", "crear", "buscar" }.Contains(currentAction);
+
+            var openSegTarea = currentController == "tarea"
+            && new[] { "index", "crear", "buscar", "asignarempleado", "reporteconsolidado" }.Contains(currentAction);
+
+            var openSegCom = currentController == "comentario"
+            && new[] { "index", "crear", "buscar" }.Contains(currentAction);
+
+            var openSeg = openSegProy || openSegTarea || openSegCom;
+        }
+        <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mod-seg"
+                aria-expanded="@(openSeg.ToString().ToLower())"
+                aria-controls="mod-seg">
+            <span>Seguimiento</span>
+            <span class="caret"></span>
+        </button>
+
+        <div id="mod-seg" class="collapse @(openSeg ? "show" : "")">
+            <nav class="nav flex-column ps-3">
+
+                <!-- Proyectos (simple) -->
+                <a class="nav-link @active("proyecto", "index")"
+                   asp-controller="Proyecto"
+                   asp-action="Index">
+                    Proyectos
+                </a>
+                <!-- Tareas (simple) -->
+                <a class="nav-link @active("tarea", "index")"
+                   asp-controller="Tarea"
+                   asp-action="Index">
+                    Tareas
+                </a>
+
+            </nav>
+        </div>
 
         <hr class="bg-light" />
 
-        <!-- Módulo de Seguimiento -->
-        <div class="text-white small fw-bold px-3 mt-2">Seguimiento</div>
-        <a class="nav-link nav-subitem @active("proyecto", "index")" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
-        <a class="nav-link nav-subitem @active("proyecto", "crear")" asp-controller="Proyecto" asp-action="Crear">Crear Proyecto</a>
-        <a class="nav-link nav-subitem @active("proyecto", "buscar")" asp-controller="Proyecto" asp-action="Buscar">Buscar Proyecto</a>
-
-        <a class="nav-link nav-subitem @active("tarea", "index")" asp-controller="Tarea" asp-action="Index">Ver Tareas</a>
-        <a class="nav-link nav-subitem @active("tarea", "crear")" asp-controller="Tarea" asp-action="Crear">Crear Tarea</a>
-        <a class="nav-link nav-subitem @active("tarea", "buscar")" asp-controller="Tarea" asp-action="Buscar">Buscar Tarea</a>
-        <a class="nav-link nav-subitem @active("tarea", "asignarempleado")" asp-controller="Tarea" asp-action="AsignarEmpleado">Asignar Empleado</a>
-        <a class="nav-link nav-subitem @active("tarea", "reporteconsolidado")" asp-controller="Tarea" asp-action="ReporteConsolidado">Reporte Consolidado</a>
-
-        <a class="nav-link nav-subitem @active("comentario", "index")" asp-controller="Comentario" asp-action="Index">Ver Comentarios</a>
-        <a class="nav-link nav-subitem @active("comentario", "crear")" asp-controller="Comentario" asp-action="Crear">Agregar Comentario</a>
-        <a class="nav-link nav-subitem @active("comentario", "buscar")" asp-controller="Comentario" asp-action="Buscar">Buscar Comentario</a>
-
-        <hr class="bg-light" />
-
-        <!-- Módulo de Documentos PDF -->
-        <div class="text-white small fw-bold px-3 mt-2">Módulo PDF</div>
-        <a class="nav-link nav-subitem @active("pdf", "listaplanos")" asp-controller="Pdf" asp-action="ListaPlanos">Lista de Planos</a>
-        <a class="nav-link nav-subitem @active("pdf", "subirplano")" asp-controller="Pdf" asp-action="SubirPlano">Subir Plano</a>
-        <a class="nav-link nav-subitem @active("pdf", "compararplanos")" asp-controller="Pdf" asp-action="CompararPlanos">Comparar Planos</a>
+        <!-- Módulo PDF (COLLAPSE) -->
+        @{
+            var openPdf = IsAny("pdf");
+        }
+        <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mod-pdf"
+                aria-expanded="@(openPdf.ToString().ToLower())"
+                aria-controls="mod-pdf">
+            <span>Módulo PDF</span>
+            <span class="caret"></span>
+        </button>
+        <div id="mod-pdf" class="collapse @(openPdf ? "show" : "")">
+            <nav class="nav flex-column ps-3">
+                <a class="nav-link nav-subitem @active("pdf", "listaplanos")" asp-controller="Pdf" asp-action="ListaPlanos">Lista de Planos</a>
+                <a class="nav-link nav-subitem @active("pdf", "subirplano")" asp-controller="Pdf" asp-action="SubirPlano">Subir Plano</a>
+                <a class="nav-link nav-subitem @active("pdf", "compararplanos")" asp-controller="Pdf" asp-action="CompararPlanos">Comparar Planos</a>
+            </nav>
+        </div>
 
         <hr class="bg-light" />
 
         <!-- Cuenta actual -->
         @if (User.Identity?.IsAuthenticated ?? false)
         {
-            <div class="px-3 text-white small">
-                <div class="fw-bold mb-1">Hola @User.Identity.Name</div>
-                <a class="nav-link nav-subitem @active("account", "editprofile")" asp-controller="Account" asp-action="EditProfile">Editar Perfil</a>
-                <a class="nav-link nav-subitem @active("account", "forgotpassword")" asp-controller="Account" asp-action="ForgotPassword">Recuperar Contraseña</a>
-                <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
-                    <button type="submit" class="btn btn-sm btn-accent w-100">Cerrar sesión</button>
-                </form>
+            var openAccount = currentController == "account"
+            && new[] { "editprofile", "forgotpassword", "login", "register" }
+            .Contains(currentAction);
+            <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mod-account"
+                    aria-expanded="@(openAccount.ToString().ToLower())"
+                    aria-controls="mod-account">
+                <span>Mi Cuenta</span>
+                <span class="caret"></span>
+            </button>
+            <div id="mod-account" class="collapse @(openAccount ? "show" : "")">
+                <div class="px-3 text-white small">
+                    <div class="fw-bold mb-1">Hola @User.Identity.Name</div>
+                    <a class="nav-link nav-subitem @active("account", "editprofile")" asp-controller="Account" asp-action="EditProfile">Editar Perfil</a>
+                    <a class="nav-link nav-subitem @active("account", "forgotpassword")" asp-controller="Account" asp-action="ForgotPassword">Recuperar Contraseña</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
+                        <button type="submit" class="btn btn-sm btn-accent w-100">Cerrar sesión</button>
+                    </form>
+                </div>
             </div>
         }
         else

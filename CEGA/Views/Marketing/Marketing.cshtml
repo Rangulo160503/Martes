@@ -5,14 +5,13 @@
 
     var campCount = Model?.Campanias?.Count ?? 0;
     var poolCount = Model?.Pools?.Count ?? 0;
-    var distCount = Model?.Programaciones?.Count ?? 0;
     var cliCount = Model?.Clientes?.Count ?? 0;
 }
 
 <!-- Header -->
 <div class="mb-3 text-center">
-    <h2 class="mb-0">📣 Módulo de Marketing</h2>
-    <p class="text-muted mb-0">Gestiona campañas, pools de correos, distribuciones y clientes.</p>
+    <h2 class="mb-1">Módulo de Marketing</h2>
+    <p class="text-muted mb-0">Gestiona campañas, pools de correos y clientes.</p>
 </div>
 
 <!-- Alertas -->
@@ -28,7 +27,7 @@
 <!-- Tabs en tarjeta -->
 <div class="card card-lg">
     <div class="card-header p-0">
-        <ul class="nav nav-tabs card-header-tabs" id="marketingTabs" role="tablist">
+        <ul class="nav nav-tabs card-header-tabs nav-fill" id="marketingTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active"
                         id="camp-tab"
@@ -55,18 +54,6 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link"
-                        id="dist-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#dist"
-                        type="button"
-                        role="tab"
-                        aria-controls="dist"
-                        aria-selected="false">
-                    Distribuciones <span class="badge bg-success ms-1">@distCount</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link"
                         id="clientes-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#clientes"
@@ -87,9 +74,6 @@
             </div>
             <div class="tab-pane fade" id="pool" role="tabpanel" aria-labelledby="pool-tab">
                 @await Html.PartialAsync("_PoolsPartial", Model.Pools)
-            </div>
-            <div class="tab-pane fade" id="dist" role="tabpanel" aria-labelledby="dist-tab">
-                @await Html.PartialAsync("_DistribucionesPartial", Model.Programaciones)
             </div>
             <div class="tab-pane fade" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
                 @await Html.PartialAsync("_ClientesPartial", Model.Clientes)

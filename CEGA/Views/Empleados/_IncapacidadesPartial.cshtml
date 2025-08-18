@@ -1,61 +1,122 @@
 ﻿@model IEnumerable<CEGA.Models.IncapacidadEmpleado>
+@using System.Linq
+@using System.Globalization
 
-<h4 class="mt-4">📝 Incapacidades</h4>
+@{
+    ViewData["Title"] = "Incapacidades";
 
-<form asp-action="SubirIncapacidad" asp-controller="Empleados" method="post" enctype="multipart/form-data" class="mb-3">
-    <div class="row">
-        <div class="col-md-8">
-            <input name="descripcion" class="form-control" placeholder="Descripción" required />
-        </div>
-        <div class="col-md-2">
-            <input name="archivo" type="file" class="form-control" required />
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-success w-100">📤 Subir</button>
-        </div>
-    </div>
-</form>
+    Func<string, string> BadgeClase = estado =>
+    {
+        if (string.IsNullOrWhiteSpace(estado)) return "bg-warning";
+        return estado.Equals("Aprobado", StringComparison.OrdinalIgnoreCase) ? "bg-success"
+             : estado.Equals("Rechazado", StringComparison.OrdinalIgnoreCase) ? "bg-danger"
+             : "bg-warning";
+    };
 
-@if (Model != null && Model.Any())
-{
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Usuario</th>
-                <th>Descripción</th>
-                <th>Archivo</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var i in Model)
-            {
-                <tr>
-                    <td>@i.UsuarioID</td>
-                    <td>@i.Descripcion</td>
-                    <td>
-                        <a href="@i.ArchivoRuta" target="_blank">📄 Ver</a>
-                    </td>
-                    <td>@i.Estado</td>
-                    <td>@i.FechaPresentacion.ToShortDateString()</td>
-                    <td>
-                        <form asp-action="CambiarEstadoIncapacidad" asp-controller="Empleados" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="@i.Id" />
-                            <select name="nuevoEstado" class="form-select d-inline w-auto">
-                                <option>Aprobado</option>
-                                <option>Rechazado</option>
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-primary">💾</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    // Para el dropdown de empleados y sugerir salario diario (opcional)
+    var empleados = ViewBag.Empleados as IEnumerable<CEGA.Models.ApplicationUser>;
+    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadoSalario>;
+    var salPorUsuario = salarios?
+        .GroupBy(s => s.UsuarioId)
+        .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.FechaRegistro).First().SalarioMensual);
 }
-else
-{
-    <div class="alert alert-info mt-3">No hay incapacidades registradas.</div>
+
+<!-- Header -->
+<div class="mb-2">
+    <h4 class="mb-0">Incapacidades</h4>
+    <p class="text-muted mb-0">Una incapacidad corresponde a días no pagados por el patrono. La cobertura de esos días corresponde al gobierno.</p>
+</div>
+
+<div class="card card-lg">
+    <div class="card-header">Registrar incapacidad</div>
+    <div class="card-body">
+        <form asp-action="SubirIncapacidad" asp-controller="Empleados" method="post" enctype="multipart/form-data" class="row g-2">
+            <div class="col-md-4">
+                <label class="form-label" for="usuarioId">Empleado</label>
+                <select id="usuarioId" name="usuarioId" class="form-select" required>
+                    <option value="">— Seleccione —</option>
+                    @if (empleados != null && empleados.Any())
+                    {
+                        foreach (var emp in empleados.OrderBy(e => e.UserName))
+                        {
+                            decimal? sMon = (salPorUsuario != null && salPorUsuario.TryGetValue(emp.Id, out var sm)) ? sm : (decimal?)null;
+                            var sDia = sMon.HasValue ? (sMon.Value / 30m) : (decimal?)null;
+                            var sDiaStr = sDia.HasValue ? sDia.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "";
+
+                            <option value="@emp.Id" data-salario-diario="@sDiaStr">@emp.UserName</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>— No hay empleados disponibles —</option>
+                    }
+                </select>
+                <div class="form-text">Si el empleado tiene salario registrado, se sugiere salario diario para el cálculo informativo.</div>
+            </div>
+
+            <!-- Rango de fechas (opcional) -->
+            <div class="col-md-4">
+                <label class="form-label d-block">Periodo de incapacidad (opcional)</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="datetime-local" id="ini_reg" name="fechaInicio" class="form-control" />
+                        <div class="form-text">Inicio</div>
+                    </div>
+                    <div class="col-6">
+                        <input type="datetime-local" id="fin_reg" name="fechaFin" class="form-control" />
+                        <div class="form-text">Fin</div>
+                    </div>
+                </div>
+                <div class="small text-muted mt-2">
+                    <span id="calc_hrs">0.00</span> h • <span id="calc_dias">0.00</span> d
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label" for="descripcion">Descripción</label>
+                <input id="descripcion" name="descripcion" class="form-control" placeholder="Motivo o detalle de la incapacidad" required />
+            </div>
+
+            <div class="col-md-10">
+                <label class="form-label" for="archivo">Archivo</label>
+                <input id="archivo" name="archivo" type="file" class="form-control" required />
+                <div class="form-text">
+                    Nota: El cálculo es informativo y no modifica el registro. El pago de los días de incapacidad lo realiza el gobierno; el patrono no paga esos días.
+                </div>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-accent w-100">Subir</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
+            function toDate(v){ const d = new Date(v); return isNaN(d.getTime()) ? null : d; }
+
+            function recalc() {
+                const ini = toDate(document.getElementById('ini_reg')?.value);
+                const fin = toDate(document.getElementById('fin_reg')?.value);
+                let horas = 0;
+                if (ini && fin) {
+                    horas = Math.max(0, (fin - ini) / 36e5); // ms -> horas
+                }
+                const dias = horas / 24;
+                const hrsEl = document.getElementById('calc_hrs');
+                const dayEl = document.getElementById('calc_dias');
+                if (hrsEl) hrsEl.textContent = round2(horas).toFixed(2);
+                if (dayEl) dayEl.textContent = round2(dias).toFixed(2);
+            }
+
+            document.addEventListener('input', function(e){
+                if (e.target && (e.target.id === 'ini_reg' || e.target.id === 'fin_reg')) {
+                    recalc();
+                }
+            });
+        })();
+    </script>
 }

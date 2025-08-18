@@ -40,7 +40,7 @@ namespace CEGA.Controllers
         // POST: Comentario/Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Crear(ComentarioProyecto comentario)
+        public IActionResult Crear(ComentariosProyecto comentario)
         {
             if (string.IsNullOrWhiteSpace(comentario.NombreComentario) &&
                 string.IsNullOrWhiteSpace(comentario.Detalles))
@@ -81,7 +81,7 @@ namespace CEGA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(ComentarioProyecto comentario)
+        public IActionResult Editar(ComentariosProyecto comentario)
         {
             if (string.IsNullOrWhiteSpace(comentario.NombreComentario) && string.IsNullOrWhiteSpace(comentario.Detalles))
             {

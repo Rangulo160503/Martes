@@ -1,0 +1,64 @@
+﻿@model List<CEGA.Models.ViewModels.AsignacionTareaPlanoVM>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No hay asignaciones registradas.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th style="white-space:nowrap;">#</th>
+                    <th>Empleado</th>
+                    <th>Tarea (Plano)</th>
+                    <th>Plano</th>
+                    <th style="width:240px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var x in Model)
+                {
+                    var tareaTitulo = !string.IsNullOrWhiteSpace(x.TareaTitulo)
+                    ? x.TareaTitulo
+                    : (!string.IsNullOrWhiteSpace(x.TareaDescripcion) ? x.TareaDescripcion : $"Tarea #{x.TareaPlanoId}");
+
+                    var planoNombre = !string.IsNullOrWhiteSpace(x.PlanoNombreArchivo)
+                    ? x.PlanoNombreArchivo
+                    : (x.PlanoId.HasValue ? $"Plano #{x.PlanoId}" : "—");
+
+                    <tr>
+                        <td>@x.AsignacionId</td>
+                        <td>@x.UsuarioNombre</td>
+                        <td>@tareaTitulo</td>
+                        <td>@planoNombre</td>
+                        <td class="d-flex flex-wrap gap-2">
+                            @* Si tienes vistas para editar la TareaPlano, enlázalas aquí *@
+                            @if (x.TareaPlanoId.HasValue)
+                            {
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-controller="Pdf" asp-action="EditarTarea" asp-route-id="@x.TareaPlanoId">
+                                    Editar tarea (plano)
+                                </a>
+                            }
+
+                            @if (x.TareaPlanoId.HasValue)
+                            {
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Tarea" asp-action="AsignarEmpleado" asp-route-tareaId="@x.TareaPlanoId">
+                                    Reasignar
+                                </a>
+                            }
+
+                            <a class="btn btn-sm btn-danger"
+                               asp-controller="Tarea" asp-action="EliminarAsignacion" asp-route-id="@x.AsignacionId">
+                                Eliminar asignación
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

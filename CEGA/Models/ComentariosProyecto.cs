@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CEGA.Models
 {
-    public class ComentarioProyecto
+    public class ComentariosProyecto
     {
         public int Id { get; set; }
 

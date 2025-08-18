@@ -1,205 +1,74 @@
-﻿@model List<CEGA.Models.TareaProyecto>
-
+﻿@model CEGA.Models.ViewModels.TareasPageVM
 @{
-    ViewData["Title"] = "Lista de Tareas";
+    ViewData["Title"] = "Tareas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Contadores seguros
+    var totalTareas = Model?.Tareas?.Count ?? 0;
+    var totalSinAsignar = Model?.TareasSinAsignar?.Count ?? 0;
+    var totalAsignaciones = Model?.Asignaciones?.Count ?? 0;
+    var totalComentarios = Model?.Comentarios?.Count ?? 0;   // <-- nuevo
 }
 
-<!-- Header -->
-<div class="mb-3">
-    <h2 class="mb-0">Listado de Tareas</h2>
-    <p class="text-muted mb-0">Gestión de tareas por proyecto, asignaciones y estados.</p>
+<div class="mb-3 text-center">
+    <h2 class="mb-1">Módulo de Tareas</h2>
+    <p class="text-muted mb-0">Gestión de tareas, asignaciones y reportes.</p>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex flex-wrap gap-2">
-        <!-- Crear Tarea (elige proyecto) -->
-        <button type="button" class="btn btn-accent btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearTarea">
-            Crear Tarea
-        </button>
-
-        <!-- Buscar Tarea -->
-        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalBuscarTarea">
-            Buscar Tarea
-        </button>
-
-        <!-- Asignar Empleado -->
-        <a class="btn btn-outline-primary btn-sm" asp-action="AsignarEmpleado">Asignar Empleado</a>
-
-        <!-- Reporte Consolidado -->
-        <a class="btn btn-dark btn-sm" asp-action="ReporteConsolidado">Reporte Consolidado</a>
-
-        <!-- Tareas Sin Asignar -->
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasSinAsignar">
-            Tareas Sin Asignar
-        </button>
-
-        <!-- Tareas por Empleado -->
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTareasPorEmpleado">
-            Tareas por Empleado
-        </button>
-
-        <!-- Ver Asignaciones -->
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalVerAsignaciones">
-            Ver Asignaciones
-        </button>
+<div class="card card-lg">
+    <div class="card-header p-0">
+        <ul class="nav nav-tabs card-header-tabs nav-fill" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-todas" type="button" role="tab">
+                    Todas <span class="badge bg-success ms-1">@totalTareas</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-sinasignar" type="button" role="tab">
+                    Sin asignar <span class="badge bg-warning ms-1">@totalSinAsignar</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-empleado" type="button" role="tab">
+                    Por empleado
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-asignaciones" type="button" role="tab">
+                    Asignaciones <span class="badge bg-dark ms-1">@totalAsignaciones</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-comentarios" type="button" role="tab">
+                    Comentarios <span class="badge bg-info ms-1">@totalComentarios</span>
+                </button>
+            </li>
+        </ul>
     </div>
 
-    <div class="card-body p-0">
-        @if (Model == null || !Model.Any())
-        {
-            <div class="alert alert-warning m-3">No se encontraron tareas registradas.</div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Proyecto</th>
-                            <th>Nombre Tarea</th>
-                            <th>Detalles</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th style="width:180px;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var tarea in Model)
-                        {
-                            <tr>
-                                <td>@tarea.Proyecto?.Nombre</td>
-                                <td>@tarea.NombreTarea</td>
-                                <td class="text-truncate" style="max-width:420px;">@tarea.Detalles</td>
-                                <td>@tarea.FechaInicio.ToString("yyyy-MM-dd")</td>
-                                <td>@tarea.FechaFin.ToString("yyyy-MM-dd")</td>
-                                <td class="d-flex flex-wrap gap-2">
-                                    <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-id="@tarea.Id">Editar</a>
-                                    <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@tarea.Id">Eliminar</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <div class="card-body">
+        @await Html.PartialAsync("_AccionesTareasBar") <!-- usa tus rutas existentes -->
+
+        <div class="tab-content mt-3">
+            <div class="tab-pane fade show active" id="tab-todas" role="tabpanel">
+                @await Html.PartialAsync("_TareasTodasPartial", Model.Tareas)
             </div>
-        }
-    </div>
-</div>
-
-<!-- ========== MODALES ========== -->
-@* CREAR TAREA *@
-<div class="modal fade" id="modalCrearTarea" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="get" asp-action="Crear">
-                <div class="modal-header">
-                    <h5 class="modal-title">Crear Tarea</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Proyecto</label>
-                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
-                        <option value="">— Seleccione —</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-accent" type="submit">Continuar</button>
-                </div>
-            </form>
+            <div class="tab-pane fade" id="tab-sinasignar" role="tabpanel">
+                @await Html.PartialAsync("_TareasSinAsignarPartial", Model.TareasSinAsignar)
+            </div>
+            <div class="tab-pane fade" id="tab-empleado" role="tabpanel">
+                @await Html.PartialAsync("_TareasPorEmpleadoPartial", Model.TareasPorEmpleado)
+            </div>
+            <div class="tab-pane fade" id="tab-asignaciones" role="tabpanel">
+                @await Html.PartialAsync("_TareasAsignacionesPartial", Model.Asignaciones)
+            </div>
+            <div class="tab-pane fade" id="tab-comentarios" role="tabpanel">
+                @await Html.PartialAsync("_ComentariosProyectoPartial", Model.Comentarios)  <!-- NUEVO -->
+            </div>
         </div>
     </div>
 </div>
 
-@* BUSCAR TAREA *@
-<div class="modal fade" id="modalBuscarTarea" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="get" asp-action="Buscar">
-                <div class="modal-header">
-                    <h5 class="modal-title">Buscar Tarea</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Texto a buscar</label>
-                    <input name="q" class="form-control" placeholder="Nombre, detalles o proyecto..." />
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" type="submit">Buscar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@* TAREAS SIN ASIGNAR *@
-<div class="modal fade" id="modalTareasSinAsignar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="get" asp-action="TareasSinAsignar">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tareas Sin Asignar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Proyecto</label>
-                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
-                        <option value="">— Seleccione —</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" type="submit">Ver</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@* TAREAS POR EMPLEADO *@
-<div class="modal fade" id="modalTareasPorEmpleado" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="get" asp-action="TareasPorEmpleado">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tareas por Empleado</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Empleado</label>
-                    <select name="usuarioId" class="form-select" asp-items="ViewBag.Empleados">
-                        <option value="">— Seleccione —</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" type="submit">Ver</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@* VER ASIGNACIONES *@
-<div class="modal fade" id="modalVerAsignaciones" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="get" asp-action="VerAsignaciones">
-                <div class="modal-header">
-                    <h5 class="modal-title">Ver Asignaciones</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Proyecto (opcional)</label>
-                    <select name="proyectoId" class="form-select" asp-items="ViewBag.Proyectos">
-                        <option value="">Todos</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" type="submit">Ver</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

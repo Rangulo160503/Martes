@@ -1,26 +1,130 @@
 ﻿@model CEGA.Models.ViewModels.ResultadoComparacionVM
 @{
     ViewData["Title"] = "Resultado de Comparación";
+    var hDefault = 80; // altura por defecto en vh
 }
 
-<h2 class="mb-2">Comparación de Planos</h2>
+<!-- Header -->
+<div class="mb-3">
+    <h2 class="mb-1">Comparación de Planos</h2>
+    <p class="text-muted mb-0">Visualiza ambos documentos lado a lado o apilados, ajusta la altura y cambia de posición los planos.</p>
+</div>
 
-<div class="d-flex gap-3 flex-wrap">
-    <div class="flex-grow-1" style="min-width:380px;">
-        <div class="fw-semibold text-center mb-2">@Model.Titulo1</div>
-        <iframe src="@($"{Model.Src1}#toolbar=1&navpanes=0")"
-                style="width:100%; height:80vh; border:1px solid var(--border);"
-                loading="lazy">
-        </iframe>
+<!-- Controles -->
+<div class="card card-lg mb-3">
+    <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+        <span class="me-auto">Controles</span>
+        <div class="btn-group" role="group" aria-label="Layout">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnToggleLayout" title="Apilar / Paralelo">Apilar</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnSwap" title="Intercambiar lados">Intercambiar</button>
+        </div>
+        <div class="btn-group ms-2" role="group" aria-label="Altura">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnHMinus" title="Altura -10%">− Altura</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnHPlus" title="Altura +10%">+ Altura</button>
+        </div>
+        <div class="btn-group ms-2" role="group" aria-label="Abrir">
+            <a class="btn btn-outline-secondary btn-sm" id="btnOpen1" target="_blank" rel="noopener">Abrir 1</a>
+            <a class="btn btn-outline-secondary btn-sm" id="btnOpen2" target="_blank" rel="noopener">Abrir 2</a>
+        </div>
+        <a asp-action="CompararPlanos" class="btn btn-accent btn-sm ms-2">Volver</a>
     </div>
-
-    <div class="flex-grow-1" style="min-width:380px;">
-        <div class="fw-semibold text-center mb-2">@Model.Titulo2</div>
-        <iframe src="@($"{Model.Src2}#toolbar=1&navpanes=0")"
-                style="width:100%; height:80vh; border:1px solid var(--border);"
-                loading="lazy">
-        </iframe>
+    <div class="card-body small text-muted">
+        Nota: el zoom y la navegación se controlan dentro de cada visor PDF.
     </div>
 </div>
 
-<a asp-action="CompararPlanos" class="btn btn-outline-secondary mt-3">Volver</a>
+<!-- Visores -->
+<div id="framesRow" class="row g-3">
+    <div class="col-12 col-md-6 col-frame">
+        <div class="fw-semibold text-center mb-2" id="t1">@Model.Titulo1</div>
+        <iframe id="f1"
+                src="@($"{Model.Src1}#toolbar=1&navpanes=0")"
+                style="width:100%; height:@(hDefault)vh; border:1px solid var(--border); border-radius:.5rem;"
+                loading="lazy"></iframe>
+    </div>
+
+    <div class="col-12 col-md-6 col-frame">
+        <div class="fw-semibold text-center mb-2" id="t2">@Model.Titulo2</div>
+        <iframe id="f2"
+                src="@($"{Model.Src2}#toolbar=1&navpanes=0")"
+                style="width:100%; height:@(hDefault)vh; border:1px solid var(--border); border-radius:.5rem;"
+                loading="lazy"></iframe>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const row = document.getElementById('framesRow');
+            const f1 = document.getElementById('f1');
+            const f2 = document.getElementById('f2');
+            const t1 = document.getElementById('t1');
+            const t2 = document.getElementById('t2');
+
+            const btnSwap = document.getElementById('btnSwap');
+            const btnToggleLayout = document.getElementById('btnToggleLayout');
+            const btnHPlus = document.getElementById('btnHPlus');
+            const btnHMinus = document.getElementById('btnHMinus');
+            const btnOpen1 = document.getElementById('btnOpen1');
+            const btnOpen2 = document.getElementById('btnOpen2');
+
+            // Inicializar enlaces "Abrir"
+            btnOpen1.href = f1.src;
+            btnOpen2.href = f2.src;
+
+            // Altura en vh
+            let h = @hDefault;
+
+            function setHeights() {
+                f1.style.height = h + 'vh';
+                f2.style.height = h + 'vh';
+            }
+
+            function toggleLayout() {
+                // Cambia entre paralelo (2 columnas) y apilado (1 columna)
+                const cols = row.querySelectorAll('.col-frame');
+                const apilado = cols[0].classList.contains('col-12') && !cols[0].classList.contains('col-md-6');
+
+                if (apilado) {
+                    // Volver a paralelo
+                    cols.forEach(c => {
+                        c.classList.remove('col-12');
+                        c.classList.add('col-md-6');
+                    });
+                    btnToggleLayout.textContent = 'Apilar';
+                } else {
+                    // Apilar
+                    cols.forEach(c => {
+                        c.classList.add('col-12');
+                        c.classList.remove('col-md-6');
+                    });
+                    btnToggleLayout.textContent = 'Paralelo';
+                }
+            }
+
+            function swapSides() {
+                // Intercambia títulos y src
+                const tmpSrc = f1.src;
+                const tmpTitle = t1.textContent;
+
+                f1.src = f2.src;
+                f2.src = tmpSrc;
+
+                t1.textContent = t2.textContent;
+                t2.textContent = tmpTitle;
+
+                // Actualizar enlaces "Abrir"
+                btnOpen1.href = f1.src;
+                btnOpen2.href = f2.src;
+            }
+
+            btnHPlus.addEventListener('click', () => { h = Math.min(120, h + 10); setHeights(); });
+            btnHMinus.addEventListener('click', () => { h = Math.max(40,  h - 10); setHeights(); });
+            btnToggleLayout.addEventListener('click', toggleLayout);
+            btnSwap.addEventListener('click', swapSides);
+
+            // Ajuste inicial
+            setHeights();
+        })();
+    </script>
+}

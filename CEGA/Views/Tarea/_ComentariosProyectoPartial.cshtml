@@ -1,0 +1,34 @@
+﻿@model List<CEGA.Models.ComentariosProyecto>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No hay comentarios.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th style="width:80px;">#</th>
+                    <th>Proyecto</th>
+                    <th>Nombre</th>
+                    <th>Detalles</th>
+                    <th style="white-space:nowrap;">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.Proyecto?.Nombre</td>
+                        <td>@c.NombreComentario</td>
+                        <td class="text-truncate" style="max-width:520px;">@c.Detalles</td>
+                        <td>@c.FechaCreacion.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

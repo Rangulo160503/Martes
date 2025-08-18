@@ -1,0 +1,10 @@
+﻿@model List<CEGA.Models.TareasProyecto>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">Todas las tareas tienen al menos una asignación.</div>
+}
+else
+{
+    @await Html.PartialAsync("_TareasTodasPartial", Model)
+}
