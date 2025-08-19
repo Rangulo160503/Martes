@@ -19,18 +19,78 @@ namespace CEGA.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            // Incapacidades para el @model IEnumerable<IncapacidadEmpleado>
             var incapacidades = _context.IncapacidadesEmpleado
                 .AsNoTracking()
                 .OrderByDescending(x => x.FechaPresentacion)
                 .ToList();
 
-            // La vista Index.cshtml ya tiene: @model IEnumerable<CEGA.Models.IncapacidadEmpleado>
+            // ===== Empleados (AspNetUsers) para el <select> =====
+            // Mostramos "Nombre Apellido" y si no hay, cae a UserName
+            var empleados = _context.Users
+                .AsNoTracking()
+                .Select(u => new ApplicationUser
+                {
+                    Id = u.Id,
+                    UserName = string.IsNullOrWhiteSpace(((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim())
+                                ? (u.UserName ?? "")
+                                : ((u.Nombre ?? "").Trim() + " " + (u.Apellido ?? "").Trim()),
+                    Nombre = u.Nombre,
+                    Apellido = u.Apellido,
+                    SubRol = u.SubRol
+                })
+                .OrderBy(u => u.UserName)
+                .ToList();
+
+            // ===== Salarios para sugerir salario diario =====
+            var salarios = _context.EmpleadosSalarios
+                .AsNoTracking()
+                .ToList();
+
+            ViewBag.Empleados = empleados; // IEnumerable<ApplicationUser>
+            ViewBag.Salarios = salarios;  // IEnumerable<EmpleadoSalario>
+
             return View(incapacidades);
         }
         [HttpGet]
         public IActionResult Crear()
         {
             var hoy = DateTime.Today;
+
+            // 1) Empleados desde AspNetUsers
+            var empleados = _context.Users
+                .AsNoTracking()
+                .Select(u => new
+                {
+                    u.Id,
+                    Nombre = (
+                        ((u.Nombre ?? "").Trim() + " " + (u.Apellido ?? "").Trim()).Trim()
+                    ) != string.Empty
+                        ? ((u.Nombre ?? "").Trim() + " " + (u.Apellido ?? "").Trim()).Trim()
+                        : (u.UserName ?? "")
+                })
+                .OrderBy(x => x.Nombre)
+                .ToList();
+
+            // 2) Salario mensual más reciente por UsuarioId
+            var salarios = _context.EmpleadosSalarios
+                .AsNoTracking()
+                .GroupBy(s => s.UsuarioId)
+                .Select(g => new
+                {
+                    UsuarioId = g.Key,
+                    SalarioMensual = g
+                        .OrderByDescending(x => x.FechaRegistro)
+                        .Select(x => x.SalarioMensual)
+                        .FirstOrDefault()
+                })
+                .ToList()
+                .ToDictionary(x => x.UsuarioId, x => x.SalarioMensual);
+
+            // 3) Pasar a la vista (coincide con tu snippet)
+            ViewBag.Empleados = empleados;               // lista { Id, Nombre }
+            ViewBag.SalPorUsuario = salarios;            // dict<string, decimal>
+
             var modelo = new ReporteIncapacidad
             {
                 FechaInicio = hoy,
@@ -38,6 +98,7 @@ namespace CEGA.Controllers
             };
             return View(modelo);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -148,6 +209,59 @@ namespace CEGA.Controllers
 
             TempData["Mensaje"] = "Reporte eliminado exitosamente";
             return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public async Task<IActionResult> SubirIncapacidad(IFormFile archivo, string descripcion, string usuarioId)
+        {
+            if (string.IsNullOrWhiteSpace(usuarioId) || archivo == null || archivo.Length == 0)
+            {
+                TempData["Error"] = "Debe seleccionar un empleado y adjuntar un documento.";
+                return RedirectToAction("Empleados");
+            }
+
+            // Leer bytes del archivo
+            byte[] contenido;
+            using (var ms = new MemoryStream())
+            {
+                await archivo.CopyToAsync(ms);
+                contenido = ms.ToArray();
+            }
+
+            var incapacidad = new IncapacidadEmpleado
+            {
+                UsuarioID = usuarioId,
+                Descripcion = descripcion,
+                ArchivoContenido = contenido,
+                ArchivoNombre = Path.GetFileName(archivo.FileName),
+                ArchivoTipo = archivo.ContentType,
+                ArchivoTamano = archivo.Length,
+                FechaPresentacion = DateTime.Now,
+                Estado = "Pendiente"
+            };
+
+            _context.IncapacidadesEmpleado.Add(incapacidad);
+            await _context.SaveChangesAsync();
+
+            TempData["Mensaje"] = "Incapacidad registrada correctamente.";
+            return RedirectToAction("Empleados");
+        }
+        [HttpGet]
+        public async Task<IActionResult> DescargarIncapacidad(int id)
+        {
+            var inc = await _context.IncapacidadesEmpleado.FindAsync(id);
+            if (inc == null) return NotFound();
+
+            if (inc.ArchivoContenido != null)
+                return File(inc.ArchivoContenido, inc.ArchivoTipo ?? "application/octet-stream", inc.ArchivoNombre ?? "archivo");
+
+            if (!string.IsNullOrWhiteSpace(inc.ArchivoRuta))
+            {
+                var physical = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", inc.ArchivoRuta.TrimStart('/'));
+                if (System.IO.File.Exists(physical))
+                    return PhysicalFile(physical, "application/octet-stream", Path.GetFileName(physical));
+            }
+
+            return NotFound();
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,15 +17,117 @@ namespace CEGA.Controllers
             _context = context;
             _userManager = userManager;
         }
+        [HttpGet]
+        public IActionResult Nuevo()
+        {
+            // (Opcional) Roles personalizados
+            ViewBag.SubRoles = new[] { "Empleado", "Supervisor", "RRHH", "Admin" };
+            return View(); // en esa vista incluyes el partial
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Crear(CrearEmpleadoVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Si fue AJAX, devuelve 400 con errores
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    var errs = ModelState.Where(kv => kv.Value!.Errors.Any())
+                                         .ToDictionary(kv => kv.Key, kv => kv.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+                    return BadRequest(new { ok = false, errors = errs });
+                }
+
+                ViewBag.SubRoles = new[] { "Empleado", "Supervisor", "RRHH", "Admin" };
+                return PartialView("_CrearEmpleadoPartial", vm);
+            }
+
+            var userName = string.IsNullOrWhiteSpace(vm.UserName) ? vm.Email : vm.UserName;
+
+            var user = new ApplicationUser
+            {
+                UserName = userName,
+                Email = vm.Email,
+                PhoneNumber = vm.PhoneNumber,
+                Nombre = vm.Nombre,
+                Apellido = vm.Apellido,
+                SubRol = string.IsNullOrWhiteSpace(vm.SubRol) ? "Empleado" : vm.SubRol,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, vm.Password);
+            if (!result.Succeeded)
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return BadRequest(new { ok = false, errors = result.Errors.Select(e => e.Description).ToArray() });
+
+                foreach (var e in result.Errors) ModelState.AddModelError(string.Empty, e.Description);
+                ViewBag.SubRoles = new[] { "Empleado", "Supervisor", "RRHH", "Admin" };
+                return PartialView("_CrearEmpleadoPartial", vm);
+            }
+
+            if (vm.SalarioMensual.HasValue)
+            {
+                _context.EmpleadosSalarios.Add(new EmpleadosSalarios
+                {
+                    UsuarioId = user.Id,
+                    SalarioMensual = vm.SalarioMensual.Value,
+                    FechaRegistro = DateTime.Now
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new
+                {
+                    ok = true,
+                    empleado = new
+                    {
+                        id = user.Id,
+                        nombre = string.IsNullOrWhiteSpace(((user.Nombre ?? "") + " " + (user.Apellido ?? "")).Trim())
+                            ? (user.UserName ?? "")
+                            : ((user.Nombre ?? "").Trim() + " " + (user.Apellido ?? "").Trim()),
+                        salarioMensual = vm.SalarioMensual
+                    }
+                });
+            }
+
+            TempData["Mensaje"] = "Empleado creado correctamente.";
+            return RedirectToAction("Index", "Empleados");
+        }
 
         [HttpGet]
         public IActionResult Empleados()
         {
-            ViewBag.Salarios = _context.EmpleadosSalarios.ToList();
-            ViewBag.Vacaciones = _context.VacacionesEmpleados.ToList();
-            ViewBag.Puestos = _context.PuestosEmpleado.ToList();
-            ViewBag.Incapacidades = _context.IncapacidadesEmpleado.ToList();
-            return View();
+            var incapacidades = _context.IncapacidadesEmpleado
+                .AsNoTracking()
+                .OrderByDescending(x => x.FechaPresentacion)
+                .ToList();
+
+            // Usuarios existentes (mostrar "Nombre Apellido" o UserName si faltan)
+            var empleados = _context.Users
+                .AsNoTracking()
+                .Select(u => new ApplicationUser
+                {
+                    Id = u.Id,
+                    UserName = string.IsNullOrWhiteSpace(((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim())
+                                ? (u.UserName ?? "")
+                                : ((u.Nombre ?? "").Trim() + " " + (u.Apellido ?? "").Trim()),
+                    Nombre = u.Nombre,
+                    Apellido = u.Apellido,
+                    SubRol = u.SubRol
+                })
+                .OrderBy(u => u.UserName)
+                .ToList();
+
+            ViewBag.Empleados = empleados;
+            ViewBag.Salarios = _context.EmpleadosSalarios.AsNoTracking().ToList(); // ver punto 3 para el tipo
+            ViewBag.Vacaciones = _context.VacacionesEmpleados.AsNoTracking().ToList();
+            ViewBag.Puestos = _context.PuestosEmpleado.AsNoTracking().ToList();
+            ViewBag.Incapacidades = incapacidades;
+
+            return View(incapacidades); // tu vista tiene @model IEnumerable<IncapacidadEmpleado>
         }
 
 
@@ -40,7 +143,7 @@ namespace CEGA.Controllers
             var existe = await _context.EmpleadosSalarios.FirstOrDefaultAsync(e => e.UsuarioId == usuarioId);
             if (existe == null)
             {
-                _context.EmpleadosSalarios.Add(new EmpleadoSalario
+                _context.EmpleadosSalarios.Add(new EmpleadosSalarios
                 {
                     UsuarioId = usuarioId,
                     SalarioMensual = salario
@@ -121,35 +224,41 @@ namespace CEGA.Controllers
             return RedirectToAction("Empleados");
         }
         [HttpPost]
-        public async Task<IActionResult> SubirIncapacidad(IFormFile archivo, string descripcion)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubirIncapacidad(IFormFile archivo, string descripcion, string usuarioId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
+            if (string.IsNullOrWhiteSpace(usuarioId))
+            {
+                TempData["Error"] = "Debe seleccionar un empleado.";
+                return RedirectToAction("Empleados");
+            }
+            if (string.IsNullOrWhiteSpace(descripcion))
+            {
+                TempData["Error"] = "La descripción es obligatoria.";
+                return RedirectToAction("Empleados");
+            }
             if (archivo == null || archivo.Length == 0)
             {
                 TempData["Error"] = "Debe adjuntar un documento.";
                 return RedirectToAction("Empleados");
             }
 
-            var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "incapacidades");
-            if (!Directory.Exists(rutaCarpeta))
-                Directory.CreateDirectory(rutaCarpeta);
-
-            var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(archivo.FileName);
-            var rutaFinal = Path.Combine(rutaCarpeta, nombreArchivo);
-
-            using (var stream = new FileStream(rutaFinal, FileMode.Create))
+            // Leer bytes del archivo en memoria
+            byte[] contenido;
+            using (var ms = new MemoryStream())
             {
-                await archivo.CopyToAsync(stream);
+                await archivo.CopyToAsync(ms);
+                contenido = ms.ToArray();
             }
 
             var incapacidad = new IncapacidadEmpleado
             {
-                UsuarioID = user.Id,
-                Descripcion = descripcion,
-                ArchivoRuta = "/incapacidades/" + nombreArchivo
+                UsuarioID = usuarioId,
+                Descripcion = descripcion.Trim(),
+                ArchivoContenido = contenido,
+                ArchivoNombre = Path.GetFileName(archivo.FileName),
+                ArchivoTipo = archivo.ContentType,
+                ArchivoTamano = archivo.Length
             };
 
             _context.IncapacidadesEmpleado.Add(incapacidad);
@@ -158,22 +267,18 @@ namespace CEGA.Controllers
             TempData["Mensaje"] = "Incapacidad registrada correctamente.";
             return RedirectToAction("Empleados");
         }
-        [HttpPost]
-        public async Task<IActionResult> CambiarEstadoIncapacidad(int id, string nuevoEstado)
+
+        [HttpGet]
+        public async Task<IActionResult> DescargarIncapacidad(int id)
         {
-            var incapacidad = await _context.IncapacidadesEmpleado.FindAsync(id);
-            if (incapacidad == null)
-            {
-                TempData["Error"] = "Incapacidad no encontrada.";
-                return RedirectToAction("Empleados");
-            }
+            var inc = await _context.IncapacidadesEmpleado.FindAsync(id);
+            if (inc == null || inc.ArchivoContenido == null)
+                return NotFound();
 
-            incapacidad.Estado = nuevoEstado;
-            await _context.SaveChangesAsync();
+            var nombre = string.IsNullOrWhiteSpace(inc.ArchivoNombre) ? $"incapacidad_{id}" : inc.ArchivoNombre;
+            var tipo = string.IsNullOrWhiteSpace(inc.ArchivoTipo) ? "application/octet-stream" : inc.ArchivoTipo;
 
-            TempData["Mensaje"] = $"Incapacidad {nuevoEstado.ToLower()} correctamente.";
-            return RedirectToAction("Empleados");
+            return File(inc.ArchivoContenido, tipo, nombre);
         }
-
     }
 }

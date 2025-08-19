@@ -3,15 +3,17 @@
     ViewData["Title"] = "Gestión de Empleados";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadoSalario>;
+    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadosSalarios>;
     var vacaciones = ViewBag.Vacaciones as IEnumerable<CEGA.Models.VacacionesEmpleado>;
     var puestos = ViewBag.Puestos as IEnumerable<CEGA.Models.PuestoEmpleado>;
     var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
+    var empleados = ViewBag.Empleados as IEnumerable<CEGA.Models.ApplicationUser>;
 
     var salCount = salarios?.Count() ?? 0;
     var vacCount = vacaciones?.Count() ?? 0;
     var pueCount = puestos?.Count() ?? 0;
     var incCount = incapacidades?.Count() ?? 0;
+    var empCount = empleados?.Count() ?? 0;
 }
 
 <!-- Header -->
@@ -82,6 +84,18 @@
                     Incapacidades <span class="badge bg-success ms-1">@incCount</span>
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="empleado-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#empleado"
+                        type="button"
+                        role="tab"
+                        aria-controls="empleado"
+                        aria-selected="false">
+                    Empleados <span class="badge bg-success ms-1">@incCount</span>
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -99,10 +113,99 @@
             <div class="tab-pane fade" id="incapacidad" role="tabpanel" aria-labelledby="incapacidad-tab">
                 @await Html.PartialAsync("_IncapacidadesPartial", incapacidades)
             </div>
+            <div class="tab-pane fade" id="empleado" role="tabpanel" aria-labelledby="empleado-tab">
+                @await Html.PartialAsync("_CrearEmpleadoPartial", new CEGA.Models.ViewModels.CrearEmpleadoVM())
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            // ===== Cálculo de horas (si no lo usas, puedes borrar esta parte) =====
+            function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
+            function toDate(v){ const d = new Date(v); return isNaN(d.getTime()) ? null : d; }
+            function recalc() {
+                const ini = toDate(document.getElementById('ini_reg')?.value);
+                const fin = toDate(document.getElementById('fin_reg')?.value);
+                let horas = 0;
+                if (ini && fin) horas = Math.max(0, (fin - ini) / 36e5); // ms -> horas
+                const dias = horas / 24;
+                const hrsEl = document.getElementById('calc_hrs');
+                const dayEl = document.getElementById('calc_dias');
+                if (hrsEl) hrsEl.textContent = round2(horas).toFixed(2);
+                if (dayEl) dayEl.textContent = round2(dias).toFixed(2);
+            }
+            document.addEventListener('input', function(e){
+                if (e.target && (e.target.id === 'ini_reg' || e.target.id === 'fin_reg')) recalc();
+            });
+
+            // ===== Interceptar submit del partial _CrearEmpleadoPartial (AJAX) =====
+            // Requisitos en tu partial:
+            //   <form asp-controller="Empleados" asp-action="Crear" id="form-crear-empleado" ...>
+            //   Modal con id="modalCrearEmpleado"
+            //   <select id="usuarioId"> en el form de incapacidad
+            document.addEventListener('submit', async function (e) {
+                const form = e.target;
+                if (!form || form.id !== 'form-crear-empleado') return;
+                e.preventDefault();
+
+                const url = form.getAttribute('action');
+                const formData = new FormData(form);
+
+                try {
+                    const resp = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    });
+
+                    if (!resp.ok) {
+                        let msgs = ['Error al crear el empleado'];
+                        try {
+                            const err = await resp.json();
+                            if (err?.errors) {
+                                msgs = Array.isArray(err.errors) ? err.errors : Object.values(err.errors).flat();
+                            }
+                        } catch { /* ignore */ }
+                        alert(msgs.join('\n'));
+                        return;
+                    }
+
+                    const data = await resp.json();
+                    if (!data.ok) { alert('No se pudo crear el empleado'); return; }
+
+                    // Agregar al <select id="usuarioId">
+                    const sel = document.getElementById('usuarioId');
+                    if (sel) {
+                        const sMon = data.empleado.salarioMensual ?? null;
+                        const sDia = (sMon != null) ? (Number(sMon) / 30) : null;
+
+                        const opt = document.createElement('option');
+                        opt.value = data.empleado.id;
+                        opt.textContent = data.empleado.nombre;
+                        if (sDia != null) {
+                            const val = Math.round(sDia * 100) / 100;
+                            opt.setAttribute('data-salario-diario', val.toString());
+                        }
+                        sel.appendChild(opt);
+                        sel.value = data.empleado.id; // seleccionar el recién creado
+                    }
+
+                    // Cerrar modal (Bootstrap 5)
+                    const modalEl = document.getElementById('modalCrearEmpleado');
+                    if (modalEl && window.bootstrap) {
+                        const m = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        m.hide();
+                    }
+                    form.reset();
+                } catch {
+                    alert('Error de red al crear el empleado');
+                }
+            });
+        })();
+    </script>
 }

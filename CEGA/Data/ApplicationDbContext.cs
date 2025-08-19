@@ -18,7 +18,7 @@ namespace CEGA.Data
         public DbSet<ProgramacionDistribucion> ProgramacionesDistribucion { get; set; }
         public DbSet<DistribucionMarketing> DistribucionesMarketing { get; set; }
         public DbSet<ClienteMarketing> ClientesMarketing { get; set; }
-        public DbSet<EmpleadoSalario> EmpleadosSalarios { get; set; }
+        public DbSet<EmpleadosSalarios> EmpleadosSalarios { get; set; }
         public DbSet<VacacionesEmpleado> VacacionesEmpleados { get; set; }
         public DbSet<PuestoEmpleado> PuestosEmpleado { get; set; }
         public DbSet<HistorialPuestos> HistorialPuestos { get; set; }

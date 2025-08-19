@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<CEGA.Models.IncapacidadEmpleado>
 @using System.Linq
 @using System.Globalization
+@using CEGA.Models
 
 @{
     ViewData["Title"] = "Incapacidades";
@@ -14,11 +15,15 @@
     };
 
     // Para el dropdown de empleados y sugerir salario diario (opcional)
-    var empleados = ViewBag.Empleados as IEnumerable<CEGA.Models.ApplicationUser>;
-    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadoSalario>;
+    var empleados = ViewBag.Empleados as IEnumerable<ApplicationUser>;
+    var salarios = ViewBag.Salarios as IEnumerable<EmpleadosSalarios>;
+
     var salPorUsuario = salarios?
         .GroupBy(s => s.UsuarioId)
-        .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.FechaRegistro).First().SalarioMensual);
+        .ToDictionary(
+            g => g.Key,
+            g => g.OrderByDescending(x => x.FechaRegistro).FirstOrDefault()?.SalarioMensual ?? 0m
+        );
 }
 
 <!-- Header -->
@@ -35,15 +40,32 @@
                 <label class="form-label" for="usuarioId">Empleado</label>
                 <select id="usuarioId" name="usuarioId" class="form-select" required>
                     <option value="">— Seleccione —</option>
-                    @if (empleados != null && empleados.Any())
+                    @if (empleados?.Any() == true)
                     {
                         foreach (var emp in empleados.OrderBy(e => e.UserName))
                         {
-                            decimal? sMon = (salPorUsuario != null && salPorUsuario.TryGetValue(emp.Id, out var sm)) ? sm : (decimal?)null;
-                            var sDia = sMon.HasValue ? (sMon.Value / 30m) : (decimal?)null;
-                            var sDiaStr = sDia.HasValue ? sDia.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "";
+                            // Salario mensual (si existe) -> salario diario
+                            decimal? sMon = null;
+                            if (salPorUsuario != null && !string.IsNullOrEmpty(emp.Id) && salPorUsuario.TryGetValue(emp.Id, out var sm))
+                            {
+                                sMon = sm;
+                            }
 
-                            <option value="@emp.Id" data-salario-diario="@sDiaStr">@emp.UserName</option>
+                            var sDia = sMon.HasValue ? decimal.Round(sMon.Value / 30m, 2) : (decimal?)null;
+                            var sDiaStr = sDia?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "";
+                            var sMonStr = sMon?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "";
+
+                            // Texto a mostrar: "Nombre Apellido" o UserName
+                            var display = string.IsNullOrWhiteSpace(($"{emp?.Nombre} {emp?.Apellido}").Trim())
+                            ? (emp?.UserName ?? emp?.Id)
+                            : $"{emp?.Nombre?.Trim()} {emp?.Apellido?.Trim()}";
+
+                            <option value="@emp.Id"
+                                    data-nombre="@display"
+                                    data-salario-mensual="@sMonStr"
+                                    data-salario-diario="@sDiaStr">
+                                @display
+                            </option>
                         }
                     }
                     else
@@ -51,7 +73,9 @@
                         <option value="" disabled>— No hay empleados disponibles —</option>
                     }
                 </select>
-                <div class="form-text">Si el empleado tiene salario registrado, se sugiere salario diario para el cálculo informativo.</div>
+                <div class="form-text">
+                    Si el empleado tiene salario registrado, se sugiere salario diario para el cálculo informativo.
+                </div>
             </div>
 
             <!-- Rango de fechas (opcional) -->
@@ -91,6 +115,7 @@
         </form>
     </div>
 </div>
+
 
 @section Scripts {
     <script>

@@ -2,7 +2,7 @@
 
 namespace CEGA.Models
 {
-    public class EmpleadoSalario
+    public class EmpleadosSalarios
     {
         public int Id { get; set; }
 

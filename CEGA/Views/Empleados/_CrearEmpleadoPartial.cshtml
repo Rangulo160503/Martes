@@ -1,0 +1,82 @@
+﻿@model CEGA.Models.ViewModels.CrearEmpleadoVM
+@using System.Linq
+
+@{
+    // Si el padre no envía roles, usa estos por defecto
+    var subRoles = (IEnumerable<string>)(ViewBag.SubRoles ?? new[] { "Empleado", "Supervisor", "RRHH", "Admin" });
+}
+
+<form asp-controller="Empleados" asp-action="Crear" method="post" id="form-crear-empleado" autocomplete="off">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Nombre" class="form-label"></label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Apellido" class="form-label"></label>
+            <input asp-for="Apellido" class="form-control" />
+            <span asp-validation-for="Apellido" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="UserName" class="form-label"></label>
+            <input asp-for="UserName" class="form-control" />
+            <div class="form-text">Si lo dejas vacío, usaré el correo como usuario.</div>
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="SubRol" class="form-label"></label>
+            <select asp-for="SubRol" class="form-select">
+                <option value="">— Seleccione —</option>
+                @foreach (var r in subRoles)
+                {
+                    <option value="@r">@r</option>
+                }
+            </select>
+            <span asp-validation-for="SubRol" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="ConfirmPassword" class="form-label"></label>
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="SalarioMensual" class="form-label"></label>
+            <input asp-for="SalarioMensual" class="form-control" />
+            <div class="form-text">Opcional: crea un registro en EmpleadosSalarios.</div>
+            <span asp-validation-for="SalarioMensual" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Crear empleado</button>
+        <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+    </div>
+</form>
+
+<!-- Asegúrate que tu _Layout ya incluye _ValidationScriptsPartial -->
