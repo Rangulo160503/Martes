@@ -102,10 +102,9 @@ namespace CEGA.Controllers
         {
             var incapacidades = _context.IncapacidadesEmpleado
                 .AsNoTracking()
-                .OrderByDescending(x => x.FechaPresentacion)
+                .OrderByDescending(x => x.Id) // ← antes: .OrderByDescending(x => x.FechaPresentacion)
                 .ToList();
 
-            // Usuarios existentes (mostrar "Nombre Apellido" o UserName si faltan)
             var empleados = _context.Users
                 .AsNoTracking()
                 .Select(u => new ApplicationUser
@@ -122,13 +121,14 @@ namespace CEGA.Controllers
                 .ToList();
 
             ViewBag.Empleados = empleados;
-            ViewBag.Salarios = _context.EmpleadosSalarios.AsNoTracking().ToList(); // ver punto 3 para el tipo
+            ViewBag.Salarios = _context.EmpleadosSalarios.AsNoTracking().ToList();
             ViewBag.Vacaciones = _context.VacacionesEmpleados.AsNoTracking().ToList();
             ViewBag.Puestos = _context.PuestosEmpleado.AsNoTracking().ToList();
             ViewBag.Incapacidades = incapacidades;
 
-            return View(incapacidades); // tu vista tiene @model IEnumerable<IncapacidadEmpleado>
+            return View(incapacidades); // @model IEnumerable<IncapacidadEmpleado>
         }
+
 
 
         [HttpPost]
@@ -279,6 +279,51 @@ namespace CEGA.Controllers
             var tipo = string.IsNullOrWhiteSpace(inc.ArchivoTipo) ? "application/octet-stream" : inc.ArchivoTipo;
 
             return File(inc.ArchivoContenido, tipo, nombre);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarEmpleado(ActualizarEmpleadoVM vm)
+        {
+            if (string.IsNullOrWhiteSpace(vm.Id))
+                return BadRequest(new { ok = false, error = "Id requerido" });
+
+            var u = await _userManager.FindByIdAsync(vm.Id);
+            if (u == null)
+                return NotFound(new { ok = false, error = "Empleado no encontrado" });
+
+            // Actualiza campos básicos
+            u.Nombre = vm.Nombre?.Trim();
+            u.Apellido = vm.Apellido?.Trim();
+            u.PhoneNumber = string.IsNullOrWhiteSpace(vm.PhoneNumber) ? null : vm.PhoneNumber.Trim();
+            u.SubRol = string.IsNullOrWhiteSpace(vm.SubRol) ? u.SubRol : vm.SubRol.Trim();
+
+            // Email/UserName: solo si llegan y cambian (y tú lo permites)
+            if (!string.IsNullOrWhiteSpace(vm.Email) && vm.Email != u.Email)
+                u.Email = vm.Email.Trim();
+            if (!string.IsNullOrWhiteSpace(vm.UserName) && vm.UserName != u.UserName)
+                u.UserName = vm.UserName.Trim();
+
+            var result = await _userManager.UpdateAsync(u);
+            if (!result.Succeeded)
+                return BadRequest(new { ok = false, error = string.Join("; ", result.Errors.Select(e => e.Description)) });
+
+            // Respuesta para refrescar la fila en la tabla
+            var nombreCompleto = $"{(u.Nombre ?? "").Trim()} {(u.Apellido ?? "").Trim()}".Trim();
+            return Json(new
+            {
+                ok = true,
+                empleado = new
+                {
+                    id = u.Id,
+                    nombre = u.Nombre,
+                    apellido = u.Apellido,
+                    nombreCompleto,
+                    phoneNumber = u.PhoneNumber,
+                    subRol = u.SubRol,
+                    userName = u.UserName,
+                    email = u.Email
+                }
+            });
         }
     }
 }

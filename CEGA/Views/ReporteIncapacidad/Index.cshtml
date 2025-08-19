@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Reportes de Incapacidades";
+
+    // Como el modelo no tiene "Estado", dejamos un helper neutro por si quieres mantener la badge en UI
     Func<string, string> BadgeClase = estado =>
     {
         if (string.IsNullOrWhiteSpace(estado)) return "bg-secondary";
@@ -9,7 +11,16 @@
              : estado.Equals("Rechazado", StringComparison.OrdinalIgnoreCase) ? "bg-danger"
              : "bg-warning";
     };
+
     var count = Model?.Count() ?? 0;
+
+    string FormatBytes(long? bytes)
+    {
+        if (bytes == null) return "—";
+        double b = bytes.Value; string[] u = { "B", "KB", "MB", "GB" }; int i = 0;
+        while (b >= 1024 && i < u.Length - 1) { b /= 1024; i++; }
+        return $"{b:0.##} {u[i]}";
+    }
 }
 
 <!-- Header -->
@@ -28,11 +39,7 @@
         <span>Listado</span>
         <div class="d-flex align-items-center gap-3">
             <span class="text-muted small">@count registro(s)</span>
-
-            <!-- Ajusta esta ruta si quieres llevar al módulo de Empleados o a un “Crear” específico -->
-            <a asp-controller="Empleados"
-               asp-action="Empleados"
-               class="btn btn-accent btn-sm">
+            <a asp-controller="Empleados" asp-action="Empleados" class="btn btn-accent btn-sm">
                 + Registrar incapacidad
             </a>
         </div>
@@ -51,36 +58,46 @@
                         <tr>
                             <th style="min-width:160px;">Usuario</th>
                             <th style="min-width:260px;">Descripción</th>
-                            <th style="min-width:120px;">Archivo</th>
-                            <th style="min-width:120px;">Estado</th>
-                            <th style="min-width:120px;">Fecha</th>
+                            <th style="min-width:160px;">Archivo</th>
+                            <th style="min-width:120px;">Estado</th>  <!-- se mantiene en UI, se muestra "—" -->
+                            <th style="min-width:120px;">Fecha</th>   <!-- se mantiene en UI, se muestra "—" -->
                             <th style="width:180px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var i in Model.OrderByDescending(x => x.FechaPresentacion))
+                        @foreach (var i in Model.OrderByDescending(x => x.Id))
                         {
-                            var badge = BadgeClase(i.Estado);
+                            var est = "—"; // IncapacidadEmpleado no tiene Estado
+                            var badge = BadgeClase(est);
+
                             <tr>
                                 <td class="fw-semibold">@i.UsuarioID</td>
                                 <td class="text-truncate" style="max-width:420px;">@i.Descripcion</td>
                                 <td>
-                                    @if (!string.IsNullOrWhiteSpace(i.ArchivoRuta))
-                                    {
-                                        <a href="@i.ArchivoRuta" target="_blank" class="btn btn-sm btn-outline-primary">Ver</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Sin archivo</span>
-                                    }
+                                    <div class="d-flex flex-column">
+                                        <span>@(string.IsNullOrWhiteSpace(i.ArchivoNombre) ? "—" : i.ArchivoNombre)</span>
+                                        <small class="text-muted">@FormatBytes(i.ArchivoTamano) · @(i.ArchivoTipo ?? "—")</small>
+                                        <div class="mt-1">
+                                            @if (i.ArchivoContenido != null)
+                                            {
+                                                <a asp-controller="ReporteIncapacidad"
+                                                   asp-action="DescargarIncapacidad"
+                                                   asp-route-id="@i.Id"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Ver/Descargar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Sin archivo</span>
+                                            }
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>
-                                    <span class="badge @badge">@(!string.IsNullOrWhiteSpace(i.Estado) ? i.Estado : "—")</span>
-                                </td>
-                                <td>@i.FechaPresentacion.ToShortDateString()</td>
+                                <td><span class="badge @badge">@est</span></td>
+                                <td>—</td> <!-- No existe FechaPresentacion en el modelo -->
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <!-- Ajusta estas rutas según tus acciones reales si deseas permitir edición/eliminación -->
                                         <a asp-controller="ReporteIncapacidad"
                                            asp-action="Editar"
                                            asp-route-id="@i.Id"

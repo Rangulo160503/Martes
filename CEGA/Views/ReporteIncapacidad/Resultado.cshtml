@@ -3,24 +3,34 @@
 @{
     ViewData["Title"] = "Resultado del Reporte de Incapacidades";
     var nombreReporte = TempData["NombreReporte"] as string ?? "Reporte de Incapacidades";
+
+    string FormatBytes(long? bytes)
+    {
+        if (bytes == null) return "—";
+        double b = bytes.Value;
+        string[] u = { "B", "KB", "MB", "GB" };
+        int i = 0; while (b >= 1024 && i < u.Length - 1) { b /= 1024; i++; }
+        return $"{b:0.##} {u[i]}";
+    }
 }
 
 <h2>@nombreReporte</h2>
 
-@if (!Model.Any())
+@if (Model == null || !Model.Any())
 {
     <div class="alert alert-info">No se encontraron incapacidades para los criterios seleccionados.</div>
 }
 else
 {
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped align-middle">
         <thead>
             <tr>
                 <th>Usuario</th>
                 <th>Descripción</th>
-                <th>Fecha de Presentación</th>
-                <th>Estado</th>
                 <th>Archivo</th>
+                <th>Tamaño</th>
+                <th>Tipo</th>
+                <th style="width:140px;"></th>
             </tr>
         </thead>
         <tbody>
@@ -29,10 +39,21 @@ else
                 <tr>
                     <td>@item.UsuarioID</td>
                     <td>@item.Descripcion</td>
-                    <td>@item.FechaPresentacion.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Estado</td>
-                    <td>
-                        <a href="@item.ArchivoRuta" target="_blank">Ver archivo</a>
+                    <td>@(string.IsNullOrWhiteSpace(item.ArchivoNombre) ? "—" : item.ArchivoNombre)</td>
+                    <td>@FormatBytes(item.ArchivoTamano)</td>
+                    <td>@(string.IsNullOrWhiteSpace(item.ArchivoTipo) ? "—" : item.ArchivoTipo)</td>
+                    <td class="text-end">
+                        @if (item.ArchivoContenido != null)
+                        {
+                            <a asp-action="DescargarIncapacidad"
+                               asp-controller="Empleados"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary">Descargar</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin archivo</span>
+                        }
                     </td>
                 </tr>
             }

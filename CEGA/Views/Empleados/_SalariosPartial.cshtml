@@ -1,25 +1,48 @@
 ﻿@model IEnumerable<CEGA.Models.EmpleadosSalarios>
 @using System.Globalization
 @using System.Linq
+@using CEGA.Models
 
 @{
     ViewData["Title"] = "Resumen de Empleados";
 
-    // Datos auxiliares para el resumen (opcionales)
-    var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
-    var puestos       = ViewBag.Puestos       as IEnumerable<CEGA.Models.PuestoEmpleado>;
-    var vacaciones    = ViewBag.Vacaciones    as IEnumerable<CEGA.Models.VacacionesEmpleado>;
+    // Datos auxiliares
+    var incapacidades = ViewBag.Incapacidades as IEnumerable<IncapacidadEmpleado>;
+    var puestos       = ViewBag.Puestos       as IEnumerable<PuestoEmpleado>;
+    var vacaciones    = ViewBag.Vacaciones    as IEnumerable<VacacionesEmpleado>;
+    var empleados     = ViewBag.Empleados     as IEnumerable<ApplicationUser>;
 
-    // "Departamentos": si el controlador no manda ViewBag.Departamentos,
-    // tomamos valores distintos de Puesto (sirve como "área").
+    // Áreas/Departamentos
     var depBag = ViewBag.Departamentos as IEnumerable<string>;
     var deptos = (depBag != null && depBag.Any())
         ? depBag
-        : (puestos?.Where(p => !string.IsNullOrWhiteSpace(p.Puesto))
-                   .Select(p => p.Puesto)
-                   .Distinct(StringComparer.OrdinalIgnoreCase)
-                   .OrderBy(p => p)
-           ?? Enumerable.Empty<string>());
+        : (puestos ?? Enumerable.Empty<PuestoEmpleado>())
+            .Where(p => !string.IsNullOrWhiteSpace(p.Puesto))
+            .Select(p => p.Puesto)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(p => p);
+
+    // Puesto actual por usuario
+    var puestoActualPorId = (puestos ?? Enumerable.Empty<PuestoEmpleado>())
+        .GroupBy(p => p.UsuarioID)
+        .ToDictionary(
+            g => g.Key,
+            g => g.OrderByDescending(x => x.FechaAsignacion).FirstOrDefault()?.Puesto ?? "—"
+        );
+
+    // Nombre mostrado por usuario
+    var nombrePorId = new Dictionary<string, string>();
+    if (empleados != null)
+    {
+        foreach (var emp in empleados)
+        {
+            var display = string.IsNullOrWhiteSpace(($"{emp?.Nombre} {emp?.Apellido}").Trim())
+                ? (emp?.UserName ?? emp?.Id)
+                : $"{emp?.Nombre?.Trim()} {emp?.Apellido?.Trim()}";
+            if (!string.IsNullOrEmpty(emp?.Id))
+                nombrePorId[emp.Id] = display!;
+        }
+    }
 
     int totalUsuarios = Model?.Select(m => m.UsuarioId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().Count() ?? 0;
 
@@ -39,13 +62,13 @@
             <h4 class="mb-1">Resumen de empleados</h4>
             <p class="text-muted mb-0">Explora salario, puesto, vacaciones e incapacidades por empleado.</p>
         </div>
-
         <div class="text-muted small">Total empleados: <strong id="countTotal">@totalUsuarios</strong></div>
     </div>
 
     <div class="card mt-2">
         <div class="card-body">
             <div class="row g-2">
+                <!-- Filtro por Área -->
                 <div class="col-md-4">
                     <label class="form-label" for="fDepto">Departamento / Área</label>
                     <select id="fDepto" class="form-select">
@@ -56,11 +79,32 @@
                         }
                     </select>
                 </div>
+
+                <!-- Filtro por Empleado (Nombre — Puesto) -->
+                <div class="col-md-4">
+                    <label class="form-label" for="fEmpleado">Empleado (Nombre — Puesto)</label>
+                    <select id="fEmpleado" class="form-select">
+                        <option value="">Todos</option>
+                        @if (empleados != null)
+                        {
+                            foreach (var e in empleados.OrderBy(x => x.UserName))
+                            {
+                                var nombre = nombrePorId.ContainsKey(e.Id) ? nombrePorId[e.Id] : (e.UserName ?? e.Id);
+                                var puesto = puestoActualPorId.ContainsKey(e.Id) ? puestoActualPorId[e.Id] : "—";
+                                <option value="@e.Id">@($"{nombre} — {puesto}")</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Búsqueda libre -->
                 <div class="col-md-4">
                     <label class="form-label" for="fTexto">Buscar</label>
-                    <input id="fTexto" class="form-control" placeholder="Usuario, puesto, estado..." />
+                    <input id="fTexto" class="form-control" placeholder="Usuario, puesto..." />
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+            </div>
+            <div class="row g-2 mt-1">
+                <div class="col-md-12 d-flex">
                     <button type="button" id="btnLimpiar" class="btn btn-outline-secondary ms-auto">Limpiar filtros</button>
                 </div>
             </div>
@@ -89,29 +133,32 @@
                             var uid   = s.UsuarioId ?? "";
                             var rid   = $"res_{uid}_{s.FechaRegistro.Ticks}".Replace(" ", "_");
 
-                            var lastInc = incapacidades?
+                            var lastInc = (incapacidades ?? Enumerable.Empty<IncapacidadEmpleado>())
                                 .Where(x => x.UsuarioID == uid)
-                                .OrderByDescending(x => x.FechaPresentacion)
+                                .OrderByDescending(x => x.Id)
                                 .FirstOrDefault();
 
-                            var lastPuesto = puestos?
+                            var lastPuesto = (puestos ?? Enumerable.Empty<PuestoEmpleado>())
                                 .Where(x => x.UsuarioID == uid)
                                 .OrderByDescending(x => x.FechaAsignacion)
                                 .FirstOrDefault();
 
-                            var lastVac = vacaciones?
+                            var lastVac = (vacaciones ?? Enumerable.Empty<VacacionesEmpleado>())
                                 .Where(x => x.UsuarioID == uid)
                                 .OrderByDescending(x => x.FechaSolicitud)
                                 .FirstOrDefault();
 
-                            // Usaremos el "puesto" como etiqueta de área/departamento para filtrar
-                            var area = lastPuesto?.Puesto ?? "General";
+                            var area   = lastPuesto?.Puesto ?? "General";
+                            var nombre = nombrePorId.ContainsKey(uid) ? nombrePorId[uid] : uid;
+                            var puestoTxt = area;
 
                             <tr class="emp-row"
                                 data-usuario="@uid"
                                 data-area="@area"
-                                data-text="@($"{uid} {area} {lastVac?.Estado} {lastInc?.Estado}")">
-                                <td class="fw-semibold">@uid</td>
+                                data-nombre="@nombre"
+                                data-puesto="@puestoTxt"
+                                data-text="@($"{nombre} {puestoTxt} {uid}")">
+                                <td class="fw-semibold">@nombre</td>
                                 <td>@s.SalarioMensual.ToString("C", CultureInfo.GetCultureInfo("es-CR"))</td>
                                 <td>@s.FechaRegistro.ToShortDateString()</td>
                                 <td>
@@ -153,9 +200,18 @@
                                                 <div class="card h-100">
                                                     <div class="card-header">Puesto</div>
                                                     <div class="card-body">
-                                                        <div><span class="text-muted">Puesto actual:</span><br /><span class="fw-semibold">@((lastPuesto?.Puesto) ?? "—")</span></div>
-                                                        <div class="mt-2"><span class="text-muted">Salario asignado:</span><br />@((lastPuesto?.SalarioAsignado).HasValue ? lastPuesto.SalarioAsignado.ToString("C", CultureInfo.GetCultureInfo("es-CR")) : "—")</div>
-                                                        <div class="mt-2"><span class="text-muted">Asignado:</span><br />@((lastPuesto?.FechaAsignacion).HasValue ? lastPuesto.FechaAsignacion.ToShortDateString() : "—")</div>
+                                                        <div>
+                                                            <span class="text-muted">Puesto actual:</span><br />
+                                                            <span class="fw-semibold">@((lastPuesto?.Puesto) ?? "—")</span>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Salario asignado:</span><br />
+                                                            @((lastPuesto != null) ? lastPuesto.SalarioAsignado.ToString("C", CultureInfo.GetCultureInfo("es-CR")) : "—")
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Asignado:</span><br />
+                                                            @((lastPuesto != null) ? lastPuesto.FechaAsignacion.ToShortDateString() : "—")
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -165,8 +221,14 @@
                                                 <div class="card h-100">
                                                     <div class="card-header">Vacaciones</div>
                                                     <div class="card-body">
-                                                        <div><span class="text-muted">Días disponibles:</span><br /><span class="fw-semibold">@((lastVac?.DiasDisponibles).HasValue ? lastVac.DiasDisponibles.ToString() : "—")</span></div>
-                                                        <div class="mt-2"><span class="text-muted">Última solicitud:</span><br />@((lastVac?.FechaSolicitud).HasValue ? lastVac.FechaSolicitud.ToShortDateString() : "—")</div>
+                                                        <div>
+                                                            <span class="text-muted">Días disponibles:</span><br />
+                                                            <span class="fw-semibold">@((lastVac != null) ? lastVac.DiasDisponibles.ToString() : "—")</span>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Última solicitud:</span><br />
+                                                            @((lastVac != null) ? lastVac.FechaSolicitud.ToShortDateString() : "—")
+                                                        </div>
                                                         <div class="mt-2">
                                                             <span class="text-muted">Estado:</span><br />
                                                             @{
@@ -175,7 +237,10 @@
                                                             }
                                                             <span class="badge @badgeVac">@estVac</span>
                                                         </div>
-                                                        <div class="mt-2"><span class="text-muted">Días solicitados (última):</span><br />@((lastVac?.DiasSolicitados).HasValue ? lastVac.DiasSolicitados.ToString() : "—")</div>
+                                                        <div class="mt-2">
+                                                            <span class="text-muted">Días solicitados (última):</span><br />
+                                                            @((lastVac != null) ? lastVac.DiasSolicitados.ToString() : "—")
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -188,22 +253,27 @@
                                                         <div>
                                                             <span class="text-muted">Estado último:</span><br />
                                                             @{
-                                                                var estInc = lastInc?.Estado ?? "—";
+                                                                var estInc = "—"; // IncapacidadEmpleado no tiene Estado
                                                                 var badgeInc = BadgeClase(estInc);
                                                             }
                                                             <span class="badge @badgeInc">@estInc</span>
                                                         </div>
                                                         <div class="mt-2">
-                                                            <span class="text-muted">Fecha:</span><br />@((lastInc?.FechaPresentacion).HasValue ? lastInc.FechaPresentacion.ToShortDateString() : "—")
+                                                            <span class="text-muted">Fecha:</span><br />— <!-- sin FechaPresentacion en el modelo -->
                                                         </div>
                                                         <div class="mt-2">
                                                             <span class="text-muted">Descripción:</span>
                                                             <div class="text-truncate" style="max-width: 100%;">@((lastInc?.Descripcion) ?? "—")</div>
                                                         </div>
                                                         <div class="mt-2">
-                                                            @if (!string.IsNullOrWhiteSpace(lastInc?.ArchivoRuta))
+                                                            @if (lastInc?.ArchivoContenido != null)
                                                             {
-                                                                <a href="@lastInc.ArchivoRuta" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">Ver archivo</a>
+                                                                <a asp-action="DescargarIncapacidad"
+                                                                   asp-controller="Empleados"
+                                                                   asp-route-id="@lastInc.Id"
+                                                                   class="btn btn-sm btn-outline-primary">
+                                                                    Ver/Descargar archivo
+                                                                </a>
                                                             }
                                                             else
                                                             {
@@ -244,62 +314,58 @@ else
 @section Scripts {
 <script>
 (function () {
-    const fDepto   = document.getElementById('fDepto');
-    const fTexto   = document.getElementById('fTexto');
-    const btnClear = document.getElementById('btnLimpiar');
-    const rows     = Array.from(document.querySelectorAll('#tablaResumen tbody tr.emp-row'));
-    const details  = new Map(); // rid -> detail <tr>
+    const $ = id => document.getElementById(id);
+    const fDepto    = $('fDepto');
+    const fEmpleado = $('fEmpleado');
+    const fTexto    = $('fTexto');
+    const btnClear  = $('btnLimpiar');
 
-    // Relacionar filas de detalle por id de collapse (aria-controls) o nextElementSibling con .emp-detail
-    document.querySelectorAll('#tablaResumen tbody tr.emp-detail').forEach(d => {
-        details.set(d.id, d);
-    });
+    const rows    = Array.from(document.querySelectorAll('#tablaResumen tbody tr.emp-row'));
+    const details = new Map();
+    document.querySelectorAll('#tablaResumen tbody tr.emp-detail').forEach(d => details.set(d.id, d));
 
-    function match(text, q) {
-        return text.toLowerCase().includes(q.toLowerCase());
-    }
+    function match(text, q) { return text.toLowerCase().includes(q.toLowerCase()); }
 
     function applyFilters() {
-        const dVal = (fDepto?.value || '').trim();
-        const qVal = (fTexto?.value || '').trim();
+        const dep = (fDepto?.value || '').trim().toLowerCase();
+        const emp = (fEmpleado?.value || '').trim();
+        const q   = (fTexto?.value || '').trim();
 
-        let visibleCount = 0;
+        let visible = 0;
 
         rows.forEach(r => {
-            const area = (r.getAttribute('data-area') || '').trim();
-            const text = (r.getAttribute('data-text') || '').trim() + ' ' + (r.getAttribute('data-usuario') || '');
+            const area = (r.getAttribute('data-area') || '').trim().toLowerCase();
+            const uid  = (r.getAttribute('data-usuario') || '').trim();
+            const text = ((r.getAttribute('data-text') || '') + ' ' + uid).trim();
+
             let ok = true;
+            if (dep) ok = ok && (area === dep);
+            if (emp) ok = ok && (uid === emp);
+            if (q)   ok = ok && match(text, q);
 
-            if (dVal) ok = ok && (area.toLowerCase() === dVal.toLowerCase());
-            if (qVal) ok = ok && match(text, qVal);
-
-            // Mostrar/ocultar fila base
             r.style.display = ok ? '' : 'none';
 
-            // Ocultar también su fila de detalle (si existe) cuando no coincide
             const btn = r.querySelector('[data-bs-target]');
             const rid = btn ? btn.getAttribute('data-bs-target')?.replace('#', '') : null;
-            if (rid && details.has(rid)) {
-                details.get(rid).style.display = ok ? '' : 'none';
-            }
+            if (rid && details.has(rid)) details.get(rid).style.display = ok ? '' : 'none';
 
-            if (ok) visibleCount++;
+            if (ok) visible++;
         });
 
-        // Actualizar contador visible (opcional)
         const countEl = document.getElementById('countTotal');
-        if (countEl) countEl.textContent = visibleCount.toString();
+        if (countEl) countEl.textContent = String(visible);
     }
 
     fDepto?.addEventListener('change', applyFilters);
+    fEmpleado?.addEventListener('change', applyFilters);
     fTexto?.addEventListener('input', applyFilters);
-    btnClear?.addEventListener('click', function () {
-        if (fDepto) fDepto.value = '';
-        if (fTexto) fTexto.value = '';
+    btnClear?.addEventListener('click', () => {
+        if (fDepto)    fDepto.value = '';
+        if (fEmpleado) fEmpleado.value = '';
+        if (fTexto)    fTexto.value = '';
         applyFilters();
     });
 
-    // Primera pasada
     applyFilters();
 })();
 </script>

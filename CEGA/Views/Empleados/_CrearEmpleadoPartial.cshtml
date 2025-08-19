@@ -1,82 +1,305 @@
 ﻿@model CEGA.Models.ViewModels.CrearEmpleadoVM
 @using System.Linq
+@using CEGA.Models
 
 @{
-    // Si el padre no envía roles, usa estos por defecto
+    ViewData["Title"] = "Crear empleado";
+
+    // Roles para el <select>
     var subRoles = (IEnumerable<string>)(ViewBag.SubRoles ?? new[] { "Empleado", "Supervisor", "RRHH", "Admin" });
+
+    // Fuente de datos para el listado (igual que en tu vista de Empleados)
+    var empleados = ViewBag.Empleados as IEnumerable<ApplicationUser>;
+    var empCount = empleados?.Count() ?? 0;
+
+    string NombreMostrar(ApplicationUser? u)
+    {
+        if (u == null) return "—";
+        var nom = (u.Nombre ?? "").Trim();
+        var ape = (u.Apellido ?? "").Trim();
+        var full = (nom + " " + ape).Trim();
+        return string.IsNullOrWhiteSpace(full) ? (u.UserName ?? u.Id ?? "—") : full;
+    }
 }
 
-<form asp-controller="Empleados" asp-action="Crear" method="post" id="form-crear-empleado" autocomplete="off">
-    @Html.AntiForgeryToken()
+<!-- Header -->
+<div class="mb-2">
+    <h4 class="mb-0">Empleados</h4>
+    <p class="text-muted mb-0">Crea nuevos empleados y consulta el listado existente.</p>
+</div>
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="Nombre" class="form-label"></label>
-            <input asp-for="Nombre" class="form-control" />
-            <span asp-validation-for="Nombre" class="text-danger"></span>
-        </div>
+<!-- === Formulario: Registrar empleado === -->
+<div class="card card-lg">
+    <div class="card-header">Registrar empleado</div>
+    <div class="card-body">
+        <form asp-controller="Empleados"
+              asp-action="Crear"
+              method="post"
+              id="form-crear-empleado"
+              autocomplete="off"
+              novalidate
+              class="row g-3">
+            @Html.AntiForgeryToken()
 
-        <div class="col-md-6">
-            <label asp-for="Apellido" class="form-label"></label>
-            <input asp-for="Apellido" class="form-control" />
-            <span asp-validation-for="Apellido" class="text-danger"></span>
-        </div>
+            <!-- Errores de modelo (generales) -->
+            <div class="col-12">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" autocomplete="given-name" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="PhoneNumber" class="form-label"></label>
-            <input asp-for="PhoneNumber" class="form-control" />
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="Apellido" class="form-label"></label>
+                <input asp-for="Apellido" class="form-control" autocomplete="family-name" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="UserName" class="form-label"></label>
-            <input asp-for="UserName" class="form-control" />
-            <div class="form-text">Si lo dejas vacío, usaré el correo como usuario.</div>
-            <span asp-validation-for="UserName" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="SubRol" class="form-label"></label>
-            <select asp-for="SubRol" class="form-select">
-                <option value="">— Seleccione —</option>
-                @foreach (var r in subRoles)
-                {
-                    <option value="@r">@r</option>
-                }
-            </select>
-            <span asp-validation-for="SubRol" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" type="tel" autocomplete="tel" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="Password" class="form-label"></label>
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" autocomplete="username" />
+                <div class="form-text">Si lo dejas vacío, usaré el correo como usuario.</div>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="ConfirmPassword" class="form-label"></label>
-            <input asp-for="ConfirmPassword" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="SubRol" class="form-label"></label>
+                <select asp-for="SubRol" class="form-select">
+                    <option value="">— Seleccione —</option>
+                    @foreach (var r in subRoles)
+                    {
+                        <option value="@r">@r</option>
+                    }
+                </select>
+                <span asp-validation-for="SubRol" class="text-danger"></span>
+            </div>
 
-        <div class="col-md-6">
-            <label asp-for="SalarioMensual" class="form-label"></label>
-            <input asp-for="SalarioMensual" class="form-control" />
-            <div class="form-text">Opcional: crea un registro en EmpleadosSalarios.</div>
-            <span asp-validation-for="SalarioMensual" class="text-danger"></span>
-        </div>
+            <div class="col-md-6">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="SalarioMensual" class="form-label"></label>
+                <input asp-for="SalarioMensual" class="form-control" type="number" step="0.01" inputmode="decimal" />
+                <div class="form-text">Opcional: crea un registro en EmpleadosSalarios.</div>
+                <span asp-validation-for="SalarioMensual" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button type="submit" class="btn btn-primary">Crear empleado</button>
+                <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="mt-3 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Crear empleado</button>
-        <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+<!-- === Listado de empleados (como el de Incapacidades) === -->
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Listado</span>
+        <span class="text-muted small">@empCount registro(s)</span>
     </div>
-</form>
+    <div class="card-body p-0">
+        @if (empleados == null || !empleados.Any())
+        {
+            <div class="m-3 alert alert-warning mb-0">No hay empleados registrados.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th style="min-width:220px;">Nombre</th>
+                            <th style="min-width:200px;">Usuario</th>
+                            <th style="min-width:220px;">Correo</th>
+                            <th style="min-width:140px;">Rol</th>
+                            <th style="min-width:140px;">Teléfono</th>
+                            <th style="width:140px;">Acciones</th>   <!-- NUEVO -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in empleados.OrderBy(x => NombreMostrar(x)))
+                        {
+                            <tr data-id="@u.Id">
+                                <td class="fw-semibold name">@NombreMostrar(u)</td>
+                                <td class="username">@((u.UserName ?? "—"))</td>
+                                <td class="email">@((u.Email ?? "—"))</td>
+                                <td class="subrol">@((string.IsNullOrWhiteSpace(u.SubRol) ? "—" : u.SubRol))</td>
+                                <td class="phone">@((string.IsNullOrWhiteSpace(u.PhoneNumber) ? "—" : u.PhoneNumber))</td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary btn-edit"
+                                            data-id="@u.Id"
+                                            data-nombre="@u.Nombre"
+                                            data-apellido="@u.Apellido"
+                                            data-username="@u.UserName"
+                                            data-email="@u.Email"
+                                            data-subrol="@u.SubRol"
+                                            data-phone="@u.PhoneNumber">
+                                        Editar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="modal fade" id="modalEditarEmpleado" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Editar empleado</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
 
-<!-- Asegúrate que tu _Layout ya incluye _ValidationScriptsPartial -->
+                            <form id="form-editar-empleado" method="post" action="/Empleados/ActualizarEmpleado" class="modal-body">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Id" id="ed_id" />
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_nombre">Nombre</label>
+                                        <input class="form-control" id="ed_nombre" name="Nombre" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_apellido">Apellido</label>
+                                        <input class="form-control" id="ed_apellido" name="Apellido" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_phone">Teléfono</label>
+                                        <input class="form-control" id="ed_phone" name="PhoneNumber" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_subrol">Rol</label>
+                                        <select class="form-select" id="ed_subrol" name="SubRol">
+                                            <option value="">— Seleccione —</option>
+                                            <option>Empleado</option>
+                                            <option>Supervisor</option>
+                                            <option>RRHH</option>
+                                            <option>Admin</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Opcionales (mejor no cambiarlos por defecto) -->
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_username">Usuario</label>
+                                        <input class="form-control" id="ed_username" name="UserName" disabled />
+                                        <div class="form-text">Cambiar usuario puede afectar el inicio de sesión.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="ed_email">Correo</label>
+                                        <input class="form-control" id="ed_email" name="Email" disabled />
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 d-flex gap-2 justify-content-end">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+@* Nota: no uses @section en partials; coloca scripts inline o en la vista padre *@
+<script>
+    (() => {
+      // Abrir y precargar
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-edit');
+        if (!btn) return;
+
+        document.getElementById('ed_id').value       = btn.dataset.id || '';
+        document.getElementById('ed_nombre').value   = btn.dataset.nombre || '';
+        document.getElementById('ed_apellido').value = btn.dataset.apellido || '';
+        document.getElementById('ed_phone').value    = btn.dataset.phone || '';
+        document.getElementById('ed_subrol').value   = btn.dataset.subrol || '';
+        document.getElementById('ed_username').value = btn.dataset.username || '';
+        document.getElementById('ed_email').value    = btn.dataset.email || '';
+
+        if (window.bootstrap) {
+          new bootstrap.Modal(document.getElementById('modalEditarEmpleado')).show();
+        }
+      });
+
+      // Enviar por AJAX y reflejar cambios en la tabla
+      document.addEventListener('submit', async (e) => {
+        const form = e.target;
+        if (form.id !== 'form-editar-empleado') return;
+
+        e.preventDefault();
+
+        const url = form.getAttribute('action');
+        const fd  = new FormData(form);
+
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        });
+
+        const data = await resp.json().catch(() => null);
+        if (!resp.ok || !data?.ok) {
+          alert((data && data.error) || 'No se pudo guardar.');
+          return;
+        }
+
+        // Actualiza la fila
+        const tr = document.querySelector(`tr[data-id="${data.empleado.id}"]`);
+        if (tr) {
+          tr.querySelector('.name').textContent =
+            (data.empleado.nombreCompleto || '').trim() || data.empleado.userName || data.empleado.id;
+          tr.querySelector('.phone').textContent   = data.empleado.phoneNumber || '—';
+          tr.querySelector('.subrol').textContent  = data.empleado.subRol || '—';
+          tr.querySelector('.username').textContent= data.empleado.userName || '—';
+          tr.querySelector('.email').textContent   = data.empleado.email || '—';
+
+          // También actualiza los data-* del botón
+          const btn = tr.querySelector('.btn-edit');
+          if (btn) {
+            btn.dataset.nombre   = data.empleado.nombre || '';
+            btn.dataset.apellido = data.empleado.apellido || '';
+            btn.dataset.phone    = data.empleado.phoneNumber || '';
+            btn.dataset.subrol   = data.empleado.subRol || '';
+            btn.dataset.username = data.empleado.userName || '';
+            btn.dataset.email    = data.empleado.email || '';
+          }
+        }
+
+        // Cierra modal
+        const modalEl = document.getElementById('modalEditarEmpleado');
+        if (modalEl && window.bootstrap) {
+          bootstrap.Modal.getInstance(modalEl)?.hide();
+        }
+      });
+    })();
+</script>
