@@ -1,7 +1,10 @@
-﻿@model IEnumerable<CEGA.Models.PoolCorreo>
+﻿@using CEGA.Models
+@using CEGA.Models.ViewModels
+@model MarketingPageVM
 
 @{
-    var count = Model?.Count() ?? 0;
+    var count = Model?.Pools?.Count() ?? 0;
+    var clientes = Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>();
 }
 
 <!-- Header -->
@@ -47,14 +50,10 @@
                 </div>
             </div>
 
-            @{
-                var clientes = ViewBag.Clientes as IEnumerable<CEGA.Models.ClienteMarketing>;
-            }
-
             <div class="col-md-5">
                 <label class="form-label">Correos</label>
 
-                <!-- Mantiene el contrato del backend (string separado por ;) -->
+                <!-- El backend espera string con emails separados por ';' -->
                 <input type="hidden" id="CorreosHidden" name="Correos" required />
 
                 <!-- Buscador -->
@@ -62,7 +61,7 @@
 
                 <!-- Select múltiple SIEMPRE visible -->
                 <select id="CorreosSelect" class="form-select" size="8" multiple>
-                    @if (clientes != null && clientes.Any())
+                    @if (clientes.Any())
                     {
                         foreach (var c in clientes.OrderBy(x => x.Nombre))
                         {
@@ -80,7 +79,9 @@
                     }
                 </select>
 
-                <div class="form-text">Selecciona uno o varios; se enviarán separados por <code>;</code>.</div>
+                <div class="form-text">
+                    Selecciona uno o varios; se enviarán separados por <code>;</code>.
+                </div>
 
                 <script>
                     (function () {
@@ -95,7 +96,6 @@
                             hidden.value = vals.join('; ');
                         }
                         sel.addEventListener('change', sync);
-                        // Inicializa por si hay preselecciones
                         sync();
 
                         if (filter) {
@@ -119,7 +119,7 @@
 </div>
 
 <!-- Listado -->
-@if (Model != null && Model.Any())
+@if (Model?.Pools != null && Model.Pools.Any())
 {
     <div class="card">
         <div class="card-header">Listado</div>
@@ -135,7 +135,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var pool in Model)
+                        @foreach (var pool in Model.Pools)
                         {
                             var correos = (pool.Correos ?? string.Empty)
                             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

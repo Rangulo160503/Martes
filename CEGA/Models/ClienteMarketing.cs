@@ -13,7 +13,6 @@ namespace CEGA.Models
         [EmailAddress(ErrorMessage = "Formato de correo electrónico incorrecto")]
         public string Correo { get; set; }
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
     }
 }
