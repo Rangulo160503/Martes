@@ -7,17 +7,17 @@ namespace CEGA.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; } = "";
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Descripcion { get; set; }
+        public string? Descripcion { get; set; } = "";
 
         [Required(ErrorMessage = "Campo Obligatorio")]
         [DataType(DataType.DateTime)]
-        public DateTime FechaHoraEnvio { get; set; }
+        public DateTime? FechaHoraEnvio { get; set; }
 
         [Required(ErrorMessage = "Campo Obligatorio")]
-        public string NombrePool { get; set; }  // Se validará si existe
+        public string? NombrePool { get; set; } = "";
     }
 }
 

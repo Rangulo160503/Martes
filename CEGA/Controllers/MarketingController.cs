@@ -13,13 +13,61 @@ namespace CEGA.Controllers
         public MarketingController(ApplicationDbContext context) => _context = context;
 
         // -------------------- Helpers --------------------
+        // Controllers/MarketingController.cs
         private MarketingPageVM BuildVM() => new MarketingPageVM
         {
-            Campanias = _context.CampsMarketing.AsNoTracking().OrderBy(x => x.Nombre).ToList(),
-            Pools = _context.PoolsCorreo.AsNoTracking().OrderBy(x => x.Nombre).ToList(),
-            Programaciones = _context.ProgramacionesDistribucion.AsNoTracking().OrderByDescending(x => x.FechaHoraEnvio).ToList(),
-            Clientes = _context.ClientesMarketing.AsNoTracking().OrderBy(x => x.Nombre).ToList()
+            Campanias = _context.CampsMarketing
+                .AsNoTracking()
+                .Select(c => new CampMarketing
+                {
+                    Id = c.Id,
+                    Nombre = c.Nombre ?? "",
+                    AsuntoCorreo = c.AsuntoCorreo ?? "",
+                    Descripcion = c.Descripcion ?? "",
+                    ImagenUrl = c.ImagenUrl,          // déjala nullable en el modelo
+                    NombrePool = c.NombrePool         // déjala nullable en el modelo
+                })
+                .OrderBy(x => x.Nombre)
+                .ToList(),
+
+            Pools = _context.PoolsCorreo
+                .AsNoTracking()
+                .Select(p => new PoolCorreo
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre ?? "",
+                    Descripcion = p.Descripcion ?? "",
+                    Correos = p.Correos ?? ""
+                })
+                .OrderBy(x => x.Nombre)
+                .ToList(),
+
+            Programaciones = _context.ProgramacionesDistribucion
+                .AsNoTracking()
+                .Select(d => new ProgramacionDistribucion
+                {
+                    Id = d.Id,
+                    Nombre = d.Nombre ?? "",
+                    Descripcion = d.Descripcion ?? "",
+                    NombrePool = d.NombrePool ?? "",
+                    FechaHoraEnvio = d.FechaHoraEnvio // mejor que sea DateTime? en el modelo
+                })
+                .OrderByDescending(x => x.FechaHoraEnvio ?? DateTime.MinValue)
+                .ToList(),
+
+            Clientes = _context.ClientesMarketing
+                .AsNoTracking()
+                .Select(c => new ClienteMarketing
+                {
+                    Id = c.Id,
+                    Nombre = c.Nombre ?? "",
+                    Correo = c.Correo ?? "",
+                    Telefono = c.Telefono // si es nullable en BD, que sea string? en el modelo
+                })
+                .OrderBy(x => x.Nombre)
+                .ToList()
         };
+
 
         private static string Norm(string? s) => (s ?? string.Empty).Trim();
 
@@ -38,20 +86,76 @@ namespace CEGA.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var vm = BuildVM(); vm.CampaniaForm = model; return View("Marketing", vm);
+                // Regresa a la vista con el VM armado
+                var vmErr = BuildVM();
+                TempData["Error"] = "Formulario inválido. Completa todos los campos requeridos.";
+                return View("Marketing", vmErr);
             }
 
-            var nombre = Norm(model.Nombre);
-            if (_context.CampsMarketing.Any(c => c.Nombre == nombre))
+            // Normaliza entradas
+            string Norm(string? s) => (s ?? string.Empty).Trim();
+
+            model.Nombre = Norm(model.Nombre);
+            model.AsuntoCorreo = Norm(model.AsuntoCorreo);
+            model.Descripcion = Norm(model.Descripcion);
+            model.ImagenUrl = string.IsNullOrWhiteSpace(model.ImagenUrl) ? null : Norm(model.ImagenUrl);
+            model.NombrePool = string.IsNullOrWhiteSpace(model.NombrePool) ? null : Norm(model.NombrePool);
+
+            // Único por nombre (si así lo quieres)
+            if (_context.CampsMarketing.Any(c => c.Nombre == model.Nombre))
             {
                 ModelState.AddModelError(nameof(model.Nombre), "Esta campaña ya existe");
-                var vm = BuildVM(); vm.CampaniaForm = model; return View("Marketing", vm);
+                var vmDup = BuildVM();
+                return View("Marketing", vmDup);
             }
 
-            model.Nombre = nombre;
-            _context.CampsMarketing.Add(model);
-            _context.SaveChanges();
-            TempData["Mensaje"] = "Campaña creada exitosamente";
+            try
+            {
+                _context.CampsMarketing.Add(model);
+                _context.SaveChanges();
+
+                TempData["Mensaje"] = "Campaña creada exitosamente.";
+                return RedirectToAction(nameof(Marketing));
+            }
+            catch (Exception ex)
+            {
+                // Muestra la causa real (inner) en el banner
+                var root = ex;
+                while (root.InnerException != null) root = root.InnerException;
+
+                TempData["Error"] = "No se pudo guardar la campaña. " + root.Message;
+
+                var vmErr = BuildVM();
+                return View("Marketing", vmErr);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EnviarCampania(int id) // id = campaña
+        {
+            var camp = _context.CampsMarketing.FirstOrDefault(c => c.Id == id);
+            if (camp == null)
+            { TempData["Error"] = "Campaña no encontrada."; return RedirectToAction(nameof(Marketing)); }
+
+            if (string.IsNullOrWhiteSpace(camp.NombrePool))
+            { TempData["Error"] = "La campaña no tiene un pool asignado."; return RedirectToAction(nameof(Marketing)); }
+
+            var pool = _context.PoolsCorreo.FirstOrDefault(p => p.Nombre == camp.NombrePool);
+            if (pool == null)
+            { TempData["Error"] = "El pool asignado no existe."; return RedirectToAction(nameof(Marketing)); }
+
+            var correos = (pool.Correos ?? "")
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (!correos.Any())
+            { TempData["Error"] = "El pool no contiene correos válidos."; return RedirectToAction(nameof(Marketing)); }
+
+            // TODO: integrar tu envío real (SMTP/MailKit). Por ahora, stub:
+            await Task.CompletedTask;
+
+            TempData["Mensaje"] = $"Se disparó el envío de \"{camp.Nombre}\" al pool \"{pool.Nombre}\" ({correos.Count} destinatario(s)).";
             return RedirectToAction(nameof(Marketing));
         }
 
@@ -133,26 +237,71 @@ namespace CEGA.Controllers
         // -------------------- Pools de Correos --------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CrearPoolCorreo(PoolCorreo model)
+        public IActionResult CrearPoolCorreo(
+    [FromForm] string Nombre,
+    [FromForm] string Descripcion,
+    [FromForm] string Correos,           // viene del input hidden
+    IFormFile? ArchivoAdjunto = null)    // opcional: por ahora se ignora
         {
-            if (!ModelState.IsValid) { var vm = BuildVM(); vm.PoolForm = model; return View("Marketing", vm); }
+            // Normalizar
+            Nombre = Norm(Nombre);
+            Descripcion = Norm(Descripcion);
 
-            var nombre = Norm(model.Nombre);
-            if (_context.PoolsCorreo.Any(p => p.Nombre == nombre))
+            // Correos: aceptar ; , y saltos de línea, quitar vacíos y duplicados
+            var correos = Norm(Correos)
+                .Replace(",", ";")
+                .Replace("\n", ";")
+                .Replace("\r", ";");
+
+            var listaCorreos = correos
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (string.IsNullOrWhiteSpace(Nombre) ||
+                string.IsNullOrWhiteSpace(Descripcion) ||
+                !listaCorreos.Any())
             {
-                ModelState.AddModelError(nameof(model.Nombre), "Este pool ya existe");
-                var vm = BuildVM(); vm.PoolForm = model; return View("Marketing", vm);
+                ModelState.AddModelError("Correos", "Selecciona al menos un correo.");
+                var vm = BuildVM();
+                vm.PoolForm = new PoolCorreo
+                {
+                    Nombre = Nombre,
+                    Descripcion = Descripcion,
+                    Correos = string.Join("; ", listaCorreos)
+                };
+                return View("Marketing", vm);
             }
 
-            // Si Correos es una cadena con emails separados por coma,
-            // aquí podrías validar el formato individual si lo necesitas.
+            // Unicidad por nombre
+            if (_context.PoolsCorreo.Any(p => p.Nombre == Nombre))
+            {
+                ModelState.AddModelError(nameof(Nombre), "Este pool ya existe.");
+                var vm = BuildVM();
+                vm.PoolForm = new PoolCorreo
+                {
+                    Nombre = Nombre,
+                    Descripcion = Descripcion,
+                    Correos = string.Join("; ", listaCorreos)
+                };
+                return View("Marketing", vm);
+            }
 
-            model.Nombre = nombre;
-            _context.PoolsCorreo.Add(model);
+            // Guardar
+            var pool = new PoolCorreo
+            {
+                Nombre = Nombre,
+                Descripcion = Descripcion,
+                Correos = string.Join("; ", listaCorreos)
+            };
+
+            _context.PoolsCorreo.Add(pool);
             _context.SaveChanges();
+
             TempData["Mensaje"] = "Pool de correos creado exitosamente.";
             return RedirectToAction(nameof(Marketing));
         }
+
 
         [HttpGet]
         public IActionResult EditarPoolCorreo(int id)

@@ -86,7 +86,7 @@
                             <tr>
                                 <td class="fw-semibold">@dist.Nombre</td>
                                 <td class="text-truncate" style="max-width:420px;">@dist.Descripcion</td>
-                                <td>@dist.FechaHoraEnvio.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(dist.FechaHoraEnvio?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
                                 <td>@dist.NombrePool</td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">

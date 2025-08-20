@@ -1,11 +1,13 @@
 ﻿@model CEGA.Models.ViewModels.MarketingPageVM
+@using CEGA.Models
+
 @{
     ViewData["Title"] = "Marketing";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var campCount = Model?.Campanias?.Count ?? 0;
     var poolCount = Model?.Pools?.Count ?? 0;
-    var cliCount = Model?.Clientes?.Count ?? 0;
+    var cliCount  = Model?.Clientes?.Count ?? 0;
 }
 
 <!-- Header -->
@@ -15,52 +17,28 @@
 </div>
 
 <!-- Alertas -->
-@if (TempData["Mensaje"] != null)
-{
-    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
-}
+@if (TempData["Mensaje"] != null) { <div class="alert alert-success mb-3">@TempData["Mensaje"]</div> }
+@if (TempData["Error"]   != null) { <div class="alert alert-danger  mb-3">@TempData["Error"]</div> }
 
 <!-- Tabs en tarjeta -->
 <div class="card card-lg">
     <div class="card-header p-0">
         <ul class="nav nav-tabs card-header-tabs nav-fill" id="marketingTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active"
-                        id="camp-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#camp"
-                        type="button"
-                        role="tab"
-                        aria-controls="camp"
-                        aria-selected="true">
+                <button class="nav-link active" id="camp-tab" data-bs-toggle="tab" data-bs-target="#camp"
+                        type="button" role="tab" aria-controls="camp" aria-selected="true">
                     Campañas <span class="badge bg-success ms-1">@campCount</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link"
-                        id="pool-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#pool"
-                        type="button"
-                        role="tab"
-                        aria-controls="pool"
-                        aria-selected="false">
+                <button class="nav-link" id="pool-tab" data-bs-toggle="tab" data-bs-target="#pool"
+                        type="button" role="tab" aria-controls="pool" aria-selected="false">
                     Pools de Correos <span class="badge bg-success ms-1">@poolCount</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link"
-                        id="clientes-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#clientes"
-                        type="button"
-                        role="tab"
-                        aria-controls="clientes"
-                        aria-selected="false">
+                <button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes"
+                        type="button" role="tab" aria-controls="clientes" aria-selected="false">
                     Clientes <span class="badge bg-success ms-1">@cliCount</span>
                 </button>
             </li>
@@ -69,14 +47,25 @@
 
     <div class="card-body">
         <div class="tab-content mt-2">
+            <!-- Campañas -->
             <div class="tab-pane fade show active" id="camp" role="tabpanel" aria-labelledby="camp-tab">
-                @await Html.PartialAsync("_CampanasPartial", Model.Campanias)
+                @{
+                    // PASAR POOLS AL PARTIAL (imprescindible para el dropdown)
+                    ViewBag.Pools = Model?.Pools ?? Enumerable.Empty<PoolCorreo>();
+                }
+                @await Html.PartialAsync("_CampaniasPartial",
+                    Model?.Campanias ?? Enumerable.Empty<CEGA.Models.CampMarketing>())
             </div>
+
+            <!-- Pools -->
             <div class="tab-pane fade" id="pool" role="tabpanel" aria-labelledby="pool-tab">
                 @await Html.PartialAsync("_PoolsPartial", Model)
             </div>
+
+            <!-- Clientes -->
             <div class="tab-pane fade" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
-                @await Html.PartialAsync("_ClientesPartial", Model.Clientes)
+                @await Html.PartialAsync("_ClientesPartial",
+                    Model?.Clientes ?? Enumerable.Empty<CEGA.Models.ClienteMarketing>())
             </div>
         </div>
     </div>

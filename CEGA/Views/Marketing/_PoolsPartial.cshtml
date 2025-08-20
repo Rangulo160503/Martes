@@ -24,6 +24,7 @@
               class="row g-2"
               novalidate>
             @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
 
             <div class="col-md-3">
                 <label class="form-label" for="Nombre">Nombre</label>
@@ -55,6 +56,7 @@
 
                 <!-- El backend espera string con emails separados por ';' -->
                 <input type="hidden" id="CorreosHidden" name="Correos" required />
+                <span class="text-danger small" data-valmsg-for="Correos" data-valmsg-replace="true"></span>
 
                 <!-- Buscador -->
                 <input id="buscarCliente" class="form-control form-control-sm mb-2" placeholder="Buscar por nombre o correo..." />
@@ -85,9 +87,10 @@
 
                 <script>
                     (function () {
-                        const sel = document.getElementById('CorreosSelect');
+                        const sel    = document.getElementById('CorreosSelect');
                         const hidden = document.getElementById('CorreosHidden');
                         const filter = document.getElementById('buscarCliente');
+                        const form   = sel.closest('form');
 
                         function sync() {
                             const vals = Array.from(sel.selectedOptions)
@@ -95,8 +98,17 @@
                                 .filter(Boolean);
                             hidden.value = vals.join('; ');
                         }
+
                         sel.addEventListener('change', sync);
-                        sync();
+
+                        // 🔑 asegura que el hidden esté actualizado justo antes de enviar
+                        form.addEventListener('submit', function (e) {
+                            sync();
+                            if (!hidden.value) { // opcional: bloquea si no hay correos
+                                e.preventDefault();
+                                alert('Selecciona al menos un correo para el pool.');
+                            }
+                        });
 
                         if (filter) {
                             filter.addEventListener('input', function () {
@@ -107,6 +119,9 @@
                                 });
                             });
                         }
+
+                        // Inicial (por si el navegador recuerda selección)
+                        sync();
                     })();
                 </script>
             </div>

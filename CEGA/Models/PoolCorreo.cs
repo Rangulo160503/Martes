@@ -6,15 +6,15 @@ namespace CEGA.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Nombre { get; set; }
+        [Required] public string Nombre { get; set; } = null!;
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Descripcion { get; set; }
+        // En BD puede ser NULL
+        public string? Descripcion { get; set; }
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [EmailAddress(ErrorMessage = "Formato de correo electrónico incorrecto")]
-        public string Correos { get; set; }
-
+        // Requerido en BD, pero pueden venir varios correos separados por ';'
+        [Required]
+        public string Correos { get; set; } = null!;
     }
+
 }
+

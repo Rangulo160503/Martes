@@ -6,17 +6,12 @@ namespace CEGA.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Nombre { get; set; } = string.Empty;
+        [Required] public string Nombre { get; set; } = null!;
+        [Required] public string AsuntoCorreo { get; set; } = null!;
+        [Required] public string Descripcion { get; set; } = null!;
 
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string AsuntoCorreo { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        public string Descripcion { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Campo Obligatorio")]
-        [Url(ErrorMessage = "Debe ser una URL válida")]
-        public string ImagenUrl { get; set; } = string.Empty;
+        // En BD permiten NULL → deben ser nullable aquí
+        public string? ImagenUrl { get; set; }
+        public string? NombrePool { get; set; }
     }
 }
