@@ -94,7 +94,7 @@ namespace CEGA.Controllers
             }
 
             TempData["Mensaje"] = "Empleado creado correctamente.";
-            return RedirectToAction("Index", "Empleados");
+            return RedirectToAction(nameof(Empleados));
         }
 
         [HttpGet]
@@ -184,8 +184,17 @@ namespace CEGA.Controllers
             return View("Empleados", model);
         }
         [HttpPost]
-        public async Task<IActionResult> AsignarPuesto(PuestoEmpleado nuevo)
+        public async Task<IActionResult> AsignarPuesto(PuestoEmpleado nuevo, bool crearSalario)
         {
+            if (crearSalario)
+            {
+                _context.EmpleadosSalarios.Add(new EmpleadosSalarios
+                {
+                    UsuarioId = nuevo.UsuarioID,
+                    SalarioMensual = nuevo.SalarioAsignado,
+                    FechaRegistro = DateTime.Now
+                });
+            }
             var user = await _userManager.FindByIdAsync(nuevo.UsuarioID);
             if (user == null)
             {

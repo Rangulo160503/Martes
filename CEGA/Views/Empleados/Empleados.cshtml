@@ -119,93 +119,95 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         (function () {
-            // ===== Cálculo de horas (si no lo usas, puedes borrar esta parte) =====
-            function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
-            function toDate(v){ const d = new Date(v); return isNaN(d.getTime()) ? null : d; }
-            function recalc() {
-                const ini = toDate(document.getElementById('ini_reg')?.value);
-                const fin = toDate(document.getElementById('fin_reg')?.value);
-                let horas = 0;
-                if (ini && fin) horas = Math.max(0, (fin - ini) / 36e5); // ms -> horas
-                const dias = horas / 24;
-                const hrsEl = document.getElementById('calc_hrs');
-                const dayEl = document.getElementById('calc_dias');
-                if (hrsEl) hrsEl.textContent = round2(horas).toFixed(2);
-                if (dayEl) dayEl.textContent = round2(dias).toFixed(2);
+            const $ = id => document.getElementById(id);
+            const fDepto    = $('fDepto');
+            const fEmpleado = $('fEmpleado');
+            const fTexto    = $('fTexto');
+            const btnApply  = $('btnAplicar');
+            const btnClear  = $('btnLimpiar');
+
+            // --- Guardas por si no hay tabla (cuando no hay salarios) ---
+            const table = document.getElementById('tablaResumen');
+            const tbody = table ? table.querySelector('tbody') : null;
+
+            // Colecciones seguras
+            const rows = tbody ? Array.from(tbody.querySelectorAll('tr.emp-row')) : [];
+            const details = new Map();
+            if (tbody) {
+                tbody.querySelectorAll('tr.emp-detail').forEach(d => details.set(d.id, d));
             }
-            document.addEventListener('input', function(e){
-                if (e.target && (e.target.id === 'ini_reg' || e.target.id === 'fin_reg')) recalc();
-            });
 
-            // ===== Interceptar submit del partial _CrearEmpleadoPartial (AJAX) =====
-            // Requisitos en tu partial:
-            //   <form asp-controller="Empleados" asp-action="Crear" id="form-crear-empleado" ...>
-            //   Modal con id="modalCrearEmpleado"
-            //   <select id="usuarioId"> en el form de incapacidad
-            document.addEventListener('submit', async function (e) {
-                const form = e.target;
-                if (!form || form.id !== 'form-crear-empleado') return;
-                e.preventDefault();
-
-                const url = form.getAttribute('action');
-                const formData = new FormData(form);
-
-                try {
-                    const resp = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                        body: formData
-                    });
-
-                    if (!resp.ok) {
-                        let msgs = ['Error al crear el empleado'];
-                        try {
-                            const err = await resp.json();
-                            if (err?.errors) {
-                                msgs = Array.isArray(err.errors) ? err.errors : Object.values(err.errors).flat();
-                            }
-                        } catch { /* ignore */ }
-                        alert(msgs.join('\n'));
-                        return;
-                    }
-
-                    const data = await resp.json();
-                    if (!data.ok) { alert('No se pudo crear el empleado'); return; }
-
-                    // Agregar al <select id="usuarioId">
-                    const sel = document.getElementById('usuarioId');
-                    if (sel) {
-                        const sMon = data.empleado.salarioMensual ?? null;
-                        const sDia = (sMon != null) ? (Number(sMon) / 30) : null;
-
-                        const opt = document.createElement('option');
-                        opt.value = data.empleado.id;
-                        opt.textContent = data.empleado.nombre;
-                        if (sDia != null) {
-                            const val = Math.round(sDia * 100) / 100;
-                            opt.setAttribute('data-salario-diario', val.toString());
-                        }
-                        sel.appendChild(opt);
-                        sel.value = data.empleado.id; // seleccionar el recién creado
-                    }
-
-                    // Cerrar modal (Bootstrap 5)
-                    const modalEl = document.getElementById('modalCrearEmpleado');
-                    if (modalEl && window.bootstrap) {
-                        const m = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                        m.hide();
-                    }
-                    form.reset();
-                } catch {
-                    alert('Error de red al crear el empleado');
+            // Fila "Sin coincidencias" solo si existe tbody
+            let emptyRow = null;
+            if (tbody) {
+                emptyRow = tbody.querySelector('tr.no-resultados');
+                if (!emptyRow) {
+                    emptyRow = document.createElement('tr');
+                    emptyRow.className = 'no-resultados';
+                    emptyRow.innerHTML = '<td colspan="4" class="text-center text-muted py-3">Sin coincidencias</td>';
+                    emptyRow.style.display = 'none';
+                    tbody.appendChild(emptyRow);
                 }
+            }
+
+            function match(text, q) { return text.toLowerCase().includes(q.toLowerCase()); }
+
+            function applyFilters() {
+                const dep = (fDepto?.value || '').trim().toLowerCase();
+                const emp = (fEmpleado?.value || '').trim();
+                const q   = (fTexto?.value || '').trim();
+
+                let visible = 0;
+
+                // Si no hay filas (p.ej., no hay salarios), solo actualiza el contador y sal
+                if (!rows.length) {
+                    const countEl = document.getElementById('countTotal');
+                    if (countEl) countEl.textContent = '0';
+                    if (emptyRow) emptyRow.style.display = ''; // muestra "Sin coincidencias" si hay tbody
+                    return;
+                }
+
+                rows.forEach(r => {
+                    const area = (r.getAttribute('data-area') || '').trim().toLowerCase();
+                    const uid  = (r.getAttribute('data-usuario') || '').trim();
+                    const text = ((r.getAttribute('data-text') || '') + ' ' + uid).trim();
+
+                    let ok = true;
+                    if (dep) ok = ok && (area === dep);
+                    if (emp) ok = ok && (uid === emp);
+                    if (q)   ok = ok && match(text, q);
+
+                    r.style.display = ok ? '' : 'none';
+
+                    const btn = r.querySelector('[data-bs-target]');
+                    const rid = btn ? btn.getAttribute('data-bs-target')?.replace('#', '') : null;
+                    if (rid && details.has(rid)) details.get(rid).style.display = ok ? '' : 'none';
+
+                    if (ok) visible++;
+                });
+
+                if (emptyRow) emptyRow.style.display = (visible === 0 ? '' : 'none');
+
+                const countEl = document.getElementById('countTotal');
+                if (countEl) countEl.textContent = String(visible);
+            }
+
+            btnApply?.addEventListener('click', applyFilters);
+            fTexto?.addEventListener('keyup', e => { if (e.key === 'Enter') applyFilters(); });
+            btnClear?.addEventListener('click', () => {
+                if (fDepto)    fDepto.value = '';
+                if (fEmpleado) fEmpleado.value = '';
+                if (fTexto)    fTexto.value = '';
+                applyFilters();
             });
+
+            // Primera pasada
+            applyFilters();
         })();
     </script>
 }

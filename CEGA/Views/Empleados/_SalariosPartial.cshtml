@@ -68,18 +68,6 @@
     <div class="card mt-2">
         <div class="card-body">
             <div class="row g-2">
-                <!-- Filtro por Área -->
-                <div class="col-md-4">
-                    <label class="form-label" for="fDepto">Departamento / Área</label>
-                    <select id="fDepto" class="form-select">
-                        <option value="">Todos</option>
-                        @foreach (var d in deptos)
-                        {
-                            <option value="@d">@d</option>
-                        }
-                    </select>
-                </div>
-
                 <!-- Filtro por Empleado (Nombre — Puesto) -->
                 <div class="col-md-4">
                     <label class="form-label" for="fEmpleado">Empleado (Nombre — Puesto)</label>
@@ -105,6 +93,7 @@
             </div>
             <div class="row g-2 mt-1">
                 <div class="col-md-12 d-flex">
+                    <button type="button" id="btnAplicar" class="btn btn-primary">Aplicar filtros</button>
                     <button type="button" id="btnLimpiar" class="btn btn-outline-secondary ms-auto">Limpiar filtros</button>
                 </div>
             </div>
@@ -318,11 +307,23 @@ else
     const fDepto    = $('fDepto');
     const fEmpleado = $('fEmpleado');
     const fTexto    = $('fTexto');
+    const btnApply  = $('btnAplicar');
     const btnClear  = $('btnLimpiar');
 
     const rows    = Array.from(document.querySelectorAll('#tablaResumen tbody tr.emp-row'));
     const details = new Map();
     document.querySelectorAll('#tablaResumen tbody tr.emp-detail').forEach(d => details.set(d.id, d));
+
+    // Fila "Sin coincidencias" (una sola vez)
+    let emptyRow = document.querySelector('#tablaResumen tbody tr.no-resultados');
+    if (!emptyRow) {
+        const tbody = document.querySelector('#tablaResumen tbody');
+        emptyRow = document.createElement('tr');
+        emptyRow.className = 'no-resultados';
+        emptyRow.innerHTML = '<td colspan="4" class="text-center text-muted py-3">Sin coincidencias</td>';
+        emptyRow.style.display = 'none';
+        tbody.appendChild(emptyRow);
+    }
 
     function match(text, q) { return text.toLowerCase().includes(q.toLowerCase()); }
 
@@ -352,13 +353,17 @@ else
             if (ok) visible++;
         });
 
+        // Mostrar/ocultar "Sin coincidencias"
+        if (emptyRow) emptyRow.style.display = (visible === 0 ? '' : 'none');
+
+        // Actualizar contador
         const countEl = document.getElementById('countTotal');
         if (countEl) countEl.textContent = String(visible);
     }
 
-    fDepto?.addEventListener('change', applyFilters);
-    fEmpleado?.addEventListener('change', applyFilters);
-    fTexto?.addEventListener('input', applyFilters);
+    btnApply?.addEventListener('click', applyFilters);
+    fTexto?.addEventListener('keyup', e => { if (e.key === 'Enter') applyFilters(); });
+
     btnClear?.addEventListener('click', () => {
         if (fDepto)    fDepto.value = '';
         if (fEmpleado) fEmpleado.value = '';
@@ -366,6 +371,7 @@ else
         applyFilters();
     });
 
+    // Primera pasada (muestra todo)
     applyFilters();
 })();
 </script>
