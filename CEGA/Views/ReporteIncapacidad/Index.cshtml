@@ -59,9 +59,6 @@
                             <th style="min-width:160px;">Usuario</th>
                             <th style="min-width:260px;">Descripción</th>
                             <th style="min-width:160px;">Archivo</th>
-                            <th style="min-width:120px;">Estado</th>  <!-- se mantiene en UI, se muestra "—" -->
-                            <th style="min-width:120px;">Fecha</th>   <!-- se mantiene en UI, se muestra "—" -->
-                            <th style="width:180px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,24 +92,7 @@
                                     </div>
                                 </td>
                                 <td><span class="badge @badge">@est</span></td>
-                                <td>—</td> <!-- No existe FechaPresentacion en el modelo -->
-                                <td>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <a asp-controller="ReporteIncapacidad"
-                                           asp-action="Editar"
-                                           asp-route-id="@i.Id"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Editar
-                                        </a>
-                                        <a asp-controller="ReporteIncapacidad"
-                                           asp-action="Eliminar"
-                                           asp-route-id="@i.Id"
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('¿Eliminar este registro de incapacidad?');">
-                                            Eliminar
-                                        </a>
-                                    </div>
-                                </td>
+                                
                             </tr>
                         }
                     </tbody>

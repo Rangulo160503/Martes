@@ -3,7 +3,8 @@
     [Nombre]       NVARCHAR (MAX) NOT NULL,
     [AsuntoCorreo] NVARCHAR (MAX) NOT NULL,
     [Descripcion]  NVARCHAR (MAX) NOT NULL,
-    [ImagenUrl]    NVARCHAR (MAX) NOT NULL,
+    [ImagenUrl]    NVARCHAR (MAX) NULL,
+    [NombrePool]   NVARCHAR (256) NULL,
     CONSTRAINT [PK_CampsMarketing] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

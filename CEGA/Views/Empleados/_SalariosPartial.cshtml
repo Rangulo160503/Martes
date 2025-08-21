@@ -152,19 +152,11 @@
                                 <td>@s.FechaRegistro.ToShortDateString()</td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                                type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#@rid"
-                                                aria-expanded="false"
-                                                aria-controls="@rid">
-                                            Ver resumen
-                                        </button>
+                                        
 
                                         <form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="m-0 d-inline">
                                             <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
                                             <input type="hidden" name="salario" value="@s.SalarioMensual" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Editar</button>
                                         </form>
 
                                         <form asp-action="EliminarSalario"

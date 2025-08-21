@@ -44,11 +44,6 @@
                 <div class="form-text">Se enviará a los correos de este pool.</div>
             </div>
 
-            <div class="col-md-3">
-                <label class="form-label" for="ImagenUrl">Imagen (URL)</label>
-                <input id="ImagenUrl" name="ImagenUrl" class="form-control" placeholder="https://..." />
-                <div class="form-text">Opcional: se incluirá en el cuerpo del correo.</div>
-            </div>
 
             <div class="col-12">
                 <label class="form-label" for="Descripcion">Descripción / Cuerpo</label>
@@ -73,8 +68,6 @@
                     <th>Asunto</th>
                     <th style="min-width:200px;">Pool</th>
                     <th style="min-width:280px;">Descripción</th>
-                    <th style="width:100px;">Imagen</th>
-                    <th style="width:300px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,51 +80,7 @@
                         <td>@camp.AsuntoCorreo</td>
                         <td>@(poolOk? camp.NombrePool: "—")</td>
                         <td class="text-truncate" style="max-width:420px;">@camp.Descripcion</td>
-                        <td>
-                            @if (!string.IsNullOrWhiteSpace(camp.ImagenUrl))
-                            {
-                                <img src="@camp.ImagenUrl"
-                                     alt="Imagen de campaña"
-                                     width="72" height="72"
-                                     class="rounded shadow-sm"
-                                     style="object-fit:cover; border:1px solid var(--border);" />
-                            }
-                            else
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                        </td>
-                        <td>
-                            <div class="d-flex flex-wrap gap-2">
-                                <!-- Editar -->
-                                <form asp-action="EditarCampania" asp-controller="Marketing" method="post" class="m-0 d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="Id" value="@camp.Id" />
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">Editar</button>
-                                </form>
-
-                                <!-- Eliminar -->
-                                <form asp-action="EliminarCampania" asp-controller="Marketing" method="post"
-                                      class="m-0 d-inline"
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta campaña?');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@camp.Id" />
-                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                </form>
-
-                                <!-- Enviar -->
-                                <form asp-action="EnviarCampania" asp-controller="Marketing" method="post" class="m-0 d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@camp.Id" />
-                                    <button type="submit"
-                                            class="btn btn-sm btn-accent"
-                                            title="@(poolOk ? $"Enviar a pool '{camp.NombrePool}'" : "Asigna un pool a la campaña para habilitar el envío")"
-                                            @(poolOk ? null : "disabled")>
-                                        Enviar
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
+                        
                     </tr>
                 }
             </tbody>

@@ -120,7 +120,6 @@
                             <th style="min-width:140px;">Fin</th>
                             <th style="min-width:140px;">Días solicitados</th>
                             <th style="min-width:140px;">Días disponibles</th>
-                            <th style="min-width:120px;">Estado</th>
                             <th style="min-width:160px;">Fecha solicitud</th>
                         </tr>
                     </thead>
@@ -139,7 +138,6 @@
                                 <td>@(finCalc.HasValue? finCalc.Value.ToShortDateString() : "—")</td>
                                 <td>@v.DiasSolicitados</td>
                                 <td>@v.DiasDisponibles</td>
-                                <td><span class="badge @badge">@(!string.IsNullOrWhiteSpace(v.Estado) ? v.Estado : "—")</span></td>
                                 <td>@v.FechaSolicitud.ToShortDateString()</td>
                             </tr>
                         }

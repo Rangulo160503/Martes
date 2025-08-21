@@ -135,10 +135,7 @@
                         <tr>
                             <th style="min-width:220px;">Nombre</th>
                             <th style="min-width:200px;">Usuario</th>
-                            <th style="min-width:220px;">Correo</th>
                             <th style="min-width:140px;">Rol</th>
-                            <th style="min-width:140px;">Teléfono</th>
-                            <th style="width:140px;">Acciones</th>   <!-- NUEVO -->
                         </tr>
                     </thead>
                     <tbody>
@@ -147,22 +144,7 @@
                             <tr data-id="@u.Id">
                                 <td class="fw-semibold name">@NombreMostrar(u)</td>
                                 <td class="username">@((u.UserName ?? "—"))</td>
-                                <td class="email">@((u.Email ?? "—"))</td>
                                 <td class="subrol">@((string.IsNullOrWhiteSpace(u.SubRol) ? "—" : u.SubRol))</td>
-                                <td class="phone">@((string.IsNullOrWhiteSpace(u.PhoneNumber) ? "—" : u.PhoneNumber))</td>
-                                <td>
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-secondary btn-edit"
-                                            data-id="@u.Id"
-                                            data-nombre="@u.Nombre"
-                                            data-apellido="@u.Apellido"
-                                            data-username="@u.UserName"
-                                            data-email="@u.Email"
-                                            data-subrol="@u.SubRol"
-                                            data-phone="@u.PhoneNumber">
-                                        Editar
-                                    </button>
-                                </td>
                             </tr>
                         }
                     </tbody>
