@@ -1,8 +1,10 @@
 using CEGA.Data;
 using CEGA.Models;
+using CEGA.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +53,25 @@ builder.Services.AddRazorPages(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Cache en memoria para OTP (no requiere BD ni Redis)
+builder.Services.AddDistributedMemoryCache();
+
+// Servicio de correo (usa tu implementación)
+builder.Services.AddScoped<CEGA.Services.IEmailSender, CEGA.Services.SmtpEmailSender>();
+
+// Servicio OTP
+builder.Services.AddScoped<OtpService>();
+
+builder.Services.AddRateLimiter(o =>
+{
+    o.AddFixedWindowLimiter("pwdreset", opts =>
+    {
+        opts.PermitLimit = 3;
+        opts.Window = TimeSpan.FromMinutes(15);
+    });
+});
+
+
 var app = builder.Build();
 
 //  Middleware
@@ -66,7 +87,8 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting();
+app.UseRouting(); 
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

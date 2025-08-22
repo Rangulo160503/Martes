@@ -1,8 +1,203 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Quiénes Somos";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero -->
+<section class="py-5" style="background: var(--brand-dark);">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <!-- Solo esta columna en blanco -->
+            <div class="col-lg-8 text-white">
+                <h1 class="display-4 fw-bold mb-3">CEGA — Ingeniería estructural y arquitectura</h1>
+                <p class="lead mb-4">
+                    Más de 24 años construyendo soluciones integrales: análisis, propuesta, diseño e implementación.
+                </p>
+                <div class="d-flex gap-3">
+                    <a class="btn btn-accent btn-lg" asp-controller="Contacto" asp-action="Index">Contáctanos</a>
+                    <a class="btn btn-outline-primary btn-lg" asp-controller="Servicios" asp-action="Index">Nuestros servicios</a>
+                </div>
+            </div>
+
+            <!-- Col derecha: card con texto oscuro por defecto -->
+            <div class="col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3" style="color: var(--accent);">Por qué CEGA</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li>Experiencia multidisciplinaria</li>
+                            <li>Enfoque integral del proyecto</li>
+                            <li>Cumplimiento normativo y calidad</li>
+                            <li>Comunicación transparente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sobre nosotros -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <h2 class="fw-bold text-cega-primary mb-3" style="color: var(--brand-mid)">Quiénes somos</h2>
+                <p>
+                    CEGA es una empresa de ingeniería estructural y arquitectura, con más de 24 años de experiencia en el desarrollo e implementación de soluciones.
+                </p>
+                <p>
+                    Nuestros servicios de consultoría son integrales, incluyendo desde las actividades de análisis, propuesta y evaluación de alternativas, hasta el diseño, desarrollo e implementación de las soluciones.
+                </p>
+                <p>
+                    Somos un equipo de profesionales formados en ingeniería, arquitectura, diseño, administración, inspección y dibujo; lo que nos permite interpretar las necesidades de nuestros clientes.
+                </p>
+                <p>
+                    Nuestro equipo cuenta con experiencia, conocimiento y continua actualización para abarcar los proyectos de manera integral. Amplia experiencia en diseños estructurales y arquitectónicos, inspección de proyectos y trámites de permisos constructivos.
+                </p>
+                <p class="mb-0">
+                    Proveemos soluciones especializadas, integrando tecnología con la estrategia del cliente y un análisis detallado de sus necesidades, buscando el óptimo costo–beneficio.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3" style="color: var(--accent)">Misión</h5>
+                        <p>
+                            Construir el camino entre las necesidades y las soluciones de arquitectura e ingeniería para nuestros clientes, mediante la excelencia operativa en el diseño y desarrollo de proyectos.
+                        </p>
+                        <hr>
+                        <h5 class="fw-bold mb-3" style="color: var(--accent)">Visión</h5>
+                        <p class="mb-0">
+                            Mantenernos como referente regional en calidad, eficiencia y servicio al cliente para proyectos constructivos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Valores -->
+<section class="py-5" style="background: var(--bg); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border);">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center" style="color: var(--brand-mid)">Valores y comportamientos</h2>
+
+        <div class="accordion" id="valoresAccordion">
+            <div class="accordion-item border-0 shadow-sm mb-3">
+                <h2 class="accordion-header">
+                    <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#v-pasion" aria-expanded="true"
+                            style="color: var(--brand-mid)">
+                        Pasión
+                    </button>
+                </h2>
+                <div id="v-pasion" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        <ul>
+                            <li>Ponemos nuestras mejores destrezas y conocimientos a disposición</li>
+                            <li>Damos el mejor de nuestros esfuerzos en cada proyecto</li>
+                            <li>Empatizamos con el cliente y brindamos el servicio que nos gustaría recibir</li>
+                            <li>Disfrutamos lo que hacemos</li>
+                            <li>Fomentamos calidez humana y empatía en nuestras relaciones</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item border-0 shadow-sm mb-3">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#v-precision"
+                            style="color: var(--brand-mid)">
+                        Precisión
+                    </button>
+                </h2>
+                <div id="v-precision" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <ul>
+                            <li>Transmitimos información exacta</li>
+                            <li>Facilitamos el cumplimiento legal y normativo</li>
+                            <li>Vigilamos los detalles del proyecto</li>
+                            <li>Entregamos en las fechas pactadas</li>
+                            <li>Comunicamos riesgos con transparencia</li>
+                            <li>Trabajamos con disciplina día a día</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item border-0 shadow-sm">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#v-confiabilidad"
+                            style="color: var(--brand-mid)">
+                        Confiabilidad
+                    </button>
+                </h2>
+                <div id="v-confiabilidad" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <ul>
+                            <li>Proveemos la mejor solución posible</li>
+                            <li>Optimizamos los recursos de nuestros clientes</li>
+                            <li>Cumplimos los acuerdos pactados</li>
+                            <li>Actuamos con ética y cero corrupción</li>
+                            <li>Cuidamos la información confidencial</li>
+                            <li>Trabajamos como equipo y apoyamos a nuestros clientes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Política de calidad -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold text-center mb-4" style="color: var(--brand-mid)">Política de calidad</h2>
+        <p class="text-center mx-auto mb-5" style="max-width: 780px;">
+            CEGA Consultora Estructural mantendrá un Sistema de Gestión de Calidad en cada proyecto de consultoría estructural, siendo siempre sinónimo de calidad.
+        </p>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <div class="col">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold mb-2" style="color: var(--accent)">Compromiso 1</h6>
+                        <p>La calidad y su mejora son responsabilidad de todos los integrantes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold mb-2" style="color: var(--accent)">Compromiso 2</h6>
+                        <p>Cumplir entregables y plazos pactados, con propuestas viables y alineadas a tendencias tecnológicas y constructivas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold mb-2" style="color: var(--accent)">Compromiso 3</h6>
+                        <p>Exceder expectativas, siendo aliados en soluciones prácticas, eficientes y de alto valor.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold mb-2" style="color: var(--accent)">Compromiso 4</h6>
+                        <p>Convertir la experiencia en mejora continua y cumplimiento de leyes y normativas vigentes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA final -->
+<section class="py-5 text-white" style="background: var(--brand-mid);">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">¿Listo para iniciar tu proyecto?</h3>
+        <p class="mb-4">Conversemos sobre tus necesidades y construyamos juntos la mejor solución.</p>
+        <a class="btn btn-accent btn-lg" asp-controller="Contacto" asp-action="Index">Agendar una reunión</a>
+    </div>
+</section>

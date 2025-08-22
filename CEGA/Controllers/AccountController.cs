@@ -1,7 +1,11 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels;
+using CEGA.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -12,12 +16,20 @@ namespace CEGA.Controllers
         private readonly ApplicationDbContext _context;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _email;
+        private readonly OtpService _otp;
+        private readonly ILogger<AccountController> _log;
 
-        public AccountController(ApplicationDbContext context, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+        public AccountController(ApplicationDbContext context, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender email,
+        OtpService otp,
+        ILogger<AccountController> log)
         {
             _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
+            _email = email;
+            _otp = otp;
+            _log = log;
         }
 
         // LOGIN
@@ -300,5 +312,103 @@ namespace CEGA.Controllers
 
             return RedirectToAction("Empleados");
         }
+        // GET: /Account/ForgotPasswordOtp
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordOtp() => View(new ForgotPasswordVM());
+
+        // POST: /Account/ForgotPasswordOtp
+        [HttpPost]
+        [AllowAnonymous]
+        [EnableRateLimiting("pwdreset")] // si configuraste rate limiting
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPasswordOtp(ForgotPasswordVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            // No revelar existencia del usuario
+            if (user != null)
+            {
+                var code = await _otp.GenerateAndStoreAsync(user.Id);
+                await _email.SendEmailAsync(model.Email,
+                    "Código de recuperación",
+                    $"Tu código es <b>{code}</b> (expira en 10 minutos).");
+                return RedirectToAction(nameof(VerifyOtp), new { userId = user.Id });
+            }
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        // GET: /Account/VerifyOtp?userId=...
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult VerifyOtp(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return RedirectToAction(nameof(ForgotPasswordOtp));
+            return View(new VerifyOtpVM { UserId = userId });
+        }
+
+        // POST: /Account/VerifyOtp
+        [HttpPost]
+        [AllowAnonymous]
+        [EnableRateLimiting("pwdreset")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var ok = await _otp.ValidateAsync(model.UserId, model.Code);
+            if (!ok)
+            {
+                ModelState.AddModelError("", "Código inválido o expirado");
+                return View(model);
+            }
+            return RedirectToAction(nameof(ResetPasswordWithOtp), new { userId = model.UserId });
+        }
+
+        // GET: /Account/ResetPasswordWithOtp?userId=...
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPasswordWithOtp(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return RedirectToAction(nameof(ForgotPasswordOtp));
+            return View(new ResetPwdVM { UserId = userId });
+        }
+
+        // POST: /Account/ResetPasswordWithOtp
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPasswordWithOtp(ResetPwdVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+
+            // Usa el token estándar de Identity para aplicar la nueva contraseña
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                foreach (var e in result.Errors)
+                    ModelState.AddModelError("", e.Description);
+                return View(model);
+            }
+            return RedirectToAction(nameof(ResetPasswordConfirmation));
+        }
+
+        // GET: /Account/ForgotPasswordConfirmation
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordConfirmation() => View();
+
+        // GET: /Account/ResetPasswordConfirmation
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPasswordConfirmation() => View();
     }
 }

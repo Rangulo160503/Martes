@@ -1,0 +1,37 @@
+﻿@using CEGA.Models.ViewModels
+@model VerifyOtpVM
+@{
+    ViewData["Title"] = "Verificar código";
+}
+<div class="mb-3 text-center">
+    <h2 class="mb-0">Verificar código</h2>
+    <p class="text-muted mb-0">Te enviamos un código de 6 dígitos a tu correo.</p>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mb-3">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p class="mb-0">@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+<div class="card card-lg auth-card mx-auto">
+    <div class="card-header text-center">Código de verificación</div>
+    <div class="card-body">
+        <form asp-action="VerifyOtp" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label">Código (6 dígitos)</label>
+                <input asp-for="Code" class="form-control" maxlength="6" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-accent w-100">Continuar</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
