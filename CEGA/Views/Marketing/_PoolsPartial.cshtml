@@ -146,7 +146,6 @@
                             <th>Nombre</th>
                             <th style="min-width:240px;">Mensaje</th>
                             <th style="min-width:280px;">Correos</th>
-                            <th style="width:220px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,28 +171,6 @@
                                     {
                                         <span class="text-muted">Sin correos</span>
                                     }
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <form asp-action="EditarPool"
-                                              asp-controller="Marketing"
-                                              method="post"
-                                              class="m-0 d-inline">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="Id" value="@pool.Id" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Editar</button>
-                                        </form>
-
-                                        <form asp-action="EliminarPool"
-                                              asp-controller="Marketing"
-                                              method="post"
-                                              class="m-0 d-inline"
-                                              onsubmit="return confirm('¿Eliminar este pool?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@pool.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
                                 </td>
                             </tr>
                         }

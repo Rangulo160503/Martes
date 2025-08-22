@@ -1,12 +1,34 @@
 ﻿@model List<CEGA.Models.ReporteIncidente>
 @{
     ViewData["Title"] = "Reportes de Incidentes";
+
+    // Helper para badge (por si en un futuro usas estados en incidentes)
+    Func<string, string> BadgeClase = estado =>
+    {
+        if (string.IsNullOrWhiteSpace(estado)) return "bg-secondary";
+        return estado.Equals("Aprobado", StringComparison.OrdinalIgnoreCase) ? "bg-success"
+             : estado.Equals("Rechazado", StringComparison.OrdinalIgnoreCase) ? "bg-danger"
+             : "bg-warning";
+    };
+
+    var count = Model?.Count() ?? 0;
+
+    string FormatBytes(long? bytes)
+    {
+        if (bytes == null) return "—";
+        double b = bytes.Value; string[] u = { "B", "KB", "MB", "GB" }; int i = 0;
+        while (b >= 1024 && i < u.Length - 1) { b /= 1024; i++; }
+        return $"{b:0.##} {u[i]}";
+    }
 }
 
-<!-- Header de página -->
-<div class="mb-3">
-    <h2 class="mb-0">@ViewData["Title"]</h2>
-    <p class="text-muted mb-0">Registros de incidentes reportados por usuario y fecha.</p>
+<!-- Header con fondo -->
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">Reportes de Incidentes</h2>
+    <p class="mb-0 fs-5">
+        Gestión y consulta de <span class="fw-semibold">incidentes</span> reportados.
+    </p>
 </div>
 
 <div class="card">

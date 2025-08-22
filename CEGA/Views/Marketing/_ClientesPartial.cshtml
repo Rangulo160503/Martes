@@ -49,7 +49,6 @@
                         <tr>
                             <th style="min-width:220px;">Nombre</th>
                             <th style="min-width:280px;">Correo</th>
-                            <th style="width:280px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,42 +70,6 @@
                                            value="@cli.Correo"
                                            disabled
                                            data-field="correo" />
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <!-- Modificar: habilita inputs -->
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-secondary"
-                                                data-action="edit"
-                                                data-target="@rowId">
-                                            Modificar
-                                        </button>
-
-                                        <!-- Guardar: postea a EditarCliente (mismo flujo) -->
-                                        <form asp-action="EditarCliente"
-                                              asp-controller="Marketing"
-                                              method="post"
-                                              class="m-0 d-inline"
-                                              data-form="save"
-                                              data-target="@rowId">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="Id" value="@cli.Id" />
-                                            <input type="hidden" name="Nombre" value="@cli.Nombre" data-sync="nombre" />
-                                            <input type="hidden" name="Correo" value="@cli.Correo" data-sync="correo" />
-                                            <button type="submit" class="btn btn-sm btn-accent" disabled>Guardar</button>
-                                        </form>
-
-                                        <!-- Eliminar -->
-                                        <form asp-action="EliminarCliente"
-                                              asp-controller="Marketing"
-                                              method="post"
-                                              class="m-0 d-inline"
-                                              onsubmit="return confirm('¿Eliminar este cliente?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@cli.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
                                 </td>
                             </tr>
                         }

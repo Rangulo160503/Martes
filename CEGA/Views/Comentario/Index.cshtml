@@ -5,16 +5,18 @@
 }
 
 <!-- Header de página -->
-<div class="mb-3">
-    <h2 class="mb-0">Listado de Comentarios</h2>
-    <p class="text-muted mb-0">Administra y busca comentarios asociados a proyectos.</p>
+<div class="mb-4 pb-3 border-bottom">
+    <h2 class="fw-bold mb-1">Listado de Comentarios</h2>
+    <p class="text-muted mb-0 fs-5">
+        Administra y busca comentarios asociados a proyectos.
+    </p>
 </div>
 
 <!-- Barra de acciones -->
 <div class="d-flex flex-wrap gap-2 mb-3">
     <!-- Ir primero a Seleccionar proyecto -->
     <a class="btn btn-accent"
-       asp-controller="Comentario" asp-action="SeleccionarProyecto">
+       asp-controller="Comentario" asp-action="SeleccionarProyectoParaComentario">
         + Agregar Comentario
     </a>
 

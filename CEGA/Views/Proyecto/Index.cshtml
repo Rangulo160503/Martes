@@ -8,11 +8,17 @@
     var comCount = Model?.Comentarios?.Count ?? 0;
 }
 
-<!-- Header -->
-<div class="mb-3 text-center">
-    <h2 class="mb-1">Módulo de Proyectos</h2>
-    <p class="text-muted mb-0">Gestiona proyectos, tareas y comentarios en un solo lugar.</p>
+<!-- Header con fondo -->
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">Módulo de Proyectos</h2>
+    <p class="mb-0 fs-5">
+        Gestiona <span class="fw-semibold">proyectos</span>,
+        <span class="fw-semibold">tareas</span> y
+        <span class="fw-semibold">comentarios</span> en un solo lugar.
+    </p>
 </div>
+
 
 <!-- Alertas -->
 @if (TempData["Mensaje"] != null)

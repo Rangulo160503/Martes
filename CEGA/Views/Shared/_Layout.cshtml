@@ -113,7 +113,7 @@
 
         <!-- Reportería (COLLAPSE) -->
         @{
-            var openReport = IsAny("reporteincapacidad","reporteincidente","reporteentradasalida");
+            var openReport = IsAny("reporteincapacidad", "reporteincidente", "reporteentradasalida");
         }
         <button class="nav-link d-flex align-items-center justify-content-between menu-toggle"
                 type="button"
@@ -126,7 +126,11 @@
         </button>
         <div id="mod-reporte" class="collapse @(openReport ? "show" : "")">
             <nav class="nav flex-column ps-3">
-                <a class="nav-link nav-subitem @active("reporteincapacidad", "index")" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
+                <a class="nav-link nav-subitem @active("reporteincapacidad", "index")"
+                   asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
+
+                <a class="nav-link nav-subitem @active("reporteincidente", "index")"
+                   asp-controller="ReporteIncidente" asp-action="Index">Incidentes</a>
             </nav>
         </div>
 
@@ -217,7 +221,6 @@
                 <div class="px-3 text-white small">
                     <div class="fw-bold mb-1">Hola @User.Identity.Name</div>
                     <a class="nav-link nav-subitem @active("account", "editprofile")" asp-controller="Account" asp-action="EditProfile">Editar Perfil</a>
-                    <a class="nav-link nav-subitem @active("account", "forgotpassword")" asp-controller="Account" asp-action="ForgotPassword">Recuperar Contraseña</a>
                     <form asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
                         <button type="submit" class="btn btn-sm btn-accent w-100">Cerrar sesión</button>
                     </form>
@@ -241,9 +244,13 @@
             <span class="fw-semibold">@ViewData["Title"]</span>
         </div>
 
+        @RenderSection("Hero", required: false)
+
         <main role="main" class="container pb-3">
             @RenderBody()
         </main>
+
+            @RenderSection("CallToAction", required: false)
 
         <footer class="mt-auto">
             &copy; 2025 - CEGA - <a asp-controller="Home" asp-action="Privacy">Política de privacidad</a>

@@ -4,40 +4,65 @@
     ViewData["Title"] = "Editar Proyecto";
 }
 
-<h2>Editar Proyecto</h2>
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <div class="text-center text-md-start">
+        <h2 class="fw-bold mb-2">Editar Proyecto</h2>
+        <p class="mb-0 fs-5">Actualiza la información del <span class="fw-semibold">proyecto</span>.</p>
+    </div>
+</div>
 
-<form asp-action="Editar" method="post">
-    <input type="hidden" asp-for="Id" />
-
-    <div>
-        <label>Nombre del Proyecto</label>
-        <input asp-for="Nombre" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+<div class="card shadow border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Datos del proyecto</span>
+        <span class="text-muted small">ID: @Model.Id</span>
     </div>
 
-    <div>
-        <label>Detalles</label>
-        <textarea asp-for="Detalles"></textarea>
-        <span asp-validation-for="Detalles" class="text-danger"></span>
-    </div>
+    <div class="card-body">
+        <form asp-action="Editar" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
 
-    <div>
-        <label>Fecha de Inicio</label>
-        <input asp-for="FechaInicio" type="date" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
 
-    <div>
-        <label>Fecha de Finalización</label>
-        <input asp-for="FechaFin" type="date" />
-        <span asp-validation-for="FechaFin" class="text-danger"></span>
-    </div>
+            <div class="row g-3">
+                <!-- Nombre -->
+                <div class="col-12">
+                    <label asp-for="Nombre" class="form-label">Nombre del Proyecto</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej: Torre Residencial Las Palmas" />
+                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                </div>
 
-    <button type="submit">Guardar Cambios</button>
-</form>
+                <!-- Detalles -->
+                <div class="col-12">
+                    <label asp-for="Detalles" class="form-label">Detalles</label>
+                    <textarea asp-for="Detalles" class="form-control" rows="4"
+                              placeholder="Descripción breve, alcance, hitos relevantes..."></textarea>
+                    <span asp-validation-for="Detalles" class="text-danger small"></span>
+                </div>
+
+                <!-- Fechas -->
+                <div class="col-md-6">
+                    <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+                    <input asp-for="FechaInicio" type="date" class="form-control" />
+                    <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FechaFin" class="form-label">Fecha de Finalización</label>
+                    <input asp-for="FechaFin" type="date" class="form-control" />
+                    <span asp-validation-for="FechaFin" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <button type="submit" class="btn btn-accent">Guardar cambios</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

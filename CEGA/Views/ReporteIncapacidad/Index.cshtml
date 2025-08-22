@@ -23,10 +23,13 @@
     }
 }
 
-<!-- Header -->
-<div class="mb-3">
-    <h2 class="mb-0">Reportes de Incapacidades</h2>
-    <p class="text-muted mb-0">Gestión y consulta de incapacidades registradas.</p>
+<!-- Header con fondo -->
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">Reportes de Incapacidades</h2>
+    <p class="mb-0 fs-5">
+        Gestión y consulta de <span class="fw-semibold">incapacidades</span> registradas.
+    </p>
 </div>
 
 @if (TempData["Mensaje"] != null)
@@ -39,9 +42,6 @@
         <span>Listado</span>
         <div class="d-flex align-items-center gap-3">
             <span class="text-muted small">@count registro(s)</span>
-            <a asp-controller="Empleados" asp-action="Empleados" class="btn btn-accent btn-sm">
-                + Registrar incapacidad
-            </a>
         </div>
     </div>
 
@@ -56,46 +56,11 @@
                 <table class="table table-striped table-hover mb-0 align-middle">
                     <thead>
                         <tr>
-                            <th style="min-width:160px;">Usuario</th>
+                            <th style="min-width:160px;">ID</th>
                             <th style="min-width:260px;">Descripción</th>
                             <th style="min-width:160px;">Archivo</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var i in Model.OrderByDescending(x => x.Id))
-                        {
-                            var est = "—"; // IncapacidadEmpleado no tiene Estado
-                            var badge = BadgeClase(est);
-
-                            <tr>
-                                <td class="fw-semibold">@i.UsuarioID</td>
-                                <td class="text-truncate" style="max-width:420px;">@i.Descripcion</td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <span>@(string.IsNullOrWhiteSpace(i.ArchivoNombre) ? "—" : i.ArchivoNombre)</span>
-                                        <small class="text-muted">@FormatBytes(i.ArchivoTamano) · @(i.ArchivoTipo ?? "—")</small>
-                                        <div class="mt-1">
-                                            @if (i.ArchivoContenido != null)
-                                            {
-                                                <a asp-controller="ReporteIncapacidad"
-                                                   asp-action="DescargarIncapacidad"
-                                                   asp-route-id="@i.Id"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    Ver/Descargar
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Sin archivo</span>
-                                            }
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge @badge">@est</span></td>
-                                
-                            </tr>
-                        }
-                    </tbody>
                 </table>
             </div>
         }

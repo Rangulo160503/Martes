@@ -113,7 +113,6 @@
                             <th style="min-width:220px;">Usuario</th>
                             <th>Salario mensual</th>
                             <th>Fecha registro</th>
-                            <th style="width:320px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -150,25 +149,6 @@
                                 <td class="fw-semibold">@nombre</td>
                                 <td>@s.SalarioMensual.ToString("C", CultureInfo.GetCultureInfo("es-CR"))</td>
                                 <td>@s.FechaRegistro.ToShortDateString()</td>
-                                <td>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        
-
-                                        <form asp-action="RegistrarSalario" asp-controller="Empleados" method="post" class="m-0 d-inline">
-                                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
-                                            <input type="hidden" name="salario" value="@s.SalarioMensual" />
-                                        </form>
-
-                                        <form asp-action="EliminarSalario"
-                                              asp-controller="Empleados"
-                                              method="post"
-                                              class="m-0 d-inline"
-                                              onsubmit="return confirm('¿Desea eliminar este salario?');">
-                                            <input type="hidden" name="usuarioId" value="@s.UsuarioId" />
-                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </td>
                             </tr>
 
                             <!-- Resumen colapsable -->

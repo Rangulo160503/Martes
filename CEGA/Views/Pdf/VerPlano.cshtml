@@ -4,28 +4,35 @@
     ViewData["Title"] = "Ver Plano";
 }
 
-<h2>@Model.Plano.NombreArchivo</h2>
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3"
+     style="background: var(--brand-mid); border-radius: .75rem;">
 
-<!-- Botones -->
-<button class="btn btn-secondary mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelLateral">
-    Ver anotaciones y tareas
-</button>
-<button class="btn btn-success mb-3 ms-2" type="button" id="btnCrearAnotacion">
-    Crear anotación
-</button>
-<button class="btn btn-warning mb-3 ms-2" type="button" id="btnCrearTarea">
-    Agregar tarea
-</button>
+    <!-- Título del plano -->
+    <div class="text-center text-md-start flex-grow-1 pe-md-3">
+        <h2 class="fw-bold mb-2">@Model.Plano.NombreArchivo</h2>
+        <p class="mb-0 fs-5">Visualiza, anota y gestiona este plano.</p>
+    </div>
 
-<!-- Botón de descarga -->
-<a class="btn btn-outline-primary mb-3 ms-2"
-   href="@Url.Action("VerArchivoPlano", "Pdf", new { id = Model.Plano.Id })"
-   download
-   onclick="return confirmarDescarga()">
-    Descargar PDF con anotaciones
-</a>
-
-
+    <!-- Botones -->
+    <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelLateral">
+            Ver anotaciones y tareas
+        </button>
+        <button class="btn btn-success" type="button" id="btnCrearAnotacion">
+            Crear anotación
+        </button>
+        <button class="btn btn-warning" type="button" id="btnCrearTarea">
+            Agregar tarea
+        </button>
+        <a class="btn btn-outline-light"
+           href="@Url.Action("VerArchivoPlano", "Pdf", new { id = Model.Plano.Id })"
+           download
+           onclick="return confirmarDescarga()">
+            Descargar PDF
+        </a>
+    </div>
+</div>
 
 <!-- Visor PDF -->
 <div id="pdf-container" style="position: relative; width: 100%; height: 600px;">

@@ -8,14 +8,21 @@
     var count = Model?.UsuariosFiltrados?.Count() ?? 0;
 }
 
-<!-- Header -->
-<div class="mb-3 text-center">
-    <h2 class="mb-0">Usuarios Registrados</h2>
-    <p class="text-muted mb-0">Filtra por nombre, correo, usuario o rol.</p>
+<!-- Header con fondo -->
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">
+        Usuarios Registrados
+    </h2>
+    <p class="mb-0 fs-5">
+        Filtra por <span class="fw-semibold">nombre</span>,
+        <span class="fw-semibold">correo</span>,
+        <span class="fw-semibold">usuario</span> o <span class="fw-semibold">rol</span>.
+    </p>
 </div>
 
 <!-- Filtros -->
-<div class="card card-lg mb-3">
+<div class="card card-lg mb-3 mt-2">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Parámetros de búsqueda</span>
         <span class="text-muted small">@(count) resultado(s)</span>
@@ -37,7 +44,6 @@
                         asp-items="@(new SelectList(Model?.RolesDisponibles ?? new List<string>(), Model?.RolSeleccionado))">
                     <option value="">-- Filtrar por rol --</option>
                 </select>
-
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-accent w-100">Buscar</button>
@@ -70,43 +76,16 @@
                             <th>Apellido</th>
                             <th>Email</th>
                             <th>Usuario</th>
-                            <th>Teléfono</th>
-                            <th>Rol</th>
-                            <th>Sub-rol</th>
-                            <th style="width:190px;">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var usuario in Model.UsuariosFiltrados)
                         {
-                            var roles = await UserManager.GetRolesAsync(usuario);
                             <tr>
                                 <td>@usuario.Nombre</td>
                                 <td>@usuario.Apellido</td>
                                 <td class="text-truncate" style="max-width:240px;">@usuario.Email</td>
                                 <td>@usuario.UserName</td>
-                                <td>@usuario.PhoneNumber</td>
-                                <td>@string.Join(", ", roles)</td>
-                                <td>
-                                    @(roles.Contains("Empleado") ? usuario.SubRol ?? "(Sin sub-rol)" : "-")
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <a asp-action="AsignarRol"
-                                           asp-route-id="@usuario.Id"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Asignar Rol
-                                        </a>
-                                        <form asp-action="EliminarUsuario"
-                                              method="post"
-                                              asp-route-id="@usuario.Id"
-                                              class="d-inline"
-                                              onsubmit="return confirm('¿Estás seguro que deseas eliminar este usuario?');">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </td>
                             </tr>
                         }
                     </tbody>

@@ -101,13 +101,6 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
-            <div class="col-md-6">
-                <label asp-for="SalarioMensual" class="form-label"></label>
-                <input asp-for="SalarioMensual" class="form-control" type="number" step="0.01" inputmode="decimal" />
-                <div class="form-text">Opcional: crea un registro en EmpleadosSalarios.</div>
-                <span asp-validation-for="SalarioMensual" class="text-danger"></span>
-            </div>
-
             <div class="col-12 d-flex gap-2 mt-2">
                 <button type="submit" class="btn btn-primary">Crear empleado</button>
                 <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
@@ -173,11 +166,11 @@
 
                                     <div class="col-md-6">
                                         <label class="form-label" for="ed_phone">Teléfono</label>
-                                        <input class="form-control" id="ed_phone" name="PhoneNumber" />
+                                        <input class="form-control" id="ed_phone" name="Numero de teléfono" />
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label" for="ed_subrol">Rol</label>
-                                        <select class="form-select" id="ed_subrol" name="SubRol">
+                                        <select class="form-select" id="ed_subrol" name="Rol">
                                             <option value="">— Seleccione —</option>
                                             <option>Empleado</option>
                                             <option>Supervisor</option>
@@ -189,7 +182,7 @@
                                     <!-- Opcionales (mejor no cambiarlos por defecto) -->
                                     <div class="col-md-6">
                                         <label class="form-label" for="ed_username">Usuario</label>
-                                        <input class="form-control" id="ed_username" name="UserName" disabled />
+                                        <input class="form-control" id="ed_username" name="Usuario" disabled />
                                         <div class="form-text">Cambiar usuario puede afectar el inicio de sesión.</div>
                                     </div>
                                     <div class="col-md-6">

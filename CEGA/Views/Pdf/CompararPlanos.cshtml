@@ -6,14 +6,20 @@
         .GroupBy(p => string.IsNullOrWhiteSpace(p.Disciplina) ? "Sin disciplina" : p.Disciplina)
         .OrderBy(g => g.Key);
 }
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3"
+     style="background: var(--brand-mid); border-radius: .75rem;">
 
-<!-- Header de página -->
-<div class="mb-3 d-flex flex-wrap align-items-end justify-content-between gap-2">
-    <div>
-        <h2 class="mb-0">Comparar Planos</h2>
-        <p class="text-muted mb-0">Seleccione dos planos distintos para generar la comparación.</p>
+    <div class="text-center text-md-start flex-grow-1 pe-md-3">
+        <h2 class="fw-bold mb-2">Comparar Planos</h2>
+        <p class="mb-0 fs-5">
+            Seleccione <span class="fw-semibold">dos planos distintos</span> para generar la comparación.
+        </p>
     </div>
-    <span class="badge bg-success align-self-start">@(total) plano(s)</span>
+
+    <span class="badge bg-light text-dark fs-6 px-3 py-2 shadow-sm ms-md-1">
+        @(total) plano(s)
+    </span>
 </div>
 
 <div class="card card-lg">

@@ -2,48 +2,71 @@
 
 @{
     ViewData["Title"] = "Editar Tarea";
+    var nombreProyecto = Model?.Proyecto?.Nombre ?? "Proyecto";
 }
 
-<h2>Editar Tarea de Proyecto: @Model.Proyecto?.Nombre</h2>
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <div class="text-center text-md-start">
+        <h2 class="fw-bold mb-2">Editar Tarea</h2>
+        <p class="mb-0 fs-5">
+            Proyecto: <span class="fw-semibold">@nombreProyecto</span>
+        </p>
+    </div>
+</div>
 
-<form asp-action="Editar" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="ProyectoId" />
-
-    <div>
-        <label>Nombre de la Tarea</label>
-        <input asp-for="NombreTarea" />
-        <span asp-validation-for="NombreTarea" class="text-danger"></span>
+<div class="card shadow border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Datos de la tarea</span>
+        <span class="text-muted small">ID: @Model.Id</span>
     </div>
 
-    <div>
-        <label>Detalles</label>
-        <textarea asp-for="Detalles"></textarea>
-        <span asp-validation-for="Detalles" class="text-danger"></span>
+    <div class="card-body">
+        <form asp-action="Editar" method="post" novalidate class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ProyectoId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+
+            <!-- Nombre -->
+            <div class="col-12">
+                <label asp-for="NombreTarea" class="form-label">Nombre de la tarea</label>
+                <input asp-for="NombreTarea" class="form-control" placeholder="Ej: Revisar detalles de fundación" />
+                <span asp-validation-for="NombreTarea" class="text-danger small"></span>
+            </div>
+
+            <!-- Detalles -->
+            <div class="col-12">
+                <label asp-for="Detalles" class="form-label">Detalles</label>
+                <textarea asp-for="Detalles" class="form-control" rows="4"
+                          placeholder="Describe el alcance, dependencias e hitos..."></textarea>
+                <span asp-validation-for="Detalles" class="text-danger small"></span>
+            </div>
+
+            <!-- Fechas -->
+            <div class="col-md-6">
+                <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="FechaFin" class="form-label">Fecha de finalización</label>
+                <input asp-for="FechaFin" type="date" class="form-control" />
+                <span asp-validation-for="FechaFin" class="text-danger small"></span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                <button type="submit" class="btn btn-accent">Guardar cambios</button>
+                <a asp-controller="Tarea" asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
     </div>
-
-    <div>
-        <label>Fecha de Inicio</label>
-        <input asp-for="FechaInicio" type="date" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
-
-    <div>
-        <label>Fecha de Finalización</label>
-        <input asp-for="FechaFin" type="date" />
-        <span asp-validation-for="FechaFin" class="text-danger"></span>
-    </div>
-
-    <button type="submit">Guardar Cambios</button>
-</form>
-
-@if (!ViewData.ModelState.IsValid && ViewData.ModelState[""].Errors.Count > 0)
-{
-    <p class="text-danger">@ViewData.ModelState[""].Errors[0].ErrorMessage</p>
-}
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -237,3 +237,18 @@ a {
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
 }
+
+/* Evita scroll horizontal al usar full-bleed */
+html, body {
+    overflow-x: hidden;
+}
+
+/* Sección a todo lo ancho aunque el padre sea .container */
+.full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}

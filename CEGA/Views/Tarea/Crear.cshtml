@@ -1,50 +1,85 @@
 ﻿@model CEGA.Models.TareasProyecto
 
-<h2>Crear Tarea</h2>
+@{
+    ViewData["Title"] = "Crear Tarea";
+}
 
-<form asp-action="Crear" method="post">
-    @Html.AntiForgeryToken()
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <div class="text-center text-md-start">
+        <h2 class="fw-bold mb-2">Crear Tarea</h2>
+        <p class="mb-0 fs-5">
+            Registra una nueva <span class="fw-semibold">tarea</span> para el proyecto seleccionado.
+        </p>
+    </div>
+</div>
 
-    <input type="hidden" asp-for="ProyectoId" />
-    <input type="hidden" name="asignar" id="asignar" value="false" />
-
-    <div class="mb-3">
-        <label class="form-label">Proyecto</label>
-        <input class="form-control" value="@ViewBag.NombreProyecto" disabled />
+<div class="card shadow border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Datos de la tarea</span>
+        <span class="text-muted small">Proyecto: @ViewBag.NombreProyecto</span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="NombreTarea" class="form-label"></label>
-        <input asp-for="NombreTarea" class="form-control" />
-        <span asp-validation-for="NombreTarea" class="text-danger"></span>
-    </div>
+    <div class="card-body">
+        <form asp-action="Crear" method="post" novalidate class="row g-3">
+            @Html.AntiForgeryToken()
 
-    <div class="mb-3">
-        <label asp-for="Detalles" class="form-label"></label>
-        <textarea asp-for="Detalles" class="form-control"></textarea>
-        <span asp-validation-for="Detalles" class="text-danger"></span>
-    </div>
+            <!-- hidden -->
+            <input type="hidden" asp-for="ProyectoId" />
+            <input type="hidden" name="asignar" id="asignar" value="false" />
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label asp-for="FechaInicio" class="form-label"></label>
-            <input asp-for="FechaInicio" type="date" class="form-control" />
-            <span asp-validation-for="FechaInicio" class="text-danger"></span>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="FechaFin" class="form-label"></label>
-            <input asp-for="FechaFin" type="date" class="form-control" />
-            <span asp-validation-for="FechaFin" class="text-danger"></span>
-        </div>
-    </div>
+            <!-- Proyecto (solo lectura) -->
+            <div class="col-12">
+                <label class="form-label">Proyecto</label>
+                <input class="form-control" value="@ViewBag.NombreProyecto" disabled />
+            </div>
 
-    <button type="submit" class="btn btn-primary">Crear</button>
-    <button type="submit" class="btn btn-success"
-            onclick="document.getElementById('asignar').value='true'">
-        Crear y asignar empleado
-    </button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-</form>
+            <!-- Nombre -->
+            <div class="col-12">
+                <label asp-for="NombreTarea" class="form-label">Nombre de la tarea</label>
+                <input asp-for="NombreTarea" class="form-control" placeholder="Ej: Levantar mediciones de planta baja" />
+                <span asp-validation-for="NombreTarea" class="text-danger small"></span>
+            </div>
+
+            <!-- Detalles -->
+            <div class="col-12">
+                <label asp-for="Detalles" class="form-label">Detalles</label>
+                <textarea asp-for="Detalles" class="form-control" rows="4"
+                          placeholder="Describe el alcance, dependencias e hitos..."></textarea>
+                <span asp-validation-for="Detalles" class="text-danger small"></span>
+            </div>
+
+            <!-- Fechas -->
+            <div class="col-md-6">
+                <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="FechaFin" class="form-label">Fecha de finalización</label>
+                <input asp-for="FechaFin" type="date" class="form-control" />
+                <span asp-validation-for="FechaFin" class="text-danger small"></span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                <button type="submit" class="btn btn-accent">
+                    Crear
+                </button>
+
+                <button type="submit" class="btn btn-success"
+                        onclick="document.getElementById('asignar').value='true'">
+                    Crear y asignar empleado
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

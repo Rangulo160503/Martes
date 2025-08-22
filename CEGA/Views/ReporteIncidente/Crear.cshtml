@@ -4,50 +4,76 @@
     ViewData["Title"] = "Generar Reporte de Incidente";
 }
 
-<h2>@ViewData["Title"]</h2>
+<!-- Header con fondo -->
+<div class="py-4 px-3 px-md-4 text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <div class="text-center text-md-start">
+        <h2 class="fw-bold mb-2">@ViewData["Title"]</h2>
+        <p class="mb-0 fs-5">
+            Registra un <span class="fw-semibold">incidente</span> con fecha, descripción e incapacidad.
+        </p>
+    </div>
+</div>
 
 @if (TempData["Mensaje"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
 }
 
-<form asp-action="Crear" method="post">
-    <div class="form-group">
-        <label asp-for="NombreReporte"></label>
-        <input asp-for="NombreReporte" class="form-control" />
-        <span asp-validation-for="NombreReporte" class="text-danger"></span>
-    </div>
+<div class="card shadow border-0">
+    <div class="card-header fw-semibold">Datos del reporte</div>
+    <div class="card-body">
+        <form asp-action="Crear" method="post" novalidate class="row g-3">
+            @Html.AntiForgeryToken()
 
-    <div class="form-group">
-        <label asp-for="UsuarioID">ID del Usuario</label>
-        <input asp-for="UsuarioID" class="form-control" />
-        <span asp-validation-for="UsuarioID" class="text-danger"></span>
-    </div>
+            <!-- Nombre del reporte -->
+            <div class="col-12">
+                <label asp-for="NombreReporte" class="form-label">Nombre del reporte</label>
+                <input asp-for="NombreReporte" class="form-control" placeholder="Ej: Caída en zona de carga" />
+                <span asp-validation-for="NombreReporte" class="text-danger small"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="FechaAccidente">Fecha del Accidente</label>
-        <input asp-for="FechaAccidente" type="date" class="form-control" />
-        <span asp-validation-for="FechaAccidente" class="text-danger"></span>
-    </div>
+            <!-- Usuario -->
+            <div class="col-12 col-md-6">
+                <label asp-for="UsuarioID" class="form-label">ID del usuario</label>
+                <input asp-for="UsuarioID" class="form-control" placeholder="Ej: U-103" />
+                <span asp-validation-for="UsuarioID" class="text-danger small"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="Descripcion">Descripción del Accidente</label>
-        <textarea asp-for="Descripcion" class="form-control"></textarea>
-        <span asp-validation-for="Descripcion" class="text-danger"></span>
-    </div>
+            <!-- Fecha -->
+            <div class="col-12 col-md-6">
+                <label asp-for="FechaAccidente" class="form-label">Fecha del accidente</label>
+                <input asp-for="FechaAccidente" type="date" class="form-control" />
+                <span asp-validation-for="FechaAccidente" class="text-danger small"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="Incapacidad">¿Hubo Incapacidad?</label>
-        <select asp-for="Incapacidad" class="form-control">
-            <option value="">-- Seleccione --</option>
-            <option value="Sí">Sí</option>
-            <option value="No">No</option>
-        </select>
-        <span asp-validation-for="Incapacidad" class="text-danger"></span>
-    </div>
+            <!-- Descripción -->
+            <div class="col-12">
+                <label asp-for="Descripcion" class="form-label">Descripción del accidente</label>
+                <textarea asp-for="Descripcion" class="form-control" rows="4"
+                          placeholder="Explique qué ocurrió, causas, consecuencias y medidas tomadas..."></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+            </div>
 
-    <button type="submit" class="btn btn-primary">Generar Reporte</button>
-</form>
+            <!-- Incapacidad -->
+            <div class="col-12 col-md-6">
+                <label asp-for="Incapacidad" class="form-label">¿Hubo incapacidad?</label>
+                <select asp-for="Incapacidad" class="form-select">
+                    <option value="">-- Seleccione --</option>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                </select>
+                <span asp-validation-for="Incapacidad" class="text-danger small"></span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                <button type="submit" class="btn btn-accent">Generar reporte</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

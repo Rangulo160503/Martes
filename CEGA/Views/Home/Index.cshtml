@@ -2,39 +2,35 @@
     ViewData["Title"] = "Quiénes Somos";
 }
 
-<!-- Hero -->
-<section class="py-5" style="background: var(--brand-dark);">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <!-- Solo esta columna en blanco -->
-            <div class="col-lg-8 text-white">
-                <h1 class="display-4 fw-bold mb-3">CEGA — Ingeniería estructural y arquitectura</h1>
-                <p class="lead mb-4">
-                    Más de 24 años construyendo soluciones integrales: análisis, propuesta, diseño e implementación.
-                </p>
-                <div class="d-flex gap-3">
-                    <a class="btn btn-accent btn-lg" asp-controller="Contacto" asp-action="Index">Contáctanos</a>
-                    <a class="btn btn-outline-primary btn-lg" asp-controller="Servicios" asp-action="Index">Nuestros servicios</a>
+@section Hero {
+    <!-- Hero -->
+    <section class="py-5 text-white hero-home" style="background: var(--brand-mid);">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">CEGA — Ingeniería estructural y arquitectura</h1>
+                    <p class="lead mb-4">
+                        Más de 24 años construyendo soluciones integrales: análisis, propuesta, diseño e implementación.
+                    </p>
                 </div>
-            </div>
-
-            <!-- Col derecha: card con texto oscuro por defecto -->
-            <div class="col-lg-4">
-                <div class="card shadow border-0">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold mb-3" style="color: var(--accent);">Por qué CEGA</h5>
-                        <ul class="list-unstyled mb-0">
-                            <li>Experiencia multidisciplinaria</li>
-                            <li>Enfoque integral del proyecto</li>
-                            <li>Cumplimiento normativo y calidad</li>
-                            <li>Comunicación transparente</li>
-                        </ul>
+                <div class="col-lg-4">
+                    <div class="card shadow border-0" style="color: var(--text);">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3" style="color: var(--accent);">Por qué CEGA</h5>
+                            <ul class="list-unstyled mb-0">
+                                <li>Experiencia multidisciplinaria</li>
+                                <li>Enfoque integral del proyecto</li>
+                                <li>Cumplimiento normativo y calidad</li>
+                                <li>Comunicación transparente</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+}
+
 
 <!-- Sobre nosotros -->
 <section class="py-5">
@@ -194,10 +190,14 @@
 </section>
 
 <!-- CTA final -->
-<section class="py-5 text-white" style="background: var(--brand-mid);">
-    <div class="container text-center">
-        <h3 class="fw-bold mb-3">¿Listo para iniciar tu proyecto?</h3>
-        <p class="mb-4">Conversemos sobre tus necesidades y construyamos juntos la mejor solución.</p>
-        <a class="btn btn-accent btn-lg" asp-controller="Contacto" asp-action="Index">Agendar una reunión</a>
-    </div>
-</section>
+<!-- fuera del layout que tiene la sidebar -->
+@section CallToAction {
+    <section class="py-5 text-white" style="background: var(--brand-mid);">
+        <div class="container text-center">
+            <h3 class="fw-bold mb-3">¿Listo para iniciar tu proyecto?</h3>
+            <p class="mb-4">
+                Conversemos sobre tus necesidades y construyamos juntos la mejor solución.
+            </p>
+        </div>
+    </section>
+}
