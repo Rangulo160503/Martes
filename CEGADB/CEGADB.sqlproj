@@ -59,38 +59,4 @@
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
   </ItemGroup>
-  <ItemGroup>
-    <Build Include="dbo\Tables\VacacionesEmpleados.sql" />
-    <Build Include="dbo\Tables\TareasProyecto.sql" />
-    <Build Include="dbo\Tables\ReportesIncidentes.sql" />
-    <Build Include="dbo\Tables\ReportesIncapacidades.sql" />
-    <Build Include="dbo\Tables\ReportesEntradasSalidas.sql" />
-    <Build Include="dbo\Tables\PuestosEmpleado.sql" />
-    <Build Include="dbo\Tables\Proyectos.sql" />
-    <Build Include="dbo\Tables\ProgramacionesDistribucion.sql" />
-    <Build Include="dbo\Tables\PoolsCorreo.sql" />
-    <Build Include="dbo\Tables\Planos.sql" />
-    <Build Include="dbo\Tables\Ingresos.sql" />
-    <Build Include="dbo\Tables\IncapacidadEmpleado.sql" />
-    <Build Include="dbo\Tables\HistorialPuestos.sql" />
-    <Build Include="dbo\Tables\EmpleadosSalarios.sql" />
-    <Build Include="dbo\Tables\Egresos.sql" />
-    <Build Include="dbo\Tables\DistribucionesMarketing.sql" />
-    <Build Include="dbo\Tables\ComentariosProyecto.sql" />
-    <Build Include="dbo\Tables\ComentariosPlano.sql" />
-    <Build Include="dbo\Tables\ClientesMarketing.sql" />
-    <Build Include="dbo\Tables\CierresRango.sql" />
-    <Build Include="dbo\Tables\CierresDiarios.sql" />
-    <Build Include="dbo\Tables\CampsMarketing.sql" />
-    <Build Include="dbo\Tables\AspNetUserTokens.sql" />
-    <Build Include="dbo\Tables\AspNetUsers.sql" />
-    <Build Include="dbo\Tables\AspNetUserRoles.sql" />
-    <Build Include="dbo\Tables\AspNetUserLogins.sql" />
-    <Build Include="dbo\Tables\AspNetUserClaims.sql" />
-    <Build Include="dbo\Tables\AspNetRoles.sql" />
-    <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
-    <Build Include="dbo\Tables\AsignacionesTareaEmpleado.sql" />
-    <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
-    <Build Include="dbo\Tables\TareasPlano.sql" />
-  </ItemGroup>
 </Project>
