@@ -26,10 +26,10 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 //  Cookies de autenticación: rutas de login/denegado
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services.ConfigureApplicationCookie(o =>
 {
-    options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    o.LoginPath = "/Account/Login";
+    o.AccessDeniedPath = "/Account/Login";
 });
 
 //  MVC con política global: requiere usuario autenticado en TODO
@@ -41,14 +41,16 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 
-//  Razor Pages: permitir anónimos SOLO a las páginas de autenticación
-builder.Services.AddRazorPages(options =>
+// Razor Pages: permitir anónimos y crear rutas amigables
+builder.Services.AddRazorPages(o =>
 {
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
-    options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResendEmailConfirmation");
+    // seguir permitiendo anónimo a las páginas reales de Identity
+    o.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
+    o.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
+
+    // Rutas de SECCIÓN hacia esas mismas páginas
+    o.Conventions.AddAreaPageRoute("Identity", "/Account/Login", "seccion/acceso");
+    o.Conventions.AddAreaPageRoute("Identity", "/Account/Register", "seccion/registro");
 });
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -95,10 +97,10 @@ app.UseAuthorization();
 //  Redirección raíz: si no hay sesión → Login; si hay sesión → Home
 app.MapGet("/", context =>
 {
-    if (context.User?.Identity?.IsAuthenticated == true)
-        context.Response.Redirect("/Home/Index");
-    else
-        context.Response.Redirect("/Identity/Account/Login");
+    var target = (context.User?.Identity?.IsAuthenticated == true)
+        ? "/Home/Index"          // cambia esto si tu “inicio con sesión” es otro
+        : "/seccion/acceso";      // NUEVO login de sección
+    context.Response.Redirect(target);
     return Task.CompletedTask;
 });
 
@@ -109,10 +111,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 //  Seeding (roles/usuario admin si aplica)
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await SeedData.InitializeAsync(services);
-}
+
 
 app.Run();

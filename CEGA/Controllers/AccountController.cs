@@ -1,12 +1,14 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
 using CEGA.Models.ViewModels;
-using CEGA.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CEGA.Controllers
@@ -16,399 +18,209 @@ namespace CEGA.Controllers
         private readonly ApplicationDbContext _context;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _email;
-        private readonly OtpService _otp;
-        private readonly ILogger<AccountController> _log;
 
-        public AccountController(ApplicationDbContext context, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IEmailSender email,
-        OtpService otp,
-        ILogger<AccountController> log)
+        public AccountController(
+            ApplicationDbContext context,
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
-            _email = email;
-            _otp = otp;
-            _log = log;
         }
 
-        // LOGIN
-        [HttpGet]
-        public IActionResult Login() => View();
+        // =====================
+        //        LOGIN
+        // =====================
+        [HttpGet, AllowAnonymous]
+        public IActionResult Login(string? returnUrl = null)
+            => View(new LoginViewModel { ReturnUrl = returnUrl });
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.Email!);
+            // Permitir email o username en el mismo campo
+            ApplicationUser? user = null;
+            var input = model.UserOrEmail?.Trim();
+            if (!string.IsNullOrWhiteSpace(input))
+            {
+                user = input.Contains("@")
+                    ? await _userManager.FindByEmailAsync(input)
+                    : await _userManager.FindByNameAsync(input);
+            }
+
             if (user == null)
             {
                 ModelState.AddModelError("", "Credenciales no registradas");
                 return View(model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password!, false, true);
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName!, model.Password!, isPersistent: false, lockoutOnFailure: true);
 
             if (result.Succeeded)
             {
-                TempData["Mensaje"] = "Login exitoso";
-                return RedirectToAction("Index", "Home");
+                var target = (!string.IsNullOrWhiteSpace(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                            ? model.ReturnUrl : Url.Action("Index", "Home")!;
+                return LocalRedirect(target);
             }
 
-            ModelState.AddModelError("", result.IsLockedOut ? "Cuenta bloqueada por intentos fallidos" : "Credenciales incorrectas");
+            ModelState.AddModelError("",
+                result.IsLockedOut ? "Cuenta bloqueada por intentos fallidos" : "Credenciales incorrectas");
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Register() => View();
+        // =====================
+        //      REGISTER
+        // =====================
+        [HttpGet, AllowAnonymous]
+        public async Task<IActionResult> Register()
+        {
+            var vm = new RegisterViewModel
+            {
+                Puestos = await _context.Puestos
+                    .Where(p => p.Activo)
+                    .OrderBy(p => p.Nombre)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre })
+                    .ToListAsync()
+            };
+            return View(vm);
+        }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                model.Puestos = await _context.Puestos.Where(p => p.Activo)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre }).ToListAsync();
                 return View(model);
-
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                PhoneNumber = model.Telefono,
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                TempData["Mensaje"] = "Cuenta creada exitosamente.";
-                return RedirectToAction("Index", "Home");
             }
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError(string.Empty, error.Description);
+            // Validaciones de negocio (mínimas)
+            if (model.Cedula < 100000000 || model.Cedula > 999999999)
+                ModelState.AddModelError(nameof(model.Cedula), "Cédula debe tener 9 dígitos.");
+            if (model.TelefonoPersonal?.Length != 8)
+                ModelState.AddModelError(nameof(model.TelefonoPersonal), "Teléfono personal: 8 dígitos.");
+            if (model.TelefonoEmergencia?.Length != 8)
+                ModelState.AddModelError(nameof(model.TelefonoEmergencia), "Teléfono emergencia: 8 dígitos.");
+            if ((model.FechaIngreso - model.FechaNacimiento).TotalDays < 18 * 365)
+                ModelState.AddModelError(nameof(model.FechaIngreso), "Debe ser mayor de 18 años.");
 
-            return View(model);
+            // Unicidad en EMPLEADO
+            if (await _context.Empleados.AnyAsync(e => e.Cedula == model.Cedula))
+                ModelState.AddModelError(nameof(model.Cedula), "Ya existe un empleado con esa cédula.");
+            if (await _context.Empleados.AnyAsync(e => e.Email == model.Email))
+                ModelState.AddModelError(nameof(model.Email), "Email ya registrado en empleados.");
+
+            if (!ModelState.IsValid)
+            {
+                model.Puestos = await _context.Puestos.Where(p => p.Activo)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre }).ToListAsync();
+                return View(model);
+            }
+
+            // Username por regla (minúsculas, sin tildes, ñ->n)
+            var username = GenerarUsername(model.Nombre!, model.Apellido1!, model.Apellido2);
+            if (await _context.Empleados.AnyAsync(e => e.Username == username))
+                username = GenerarUsernameFallback(model.Nombre!, model.Apellido1!);
+
+            // 1) Crear AspNetUser con ese username
+            var user = new ApplicationUser
+            {
+                UserName = username,
+                Email = model.Email,
+                EmailConfirmed = true,
+                PhoneNumber = model.TelefonoPersonal
+            };
+            var create = await _userManager.CreateAsync(user, model.Password!);
+            if (!create.Succeeded)
+            {
+                foreach (var e in create.Errors) ModelState.AddModelError("", e.Description);
+                model.Puestos = await _context.Puestos.Where(p => p.Activo)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre }).ToListAsync();
+                return View(model);
+            }
+
+            // 2) Insertar EMPLEADO vinculado
+            var emp = new Empleado
+            {
+                Cedula = model.Cedula,
+                Nombre = model.Nombre!,
+                SegundoNombre = model.SegundoNombre,
+                Apellido1 = model.Apellido1!,
+                Apellido2 = model.Apellido2,
+                Username = username,
+                Email = model.Email!,
+                TelefonoPersonal = model.TelefonoPersonal!,
+                TelefonoEmergencia = model.TelefonoEmergencia!,
+                Sexo = model.Sexo!,
+                FechaNacimiento = model.FechaNacimiento,
+                FechaIngreso = model.FechaIngreso,
+                TipoSangre = model.TipoSangre,
+                Alergias = model.Alergias,
+                ContactoEmergenciaNombre = model.ContactoEmergenciaNombre,
+                ContactoEmergenciaTelefono = model.ContactoEmergenciaTelefono,
+                PolizaSeguro = model.PolizaSeguro,
+                PuestoId = model.PuestoId,
+                AspNetUserId = user.Id
+            };
+
+            try
+            {
+                _context.Empleados.Add(emp);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Si falla EMPLEADO, revertimos el usuario creado
+                await _userManager.DeleteAsync(user);
+                ModelState.AddModelError("", "No se pudo registrar el empleado. Intenta de nuevo.");
+                model.Puestos = await _context.Puestos.Where(p => p.Activo)
+                    .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre }).ToListAsync();
+                return View(model);
+            }
+
+            // 3) Login directo
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Index", "Home");
         }
 
+        // =====================
+        //       LOGOUT
+        // =====================
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login");
+            return RedirectToAction(nameof(Login));
         }
 
-        [HttpGet]
-        public IActionResult ForgotPassword() => View();
-
-        [HttpPost]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        // =====================
+        //   Helpers username
+        // =====================
+        private static string GenerarUsername(string nombre, string ape1, string? ape2)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.FindByEmailAsync(model.Email!);
-            if (user == null)
-            {
-                ModelState.AddModelError("", "Correo no encontrado en el sistema");
-                return View(model);
-            }
-
-            TempData["Mensaje"] = "Se ha enviado un correo con las instrucciones para restablecer la contraseña (simulado).";
-            return RedirectToAction("Login");
+            string n = QuitarTildes(nombre).ToLower().Trim();
+            string a1 = QuitarTildes(ape1).ToLower().Replace(" ", "");
+            string a2 = QuitarTildes(ape2 ?? "").ToLower();
+            return $"{n[0]}{a1}{(string.IsNullOrEmpty(a2) ? "" : a2[0])}";
         }
-
-        [HttpGet]
-        public async Task<IActionResult> EditProfile()
+        private static string GenerarUsernameFallback(string nombre, string ape1)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
-
-            return View(new EditProfileViewModel
-            {
-                Nombre = user.Nombre,
-                Apellido = user.Apellido,
-                Email = user.Email,
-                Telefono = user.PhoneNumber
-            });
+            var n = QuitarTildes(nombre).ToLower();
+            var a = QuitarTildes(ape1).ToLower().Replace(" ", "");
+            return $"{(n.Length > 1 ? n[..2] : n)}{a}";
         }
-
-        [HttpPost]
-        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+        private static string QuitarTildes(string? s)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
-
-            user.Nombre = model.Nombre;
-            user.Apellido = model.Apellido;
-            user.Email = model.Email;
-            user.UserName = model.Email;
-            user.PhoneNumber = model.Telefono;
-
-            var result = await _userManager.UpdateAsync(user);
-
-            if (result.Succeeded)
-            {
-                TempData["Mensaje"] = "Perfil actualizado correctamente.";
-                return RedirectToAction("EditProfile");
-            }
-
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-
-            return View(model);
+            if (string.IsNullOrWhiteSpace(s)) return "";
+            var norm = s.Normalize(NormalizationForm.FormD);
+            var chars = norm.Where(c =>
+                CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark);
+            return new string(chars.ToArray()).Replace('ñ', 'n').Replace('Ñ', 'n');
         }
-
-        [HttpGet]
-        public IActionResult GestionUsuarios()
-        {
-            return RedirectToAction(nameof(ListaUsuarios));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ListaUsuarios(string? filtroTexto, string? rolSeleccionado)
-        {
-            var usuarios = _userManager.Users.ToList();
-            var rolesDisponibles = new List<string> { "Admin", "Empleado", "Cliente" };
-
-            if (!string.IsNullOrWhiteSpace(filtroTexto))
-            {
-                filtroTexto = filtroTexto.ToLower();
-                usuarios = usuarios.Where(u =>
-                    (u.Nombre + " " + u.Apellido).ToLower().Contains(filtroTexto)
-                    || (u.Email ?? "").ToLower().Contains(filtroTexto)
-                    || (u.UserName ?? "").ToLower().Contains(filtroTexto)
-                ).ToList();
-            }
-
-            if (!string.IsNullOrWhiteSpace(rolSeleccionado))
-            {
-                var usuariosConRol = new List<ApplicationUser>();
-                foreach (var usuario in usuarios)
-                {
-                    var roles = await _userManager.GetRolesAsync(usuario);
-                    if (roles.Contains(rolSeleccionado))
-                        usuariosConRol.Add(usuario);
-                }
-                usuarios = usuariosConRol;
-            }
-
-            var modelo = new BuscarUsuarioFiltroViewModel
-            {
-                FiltroTexto = filtroTexto,
-                RolSeleccionado = rolSeleccionado,
-                UsuariosFiltrados = usuarios,
-                RolesDisponibles = rolesDisponibles
-            };
-
-            return View(modelo);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EliminarUsuario(string id)
-        {
-            var usuario = await _userManager.FindByIdAsync(id);
-            if (usuario == null)
-            {
-                TempData["Error"] = "El usuario no fue encontrado.";
-                return RedirectToAction("ListaUsuarios");
-            }
-
-            var resultado = await _userManager.DeleteAsync(usuario);
-            TempData[resultado.Succeeded ? "Mensaje" : "Error"] = resultado.Succeeded
-                ? "Usuario eliminado exitosamente."
-                : "Error al eliminar el usuario.";
-
-            return RedirectToAction("ListaUsuarios");
-        }
-
-        [HttpGet]
-        public IActionResult EliminarCuenta() => View();
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EliminarCuentaConfirmado()
-        {
-            var usuario = await _userManager.GetUserAsync(User);
-            if (usuario == null) return RedirectToAction("Login");
-
-            await _signInManager.SignOutAsync();
-            var resultado = await _userManager.DeleteAsync(usuario);
-
-            if (resultado.Succeeded)
-            {
-                TempData["Mensaje"] = "Tu cuenta ha sido eliminada exitosamente.";
-                return RedirectToAction("Login");
-            }
-
-            TempData["Error"] = "No se pudo eliminar la cuenta.";
-            return RedirectToAction("EliminarCuenta");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AsignarRol(string id)
-        {
-            var usuario = await _userManager.FindByIdAsync(id);
-            if (usuario == null) return RedirectToAction("ListaUsuarios");
-
-            var rolesActuales = await _userManager.GetRolesAsync(usuario);
-            var rolActual = rolesActuales.FirstOrDefault();
-
-            var modelo = new AsignarRolViewModel
-            {
-                UsuarioId = usuario.Id,
-                Email = usuario.Email!,
-                RolSeleccionado = rolActual,
-                RolesDisponibles = new List<string> { "Admin", "Empleado", "Cliente" },
-                SubRolesDisponibles = new List<string> { "Arquitecto", "Ingeniero", "Dibujante" }
-            };
-
-            return View(modelo);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AsignarRol(AsignarRolViewModel modelo)
-        {
-            modelo.RolesDisponibles = new List<string> { "Admin", "Empleado", "Cliente" };
-            modelo.SubRolesDisponibles = new List<string> { "Arquitecto", "Ingeniero", "Dibujante" };
-
-            if (!ModelState.IsValid) return View(modelo);
-
-            var usuario = await _userManager.FindByIdAsync(modelo.UsuarioId!);
-            if (usuario == null)
-            {
-                TempData["Error"] = "Usuario no encontrado.";
-                return RedirectToAction("ListaUsuarios");
-            }
-
-            var rolesActuales = await _userManager.GetRolesAsync(usuario);
-            await _userManager.RemoveFromRolesAsync(usuario, rolesActuales);
-            await _userManager.AddToRoleAsync(usuario, modelo.RolSeleccionado!);
-
-            if (modelo.RolSeleccionado == "Empleado" && !string.IsNullOrWhiteSpace(modelo.SubRol))
-            {
-                usuario.SubRol = modelo.SubRol;
-                await _userManager.UpdateAsync(usuario);
-            }
-
-            TempData["Mensaje"] = $"Rol actualizado a '{modelo.RolSeleccionado}' para el usuario {usuario.Email}.";
-            return RedirectToAction("ListaUsuarios");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EliminarSalario(string usuarioId)
-        {
-            var salario = await _context.EmpleadosSalarios.FirstOrDefaultAsync(s => s.UsuarioId == usuarioId);
-            if (salario != null)
-            {
-                _context.EmpleadosSalarios.Remove(salario);
-                await _context.SaveChangesAsync();
-                TempData["Mensaje"] = "Salario eliminado correctamente.";
-            }
-            else
-            {
-                TempData["Error"] = "Salario no encontrado.";
-            }
-
-            return RedirectToAction("Empleados");
-        }
-        // GET: /Account/ForgotPasswordOtp
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordOtp() => View(new ForgotPasswordVM());
-
-        // POST: /Account/ForgotPasswordOtp
-        [HttpPost]
-        [AllowAnonymous]
-        [EnableRateLimiting("pwdreset")] // si configuraste rate limiting
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPasswordOtp(ForgotPasswordVM model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            // No revelar existencia del usuario
-            if (user != null)
-            {
-                var code = await _otp.GenerateAndStoreAsync(user.Id);
-                await _email.SendEmailAsync(model.Email,
-                    "Código de recuperación",
-                    $"Tu código es <b>{code}</b> (expira en 10 minutos).");
-                return RedirectToAction(nameof(VerifyOtp), new { userId = user.Id });
-            }
-            return RedirectToAction(nameof(ForgotPasswordConfirmation));
-        }
-
-        // GET: /Account/VerifyOtp?userId=...
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult VerifyOtp(string userId)
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-                return RedirectToAction(nameof(ForgotPasswordOtp));
-            return View(new VerifyOtpVM { UserId = userId });
-        }
-
-        // POST: /Account/VerifyOtp
-        [HttpPost]
-        [AllowAnonymous]
-        [EnableRateLimiting("pwdreset")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpVM model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var ok = await _otp.ValidateAsync(model.UserId, model.Code);
-            if (!ok)
-            {
-                ModelState.AddModelError("", "Código inválido o expirado");
-                return View(model);
-            }
-            return RedirectToAction(nameof(ResetPasswordWithOtp), new { userId = model.UserId });
-        }
-
-        // GET: /Account/ResetPasswordWithOtp?userId=...
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordWithOtp(string userId)
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-                return RedirectToAction(nameof(ForgotPasswordOtp));
-            return View(new ResetPwdVM { UserId = userId });
-        }
-
-        // POST: /Account/ResetPasswordWithOtp
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPasswordWithOtp(ResetPwdVM model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-                return RedirectToAction(nameof(ForgotPasswordConfirmation));
-
-            // Usa el token estándar de Identity para aplicar la nueva contraseña
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
-            if (!result.Succeeded)
-            {
-                foreach (var e in result.Errors)
-                    ModelState.AddModelError("", e.Description);
-                return View(model);
-            }
-            return RedirectToAction(nameof(ResetPasswordConfirmation));
-        }
-
-        // GET: /Account/ForgotPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation() => View();
-
-        // GET: /Account/ResetPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordConfirmation() => View();
     }
 }
