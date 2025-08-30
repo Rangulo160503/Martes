@@ -1,41 +1,57 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\",
+  "WorkspaceRootPath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\models\\empleado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\views\\account\\editarusuario.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\views\\account\\editarusuario.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\models\\viewmodels\\puestocreatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\models\\viewmodels\\puestocreatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\models\\viewmodels\\registerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\models\\viewmodels\\registerviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\models\\empleado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\models\\empleado.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\models\\puesto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\models\\puesto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\models\\puesto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\rangulo\\documents\\cegaa\\cega\\cega\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|c:\\users\\v-ronaldan\\onedrive - microsoft\\documents\\martes2\\cega\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{131AD65C-3DC6-4927-9B5F-7D242BE639C9}|CEGA\\CEGA.csproj|solutionrelative:cega\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -46,71 +62,49 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\appsettings.json",
-              "RelativeDocumentMoniker": "CEGA\\appsettings.json",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\appsettings.json",
-              "RelativeToolTip": "CEGA\\appsettings.json",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAmwBYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-30T02:31:59.243Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Views\\Account\\Login.cshtml",
-              "RelativeDocumentMoniker": "CEGA\\Views\\Account\\Login.cshtml",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Views\\Account\\Login.cshtml",
-              "RelativeToolTip": "CEGA\\Views\\Account\\Login.cshtml",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAACsAAABWAAAAAAAAAA==",
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "CEGA\\Views\\Account\\Register.cshtml",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\Register.cshtml",
+              "RelativeToolTip": "CEGA\\Views\\Account\\Register.cshtml",
+              "ViewState": "AgIAAJoAAAAAAAAAAAAAAJoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-08-30T02:20:34.402Z",
+              "WhenOpened": "2025-08-30T06:05:20.932Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "CEGA\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "CEGA\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAACsAAAAcAAAAAAAAAA==",
+              "Title": "EditarUsuario.cshtml",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\EditarUsuario.cshtml",
+              "RelativeDocumentMoniker": "CEGA\\Views\\Account\\EditarUsuario.cshtml",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\EditarUsuario.cshtml",
+              "RelativeToolTip": "CEGA\\Views\\Account\\EditarUsuario.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-08-30T02:19:14.224Z",
+              "WhenOpened": "2025-08-30T06:05:16.586Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Program.cs",
-              "RelativeDocumentMoniker": "CEGA\\Program.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Program.cs*",
-              "RelativeToolTip": "CEGA\\Program.cs*",
-              "ViewState": "AgIAABAAAAAAAAAAAAAcwBoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-30T02:17:48.261Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "HomeController.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Controllers\\HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "CEGA\\Controllers\\HomeController.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Controllers\\HomeController.cs",
               "RelativeToolTip": "CEGA\\Controllers\\HomeController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -119,24 +113,115 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Program.cs",
+              "RelativeDocumentMoniker": "CEGA\\Program.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Program.cs",
+              "RelativeToolTip": "CEGA\\Program.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAAD0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-30T02:17:48.261Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\Login.cshtml",
+              "RelativeDocumentMoniker": "CEGA\\Views\\Account\\Login.cshtml",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Account\\Login.cshtml",
+              "RelativeToolTip": "CEGA\\Views\\Account\\Login.cshtml",
+              "ViewState": "AgIAAJUAAAAAAAAAAAAAAN0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-08-30T02:20:34.402Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "CEGA\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Controllers\\AccountController.cs*",
+              "RelativeToolTip": "CEGA\\Controllers\\AccountController.cs*",
+              "ViewState": "AgIAANkAAAAAAAAAAAAwwOYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-30T01:05:46.363Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RegisterViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\ViewModels\\RegisterViewModel.cs",
+              "RelativeDocumentMoniker": "CEGA\\Models\\ViewModels\\RegisterViewModel.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\ViewModels\\RegisterViewModel.cs",
+              "RelativeToolTip": "CEGA\\Models\\ViewModels\\RegisterViewModel.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAAADEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-30T06:08:10.862Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 6,
+              "Title": "PuestoCreateVM.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\ViewModels\\PuestoCreateVM.cs",
+              "RelativeDocumentMoniker": "CEGA\\Models\\ViewModels\\PuestoCreateVM.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\ViewModels\\PuestoCreateVM.cs",
+              "RelativeToolTip": "CEGA\\Models\\ViewModels\\PuestoCreateVM.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAIwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-30T06:17:49.219Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "Empleado.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Models\\Empleado.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\Empleado.cs",
               "RelativeDocumentMoniker": "CEGA\\Models\\Empleado.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Models\\Empleado.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\Empleado.cs",
               "RelativeToolTip": "CEGA\\Models\\Empleado.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACsAAAAAAAAAAAAywDgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-30T01:18:16.492Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\appsettings.json",
+              "RelativeDocumentMoniker": "CEGA\\appsettings.json",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\appsettings.json",
+              "RelativeToolTip": "CEGA\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-30T02:31:59.243Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "CEGA\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "CEGA\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAC4AAAAAAAAAAAAvwDgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-08-30T02:19:14.224Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "Puesto.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Models\\Puesto.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\Puesto.cs",
               "RelativeDocumentMoniker": "CEGA\\Models\\Puesto.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Models\\Puesto.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Models\\Puesto.cs",
               "RelativeToolTip": "CEGA\\Models\\Puesto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
@@ -145,28 +230,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 12,
               "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Data\\ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Data\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "CEGA\\Data\\ApplicationDbContext.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes2\\CEGA\\Data\\ApplicationDbContext.cs",
               "RelativeToolTip": "CEGA\\Data\\ApplicationDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-30T01:06:42.193Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AccountController.cs",
-              "DocumentMoniker": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Controllers\\AccountController.cs",
-              "RelativeDocumentMoniker": "CEGA\\Controllers\\AccountController.cs",
-              "ToolTip": "C:\\Users\\rangulo\\Documents\\CEGAA\\CEGA\\CEGA\\Controllers\\AccountController.cs",
-              "RelativeToolTip": "CEGA\\Controllers\\AccountController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOYAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-30T01:05:46.363Z",
               "EditorCaption": ""
             }
           ]
