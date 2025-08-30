@@ -1,40 +1,58 @@
-﻿namespace CEGA.Models.Domain
+﻿using CEGA.Models.Domain;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CEGA.Models
 {
+    [Table("EMPLEADO")]
     public class Empleado
     {
-        // PK: cédula CR (9 dígitos, sólo números)
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Range(100000000, 999999999)]
         public int Cedula { get; set; }
 
-        // Nombre
-        public string Nombre { get; set; } = "";
-        public string? SegundoNombre { get; set; }
-        public string Apellido1 { get; set; } = "";
-        public string? Apellido2 { get; set; }
+        [Required, MaxLength(50)] public string Nombre { get; set; } = "";
+        [MaxLength(50)] public string? SegundoNombre { get; set; }
+        [Required, MaxLength(50)] public string Apellido1 { get; set; } = "";
+        [MaxLength(50)] public string? Apellido2 { get; set; }
 
-        // Reglas: minúsculas, sin tildes/ñ; UNIQUE
-        public string Username { get; set; } = "";
+        [Required, MaxLength(50)] public string Username { get; set; } = ""; // login
+        [Required, MaxLength(256), EmailAddress] public string Email { get; set; } = ""; // login
+        [Required, MaxLength(100)] public string PasswordHash { get; set; } = ""; // bcrypt (~60) - login
+        public bool Activo { get; set; } = true;
 
-        // Contacto (Email UNIQUE)
-        public string Email { get; set; } = "";
-        public string TelefonoPersonal { get; set; } = "";   // 8 dígitos (UI agrega +506)
-        public string TelefonoEmergencia { get; set; } = ""; // 8 dígitos (UI agrega +506)
+        // Rol de aplicación (no confundir con Puesto/cargo)
+        [Column(TypeName = "tinyint")]
+        public RolEmpleado Rol { get; set; } = RolEmpleado.AdminSistema;
+
+        // Recuperación por email
+        [MaxLength(200)] public string? ResetTokenHash { get; set; }
+        public DateTime? ResetTokenExpiraEn { get; set; }
+
+        // Contacto
+        [Required, MaxLength(8)]
+        [RegularExpression(@"^\d{8}$")] public string TelefonoPersonal { get; set; } = "";
+        [Required, MaxLength(8)]
+        [RegularExpression(@"^\d{8}$")] public string TelefonoEmergencia { get; set; } = "";
 
         // Perfil
-        public string Sexo { get; set; } = "M";  // M/F/X/Prefiero no decir
-        public DateTime FechaNacimiento { get; set; }
-        public DateTime FechaIngreso { get; set; } // ≥ FechaNacimiento + 18 años
+        [Required, MaxLength(20)] public string Sexo { get; set; } = "M";
+        [Required, DataType(DataType.Date)] public DateTime FechaNacimiento { get; set; }
+        [Required, DataType(DataType.Date)] public DateTime FechaIngreso { get; set; }
 
         // Médicos / emergencia (opcionales)
-        public string? TipoSangre { get; set; }
-        public string? Alergias { get; set; }
-        public string? ContactoEmergenciaNombre { get; set; }
-        public string? ContactoEmergenciaTelefono { get; set; }
-        public string? PolizaSeguro { get; set; }
+        [MaxLength(3)] public string? TipoSangre { get; set; }
+        [MaxLength(200)] public string? Alergias { get; set; }
+        [MaxLength(100)] public string? ContactoEmergenciaNombre { get; set; }
+        [MaxLength(8)]
+        [RegularExpression(@"^\d{8}$")] public string? ContactoEmergenciaTelefono { get; set; }
+        [MaxLength(50)] public string? PolizaSeguro { get; set; }
 
-        // FK a Puesto (obligatorio)
-        public int PuestoId { get; set; }
-
-        // Vínculo 1:1 con AspNetUsers (opcional pero recomendado)
-        public string? AspNetUserId { get; set; }
+        // Puesto/cargo (NULL en BD, pero obligatorio en la UI al guardar)
+        public int? PuestoId { get; set; }
+        [ForeignKey(nameof(PuestoId))] public Puesto? Puesto { get; set; }
     }
+
+    public enum RolEmpleado : byte { AdminSistema = 1, RRHH = 2, Supervisor = 3, Colaborador = 4 }
 }

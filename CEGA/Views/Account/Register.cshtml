@@ -1,61 +1,141 @@
-﻿@model CEGA.Models.RegisterViewModel
-
+﻿@model CEGA.Models.ViewModels.RegisterViewModel
 @{
-    ViewData["Title"] = "Crear Cuenta";
+    ViewData["Title"] = "Crear cuenta";
 }
 
-<h2 class="mb-4">📝 Crear Cuenta</h2>
+<h2 class="mb-3">Crear cuenta</h2>
 
-@if (TempData["Mensaje"] != null)
-{
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-
-<form asp-action="Register" asp-controller="Account" method="post">
+<form asp-action="Register" method="post" class="row g-3">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <div class="mb-2">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Identificación -->
+    <div class="col-md-4">
+        <label asp-for="Cedula" class="form-label"></label>
+        <input asp-for="Cedula" class="form-control" maxlength="9" />
+        <span asp-validation-for="Cedula" class="text-danger"></span>
+    </div>
+
+    <!-- Nombres -->
+    <div class="col-md-4">
         <label asp-for="Nombre" class="form-label"></label>
         <input asp-for="Nombre" class="form-control" />
         <span asp-validation-for="Nombre" class="text-danger"></span>
     </div>
-
-    <div class="mb-2">
-        <label asp-for="Apellido" class="form-label"></label>
-        <input asp-for="Apellido" class="form-control" />
-        <span asp-validation-for="Apellido" class="text-danger"></span>
+    <div class="col-md-4">
+        <label asp-for="SegundoNombre" class="form-label"></label>
+        <input asp-for="SegundoNombre" class="form-control" />
+        <span asp-validation-for="SegundoNombre" class="text-danger"></span>
     </div>
 
-    <div class="mb-2">
+    <!-- Apellidos -->
+    <div class="col-md-4">
+        <label asp-for="Apellido1" class="form-label"></label>
+        <input asp-for="Apellido1" class="form-control" />
+        <span asp-validation-for="Apellido1" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Apellido2" class="form-label"></label>
+        <input asp-for="Apellido2" class="form-control" />
+        <span asp-validation-for="Apellido2" class="text-danger"></span>
+    </div>
+
+    <!-- Acceso -->
+    <div class="col-md-6">
         <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
+        <input asp-for="Email" class="form-control" autocomplete="email" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-
-    <div class="mb-2">
-        <label asp-for="Telefono" class="form-label"></label>
-        <input asp-for="Telefono" class="form-control" />
-        <span asp-validation-for="Telefono" class="text-danger"></span>
-    </div>
-
-    <div class="mb-2">
+    <div class="col-md-6">
         <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" type="password" class="form-control" />
+        <input asp-for="Password" class="form-control" autocomplete="new-password" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
-    <div class="mb-2">
-        <label asp-for="ConfirmPassword" class="form-label"></label>
-        <input asp-for="ConfirmPassword" type="password" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    <!-- Contacto -->
+    <div class="col-md-6">
+        <label asp-for="TelefonoPersonal" class="form-label">Teléfono personal (+506)</label>
+        <div class="input-group">
+            <span class="input-group-text">+506</span>
+            <input asp-for="TelefonoPersonal" class="form-control" maxlength="8" />
+        </div>
+        <span asp-validation-for="TelefonoPersonal" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="TelefonoEmergencia" class="form-label">Teléfono emergencia (+506)</label>
+        <div class="input-group">
+            <span class="input-group-text">+506</span>
+            <input asp-for="TelefonoEmergencia" class="form-control" maxlength="8" />
+        </div>
+        <span asp-validation-for="TelefonoEmergencia" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success mt-2">Crear cuenta</button>
+    <!-- Perfil -->
+    <div class="col-md-4">
+        <label asp-for="Sexo" class="form-label"></label>
+        <select asp-for="Sexo" class="form-select">
+            <option value="M">M</option>
+            <option value="F">F</option>
+            <option value="X">X</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+        </select>
+        <span asp-validation-for="Sexo" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="FechaNacimiento" class="form-label"></label>
+        <input asp-for="FechaNacimiento" type="date" class="form-control" />
+        <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="FechaIngreso" class="form-label"></label>
+        <input asp-for="FechaIngreso" type="date" class="form-control" />
+        <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+    </div>
+
+    <!-- Médicos / emergencia -->
+    <div class="col-md-3">
+        <label asp-for="TipoSangre" class="form-label"></label>
+        <input asp-for="TipoSangre" class="form-control" placeholder="O+, A-, AB..." />
+        <span asp-validation-for="TipoSangre" class="text-danger"></span>
+    </div>
+    <div class="col-md-9">
+        <label asp-for="Alergias" class="form-label"></label>
+        <input asp-for="Alergias" class="form-control" />
+        <span asp-validation-for="Alergias" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ContactoEmergenciaNombre" class="form-label"></label>
+        <input asp-for="ContactoEmergenciaNombre" class="form-control" />
+        <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ContactoEmergenciaTelefono" class="form-label">Teléfono emergencia (+506)</label>
+        <div class="input-group">
+            <span class="input-group-text">+506</span>
+            <input asp-for="ContactoEmergenciaTelefono" class="form-control" maxlength="8" />
+        </div>
+        <span asp-validation-for="ContactoEmergenciaTelefono" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="PolizaSeguro" class="form-label"></label>
+        <input asp-for="PolizaSeguro" class="form-control" />
+        <span asp-validation-for="PolizaSeguro" class="text-danger"></span>
+    </div>
+
+    <!-- Puesto -->
+    <div class="col-md-6">
+        <label asp-for="PuestoId" class="form-label"></label>
+        <select asp-for="PuestoId" asp-items="Model.Puestos" class="form-select">
+            <option value="">— Seleccione un puesto —</option>
+        </select>
+        <span asp-validation-for="PuestoId" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-success">Crear</button>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary">Volver a login</a>
+    </div>
 </form>
 
 @section Scripts {

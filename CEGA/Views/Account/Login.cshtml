@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CEGA.Models.ViewModels.LoginViewModel
+@{
     ViewData["Title"] = "Quiénes Somos";
 }
 
@@ -19,13 +20,31 @@
             <div class="col-lg-4">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title mb-3">Por qué CEGA</h5>
-                        <ul class="list-unstyled mb-0">
-                            <li>Experiencia multidisciplinaria</li>
-                            <li>Enfoque integral del proyecto</li>
-                            <li>Cumplimiento normativo y calidad</li>
-                            <li>Comunicación transparente</li>
-                        </ul>
+                        <h5 class="card-title mb-3">Iniciar sesión</h5>
+
+                        <form asp-action="Login" method="post" class="vstack gap-3">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <input type="hidden" asp-for="ReturnUrl" />
+
+                            <div>
+                                <label asp-for="UserOrEmail" class="form-label"></label>
+                                <input asp-for="UserOrEmail" class="form-control" autocomplete="username" />
+                                <span asp-validation-for="UserOrEmail" class="text-danger"></span>
+                            </div>
+
+                            <div>
+                                <label asp-for="Password" class="form-label"></label>
+                                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">Entrar</button>
+                                <a asp-action="Register" class="btn btn-outline-primary">Crear cuenta</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -196,3 +215,7 @@
         <a class="btn btn-light btn-lg" asp-controller="Contacto" asp-action="Index">Agendar una reunión</a>
     </div>
 </section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

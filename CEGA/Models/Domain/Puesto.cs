@@ -1,10 +1,14 @@
-﻿namespace CEGA.Models.Domain
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CEGA.Models.Domain
 {
+    [Table("PUESTO")]
     public class Puesto
     {
-        public int Id { get; set; }                 // PK (IDENTITY)
-        public string Nombre { get; set; } = "";    // UNIQUE
-        public string? Descripcion { get; set; }
+        [Key] public int Id { get; set; }
+        [Required, MaxLength(100)] public string Nombre { get; set; } = "";
+        [MaxLength(300)] public string? Descripcion { get; set; }
         public bool Activo { get; set; } = true;
     }
 }
