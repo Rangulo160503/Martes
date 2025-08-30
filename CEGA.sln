@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEGA", "CEGA\CEGA.csproj", "{131AD65C-3DC6-4927-9B5F-7D242BE639C9}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BD", "BD\BD.sqlproj", "{1553747A-05AE-4B25-9C0B-013AC787A6DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,12 @@ Global
 		{131AD65C-3DC6-4927-9B5F-7D242BE639C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{131AD65C-3DC6-4927-9B5F-7D242BE639C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{131AD65C-3DC6-4927-9B5F-7D242BE639C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1553747A-05AE-4B25-9C0B-013AC787A6DB}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

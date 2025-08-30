@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[Empleado] (
+    [Cedula]                     NVARCHAR (12)  NOT NULL,
+    [Nombre]                     NVARCHAR (100) NOT NULL,
+    [SegundoNombre]              NVARCHAR (100) NULL,
+    [Apellido1]                  NVARCHAR (100) NOT NULL,
+    [Apellido2]                  NVARCHAR (100) NULL,
+    [Username]                   NVARCHAR (50)  NOT NULL,
+    [Email]                      NVARCHAR (150) NOT NULL,
+    [PasswordHash]               NVARCHAR (200) NOT NULL,
+    [Activo]                     BIT            DEFAULT ((1)) NOT NULL,
+    [TelefonoPersonal]           NVARCHAR (20)  NOT NULL,
+    [TelefonoEmergencia]         NVARCHAR (20)  NOT NULL,
+    [Sexo]                       NVARCHAR (10)  NOT NULL,
+    [FechaNacimiento]            DATE           NOT NULL,
+    [FechaIngreso]               DATE           NOT NULL,
+    [TipoSangre]                 NVARCHAR (10)  NULL,
+    [Alergias]                   NVARCHAR (255) NULL,
+    [ContactoEmergenciaNombre]   NVARCHAR (150) NULL,
+    [ContactoEmergenciaTelefono] NVARCHAR (20)  NULL,
+    [PolizaSeguro]               NVARCHAR (100) NULL,
+    [PuestoId]                   INT            NOT NULL,
+    PRIMARY KEY CLUSTERED ([Cedula] ASC),
+    CONSTRAINT [FK_Empleado_Puesto] FOREIGN KEY ([PuestoId]) REFERENCES [dbo].[Puesto] ([Id]) ON UPDATE CASCADE,
+    UNIQUE NONCLUSTERED ([Email] ASC),
+    UNIQUE NONCLUSTERED ([Username] ASC)
+);
+
