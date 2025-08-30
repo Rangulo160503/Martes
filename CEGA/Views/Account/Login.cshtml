@@ -1,0 +1,221 @@
+﻿@model CEGA.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Quiénes Somos";
+}
+
+<!-- Hero -->
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">CEGA — Ingeniería estructural y arquitectura</h1>
+                <p class="lead mb-4">
+                    Más de 24 años construyendo soluciones integrales: análisis, propuesta, diseño e implementación.
+                </p>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-primary btn-lg" asp-controller="Contacto" asp-action="Index">Contáctanos</a>
+                    <a class="btn btn-outline-primary btn-lg" asp-controller="Servicios" asp-action="Index">Nuestros servicios</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Iniciar sesión</h5>
+
+                        <form asp-action="Login" method="post" class="vstack gap-3">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <input type="hidden" asp-for="ReturnUrl" />
+
+                            <div>
+                                <label asp-for="UserOrEmail" class="form-label"></label>
+                                <input asp-for="UserOrEmail" class="form-control" autocomplete="username" />
+                                <span asp-validation-for="UserOrEmail" class="text-danger"></span>
+                            </div>
+
+                            <div>
+                                <label asp-for="Password" class="form-label"></label>
+                                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">Entrar</button>
+                                <a asp-action="Register" class="btn btn-outline-primary">Crear cuenta</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sobre nosotros -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <h2 class="fw-bold mb-3">Quiénes somos</h2>
+                <p>
+                    CEGA es una empresa de ingeniería estructural y arquitectura, con más de 24 años de experiencia en el desarrollo e implementación de soluciones.
+                </p>
+                <p>
+                    Nuestros servicios de consultoría son integrales, incluyendo desde las actividades de análisis, propuesta y evaluación de alternativas, hasta el diseño, desarrollo e implementación de las soluciones.
+                </p>
+                <p>
+                    Somos un equipo de profesionales formados en ingeniería, arquitectura, diseño, administración, inspección y dibujo; lo que nos permite interpretar las necesidades de nuestros clientes.
+                </p>
+                <p>
+                    Nuestro equipo cuenta con experiencia, conocimiento y continua actualización para abarcar los proyectos de manera integral. Amplia experiencia en diseños estructurales y arquitectónicos, inspección de proyectos y trámites de permisos constructivos.
+                </p>
+                <p class="mb-0">
+                    Proveemos soluciones especializadas, integrando tecnología con la estrategia del cliente y un análisis detallado de sus necesidades, buscando el óptimo costo–beneficio.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Misión</h5>
+                        <p>
+                            Construir el camino entre las necesidades y las soluciones de arquitectura e ingeniería para nuestros clientes, mediante la excelencia operativa en el diseño y desarrollo de proyectos.
+                        </p>
+                        <hr>
+                        <h5 class="fw-bold mb-3">Visión</h5>
+                        <p class="mb-0">
+                            Mantenernos como referente regional en calidad, eficiencia y servicio al cliente para proyectos constructivos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Valores (acordeón) -->
+<section class="py-5 bg-light border-top border-bottom">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Valores y comportamientos</h2>
+
+        <div class="accordion" id="valoresAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="v-pasion-h">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-pasion" aria-expanded="true" aria-controls="v-pasion">
+                        Pasión
+                    </button>
+                </h2>
+                <div id="v-pasion" class="accordion-collapse collapse show" aria-labelledby="v-pasion-h" data-bs-parent="#valoresAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Ponemos nuestras mejores destrezas y conocimientos a disposición</li>
+                            <li>Damos el mejor de nuestros esfuerzos en cada proyecto</li>
+                            <li>Empatizamos con el cliente y brindamos el servicio que nos gustaría recibir</li>
+                            <li>Disfrutamos lo que hacemos</li>
+                            <li>Fomentamos calidez humana y empatía en nuestras relaciones</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="v-precision-h">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#v-precision" aria-expanded="false" aria-controls="v-precision">
+                        Precisión
+                    </button>
+                </h2>
+                <div id="v-precision" class="accordion-collapse collapse" aria-labelledby="v-precision-h" data-bs-parent="#valoresAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Transmitimos información exacta</li>
+                            <li>Facilitamos el cumplimiento legal y normativo</li>
+                            <li>Vigilamos los detalles del proyecto</li>
+                            <li>Entregamos en las fechas pactadas</li>
+                            <li>Comunicamos riesgos con transparencia</li>
+                            <li>Trabajamos con disciplina día a día</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="v-confiabilidad-h">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#v-confiabilidad" aria-expanded="false" aria-controls="v-confiabilidad">
+                        Confiabilidad
+                    </button>
+                </h2>
+                <div id="v-confiabilidad" class="accordion-collapse collapse" aria-labelledby="v-confiabilidad-h" data-bs-parent="#valoresAccordion">
+                    <div class="accordion-body">
+                        <ul class="mb-0">
+                            <li>Proveemos la mejor solución posible</li>
+                            <li>Optimizamos los recursos de nuestros clientes</li>
+                            <li>Cumplimos los acuerdos pactados</li>
+                            <li>Actuamos con ética y cero corrupción</li>
+                            <li>Cuidamos la información confidencial</li>
+                            <li>Trabajamos como equipo y apoyamos a nuestros clientes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Política de calidad (tarjetas) -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4 text-center">Política de calidad</h2>
+        <p class="text-center mx-auto" style="max-width: 780px;">
+            CEGA Consultora Estructural mantendrá un Sistema de Gestión de Calidad en cada proyecto de consultoría estructural, siendo siempre sinónimo de calidad. Compromisos:
+        </p>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mt-1">
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Compromiso 1</span>
+                        <p class="mb-0">La calidad y su mejora son responsabilidad de todos los integrantes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Compromiso 2</span>
+                        <p class="mb-0">Cumplir entregables y plazos pactados, con propuestas viables y alineadas a tendencias tecnológicas y constructivas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Compromiso 3</span>
+                        <p class="mb-0">Exceder expectativas, siendo aliados en soluciones prácticas, eficientes y de alto valor.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">Compromiso 4</span>
+                        <p class="mb-0">Convertir la experiencia en mejora continua y cumplimiento de leyes y normativas vigentes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA final -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-2">¿Listo para iniciar tu proyecto?</h3>
+        <p class="mb-4">Conversemos sobre tus necesidades y construyamos juntos la mejor solución.</p>
+        <a class="btn btn-light btn-lg" asp-controller="Contacto" asp-action="Index">Agendar una reunión</a>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
