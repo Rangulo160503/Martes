@@ -42,7 +42,7 @@ namespace CEGA.Models.ViewModels
         public string? PolizaSeguro { get; set; }
 
         [Required]
-        public int PuestoId { get; set; }
+        public int? PuestoId { get; set; }
 
         // UI
         public IEnumerable<SelectListItem> Puestos { get; set; } = Enumerable.Empty<SelectListItem>();

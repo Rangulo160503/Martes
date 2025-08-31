@@ -21,22 +21,17 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Iniciar sesión</h5>
-
                         <form asp-action="Login" method="post" class="vstack gap-3">
                             @Html.AntiForgeryToken()
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                            <input type="hidden" asp-for="ReturnUrl" />
-
                             <div>
-                                <label asp-for="UserOrEmail" class="form-label"></label>
+                                <label asp-for="UserOrEmail" class="form-label">Usuario o correo</label>
                                 <input asp-for="UserOrEmail" class="form-control" autocomplete="username" />
                                 <span asp-validation-for="UserOrEmail" class="text-danger"></span>
                             </div>
 
                             <div>
-                                <label asp-for="Password" class="form-label"></label>
-                                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                                <label asp-for="Password" class="form-label">Contraseña</label>
+                                <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
 
@@ -46,7 +41,6 @@
                                         onclick="openModal('@Url.Action("Register", "Account")','Crear cuenta')">
                                     Crear cuenta
                                 </button>
-
                             </div>
                         </form>
                     </div>

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CEGA.Models
 {
-    [Table("EMPLEADO")]
+    [Table("Empleado")]
     public class Empleado
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]

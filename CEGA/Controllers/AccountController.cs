@@ -31,15 +31,16 @@ namespace CEGA.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var input = model.UserOrEmail?.Trim();
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                ModelState.AddModelError("", "Ingrese usuario o correo.");
-                return View(model);
-            }
+            if (string.IsNullOrWhiteSpace(input)) { ModelState.AddModelError("", "Ingrese usuario o correo."); return View(model); }
 
-            // Buscar por Email o Username
-            var emp = await _context.Empleados
-                .FirstOrDefaultAsync(e => (input.Contains("@") ? e.Email == input : e.Username == input));
+            var inputLower = input.ToLowerInvariant();
+            var byEmail = input.Contains("@");
+            var isDigits = input.All(char.IsDigit); // si quieres permitir login por cédula
+
+            var emp = await _context.Empleados.FirstOrDefaultAsync(e =>
+                byEmail ? e.Email.ToLower() == inputLower :
+                isDigits ? e.Cedula.ToString() == input :
+                           e.Username.ToLower() == inputLower);
 
             if (emp == null || !emp.Activo)
             {
@@ -84,40 +85,101 @@ namespace CEGA.Controllers
             // Repoblar combo si algo falla
             async Task LoadPuestosAsync()
             {
-                model.Puestos = await _context.Puestos.Where(p => p.Activo)
+                model.Puestos = await _context.Puestos
+                    .Where(p => p.Activo)
                     .OrderBy(p => p.Nombre)
                     .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Nombre })
                     .ToListAsync();
             }
 
+            // ---- DEBUG: conexión efectiva de EF ----
+            try
+            {
+                var dbConn = _context.Database.GetDbConnection();
+                TempData["DbgRegister"] = $"POST Register OK | DB={dbConn.Database} @ {dbConn.DataSource}";
+            }
+            catch { /* ignora si falla */ }
+
             if (!ModelState.IsValid) { await LoadPuestosAsync(); return View(model); }
 
+            // ===============================
             // Validaciones de negocio mínimas
-            if (model.Cedula < 100000000 || model.Cedula > 999999999)
-                ModelState.AddModelError(nameof(model.Cedula), "Cédula debe tener 9 dígitos.");
-            if (string.IsNullOrWhiteSpace(model.TelefonoPersonal) || model.TelefonoPersonal.Length != 8)
-                ModelState.AddModelError(nameof(model.TelefonoPersonal), "Teléfono personal: 8 dígitos.");
-            if (string.IsNullOrWhiteSpace(model.TelefonoEmergencia) || model.TelefonoEmergencia.Length != 8)
-                ModelState.AddModelError(nameof(model.TelefonoEmergencia), "Teléfono emergencia: 8 dígitos.");
-            if ((model.FechaIngreso - model.FechaNacimiento).TotalDays < 18 * 365)
-                ModelState.AddModelError(nameof(model.FechaIngreso), "Debe ser mayor de 18 años.");
-            if (model.PuestoId == null)
-                ModelState.AddModelError(nameof(model.PuestoId), "Debe seleccionar un puesto.");
+            // ===============================
 
-            // Unicidad
+            // Cédula 9 dígitos
+            var cedStr = model.Cedula.ToString();
+            if (model.Cedula < 100000000 || model.Cedula > 999999999 || cedStr.Length != 9)
+                ModelState.AddModelError(nameof(model.Cedula), "Cédula debe tener 9 dígitos.");
+
+            // Teléfonos: 8 dígitos exactos
+            bool TelOk(string? s) => !string.IsNullOrWhiteSpace(s) &&
+                                     System.Text.RegularExpressions.Regex.IsMatch(s!, @"^\d{8}$");
+            if (!TelOk(model.TelefonoPersonal))
+                ModelState.AddModelError(nameof(model.TelefonoPersonal), "Teléfono personal: 8 dígitos.");
+            if (!TelOk(model.TelefonoEmergencia))
+                ModelState.AddModelError(nameof(model.TelefonoEmergencia), "Teléfono emergencia: 8 dígitos.");
+
+            // Mayor de 18 a la fecha de ingreso
+            if (model.FechaNacimiento.AddYears(18) > model.FechaIngreso)
+                ModelState.AddModelError(nameof(model.FechaIngreso), "Debe ser mayor de 18 años a la fecha de ingreso.");
+
+            // Puesto seleccionado y válido
+            if (!model.PuestoId.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.PuestoId), "Debe seleccionar un puesto.");
+            }
+            else
+            {
+                var puestoId = model.PuestoId.Value;
+                var puestoValido = await _context.Puestos.AnyAsync(p => p.Id == puestoId && p.Activo);
+                if (!puestoValido)
+                    ModelState.AddModelError(nameof(model.PuestoId), "El puesto seleccionado no es válido o está inactivo.");
+            }
+
+            // ===============================
+            // Unicidad (email normalizado)
+            // ===============================
+            var emailNorm = (model.Email ?? string.Empty).Trim().ToLower();
             if (await _context.Empleados.AnyAsync(e => e.Cedula == model.Cedula))
                 ModelState.AddModelError(nameof(model.Cedula), "Ya existe un empleado con esa cédula.");
-            if (await _context.Empleados.AnyAsync(e => e.Email == model.Email))
+            if (await _context.Empleados.AnyAsync(e => e.Email.ToLower() == emailNorm))
                 ModelState.AddModelError(nameof(model.Email), "Email ya registrado.");
 
-            // Username según regla
+            // ===============================
+            // Username único
+            // ===============================
             var username = GenerarUsername(model.Nombre!, model.Apellido1!, model.Apellido2);
             if (await _context.Empleados.AnyAsync(e => e.Username == username))
+            {
                 username = GenerarUsernameFallback(model.Nombre!, model.Apellido1!);
+                if (await _context.Empleados.AnyAsync(e => e.Username == username))
+                {
+                    var baseU = username;
+                    int suf = 2;
+                    while (await _context.Empleados.AnyAsync(e => e.Username == $"{baseU}{suf}"))
+                        suf++;
+                    username = $"{baseU}{suf}";
+                }
+            }
 
-            if (!ModelState.IsValid) { await LoadPuestosAsync(); return View(model); }
+            if (!ModelState.IsValid)
+            {
+                // ---- DEBUG: lista de errores ----
+                try
+                {
+                    var errores = ModelState
+                        .Where(kv => kv.Value.Errors.Count > 0)
+                        .Select(kv => $"{kv.Key}: {string.Join(" | ", kv.Value.Errors.Select(e => e.ErrorMessage))}");
+                    TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + "\nModelState INVALIDO:\n" + string.Join("\n", errores);
+                }
+                catch { }
+                await LoadPuestosAsync();
+                return View(model);
+            }
 
+            // ===============================
             // Hash de contraseña (bcrypt)
+            // ===============================
             var hash = BCrypt.Net.BCrypt.HashPassword(model.Password!);
 
             var emp = new Empleado
@@ -128,10 +190,9 @@ namespace CEGA.Controllers
                 Apellido1 = model.Apellido1!,
                 Apellido2 = model.Apellido2,
                 Username = username,
-                Email = model.Email!,
+                Email = model.Email!, // se guarda como lo ingresó; unicidad con emailNorm
                 PasswordHash = hash,
-                Activo = true, // por ahora
-                // Rol por defecto: usa el valor default del modelo (p.ej. AdminSistema si lo dejaste así)
+                Activo = true,
                 TelefonoPersonal = model.TelefonoPersonal!,
                 TelefonoEmergencia = model.TelefonoEmergencia!,
                 Sexo = model.Sexo!,
@@ -142,21 +203,38 @@ namespace CEGA.Controllers
                 ContactoEmergenciaNombre = model.ContactoEmergenciaNombre,
                 ContactoEmergenciaTelefono = model.ContactoEmergenciaTelefono,
                 PolizaSeguro = model.PolizaSeguro,
-                PuestoId = model.PuestoId
+                PuestoId = model.PuestoId,
+                // Si tu columna Rol es NOT NULL, asigna explícito:
+                Rol = RolEmpleado.Colaborador,
+                // ResetToken* se quedan nulos al registrarse
             };
 
             try
             {
                 _context.Empleados.Add(emp);
-                await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync();
+
+                // ---- DEBUG: confirma filas afectadas y existencia ----
+                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + $"\nSaveChanges OK (rows={rows}).";
+
+                var exists = await _context.Empleados.AsNoTracking()
+                                  .AnyAsync(e => e.Cedula == model.Cedula);
+                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + $"\nExiste tras guardar: {exists}";
             }
             catch (DbUpdateException ex)
             {
-                // Manejo de UQ de Username/Email
                 var msg = ex.InnerException?.Message ?? ex.Message;
-                if (msg.Contains("UQ_EMPLEADO_Username")) ModelState.AddModelError(nameof(model.Email), "Username en uso.");
-                else if (msg.Contains("UQ_EMPLEADO_Email")) ModelState.AddModelError(nameof(model.Email), "Email en uso.");
-                else ModelState.AddModelError("", "No se pudo registrar el empleado.");
+
+                if (msg.Contains("UQ_EMPLEADO_Username", StringComparison.OrdinalIgnoreCase))
+                    ModelState.AddModelError("", "El nombre de usuario generado ya está en uso. Intente nuevamente.");
+                else if (msg.Contains("UQ_EMPLEADO_Email", StringComparison.OrdinalIgnoreCase))
+                    ModelState.AddModelError(nameof(model.Email), "Email en uso.");
+                else
+                    ModelState.AddModelError("", "No se pudo registrar el empleado. " + msg); // expón detalle
+
+                // ---- DEBUG: expón mensaje real de SQL ----
+                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + "\nDbUpdateException: " + msg;
+
                 await LoadPuestosAsync();
                 return View(model);
             }
@@ -165,6 +243,8 @@ namespace CEGA.Controllers
             await SignInEmpleadoAsync(emp, isPersistent: false);
             return RedirectToAction("Index", "Home");
         }
+
+
 
         // =====================
         //       LOGOUT
