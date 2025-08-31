@@ -1,29 +1,89 @@
-﻿<div class="modal fade" id="modalNuevoPuesto" tabindex="-1" aria-hidden="true"
-     data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modalNuevoPuestoLabel">
-    <div class="modal-dialog">
-        <form id="formNuevoPuesto" class="modal-content">
+﻿<div class="modal fade" id="modalNuevoPuesto" tabindex="-1"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false"
+     aria-labelledby="modalNuevoPuestoLabel">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <form id="formNuevoPuesto" class="modal-content bg-white" method="post">
             @Html.AntiForgeryToken()
 
             <div class="modal-header">
                 <h5 class="modal-title" id="modalNuevoPuestoLabel">Crear puesto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <div class="modal-body">
-                <div class="mb-3">
-                    <label for="Puesto_Nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="Puesto_Nombre" name="Nombre" required />
-                    <div class="invalid-feedback">Campo obligatorio.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="Puesto_Codigo" class="form-label">Código (opcional)</label>
-                    <input type="text" class="form-control" id="Puesto_Codigo" name="Codigo" />
+                <div class="row g-3">
+
+                    <!-- Codigo -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Código</label>
+                        <input name="Codigo" class="form-control" maxlength="20" required />
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="col-12 col-md-8">
+                        <label class="form-label">Nombre</label>
+                        <input name="Nombre" class="form-control" maxlength="100" required />
+                    </div>
+
+                    <!-- Departamento -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Departamento</label>
+                        <input name="Departamento" class="form-control" maxlength="200" />
+                    </div>
+
+                    <!-- Nivel -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Nivel</label>
+                        <input name="Nivel" class="form-control" maxlength="100" placeholder="Junior / Senior / Gerencial" />
+                    </div>
+
+                    <!-- Descripcion -->
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="Descripcion" class="form-control" maxlength="500" rows="2" required></textarea>
+                    </div>
+
+                    <!-- Requisitos -->
+                    <div class="col-12">
+                        <label class="form-label">Requisitos</label>
+                        <textarea name="Requisitos" class="form-control" maxlength="500" rows="2"></textarea>
+                    </div>
+
+                    <!-- Salario base -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Salario base</label>
+                        <input name="SalarioBase" type="number" step="0.01" min="0" class="form-control" />
+                    </div>
+
+                    <!-- Moneda -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Moneda</label>
+                        <input name="Moneda" class="form-control" maxlength="50" value="CRC" />
+                    </div>
+
+                    <!-- Jornada -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Jornada</label>
+                        <input name="Jornada" class="form-control" maxlength="100" placeholder="Tiempo completo / Medio tiempo" />
+                    </div>
+
+                    <!-- Activo -->
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="Activo" id="PuestoActivo" checked />
+                            <label class="form-check-label" for="PuestoActivo">Activo</label>
+                        </div>
+                    </div>
+
+                    <!-- Errores -->
+                    <div class="col-12">
+                        <div class="text-danger small d-none" id="errorNuevoPuesto"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success">Guardar</button>
             </div>
         </form>
     </div>

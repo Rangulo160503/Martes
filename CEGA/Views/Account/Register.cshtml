@@ -110,7 +110,7 @@
         <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
     </div>
     <div class="col-md-6">
-        <label asp-for="ContactoEmergenciaTelefono" class="form-label">Teléfono emergencia (+506)</label>
+        <label asp-for="ContactoEmergenciaTelefono" class="form-label">Contacto emergencia (+506)</label>
         <div class="input-group">
             <span class="input-group-text">+506</span>
             <input asp-for="ContactoEmergenciaTelefono" class="form-control" maxlength="8" />
@@ -153,10 +153,11 @@
 
             <button type="button"
                     class="btn btn-outline-primary"
-                    data-bs-toggle="modal"
-                    data-open-child="#modalNuevoPuesto">
+                    onclick="bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevoPuesto')).show()">
                 Nuevo
             </button>
+
+
         </div>
 
         @if (!hayPuestos)
@@ -176,51 +177,4 @@
 </form>
 
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        (function(){
-          const form = document.getElementById('formNuevoPuesto');
-          const errorBox = document.getElementById('errorNuevoPuesto');
-          const select = document.getElementById('PuestoId');
-
-          form.addEventListener('submit', async function(e){
-            e.preventDefault();
-            errorBox.classList.add('d-none'); errorBox.textContent = '';
-
-            const fd = new FormData(form);
-            try {
-              const res = await fetch('@Url.Action("CreateInline", "Puesto")', {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                body: fd
-              });
-              if (!res.ok) throw new Error(await res.text());
-
-              const { id, nombre } = await res.json();
-
-              // Agregar al select si no existe, y seleccionarlo
-              let opt = Array.from(select.options).find(o => o.value == id);
-              if (!opt) {
-                opt = new Option(nombre, id, true, true);
-                select.add(opt);
-              } else {
-                opt.selected = true;
-              }
-
-              // Cerrar modal y limpiar
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevoPuesto')).hide();
-                      form.reset();
-              form.querySelector('input[name="Moneda"]').value = 'CRC';
-              form.querySelector('#PuestoActivo').checked = true;
-
-            } catch (err) {
-              errorBox.textContent = err?.message || 'No se pudo crear el puesto.';
-              errorBox.classList.remove('d-none');
-            }
-          });
-        })();
-    </script>
-}
 

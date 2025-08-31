@@ -53,7 +53,6 @@
             &copy; 2025 - CEGA
         </div>
     </footer>
-
     <!-- Modal genérico -->
     <div class="modal fade" id="modalDynamic" tabindex="-1" aria-hidden="true" aria-labelledby="modalDynamicLabel">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -68,21 +67,36 @@
         </div>
     </div>
 
+    @await Html.PartialAsync("_ModalNuevoPuesto")
+
+
+    <!-- Librerías en el orden correcto -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- Tu JS global -->
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <!-- Script inline (openModal, helper para modal hijo y helpers) -->
     <script>
-        // Modal dinámico reutilizable
+              document.addEventListener('shown.bs.modal', function (ev) {
+          if (ev.target.id === 'modalNuevoPuesto') {
+            // Marca el backdrop más reciente como "del hijo" para aplicar el z-index especial
+            const backs = document.querySelectorAll('.modal-backdrop');
+            backs[backs.length - 1]?.classList.add('modal-backdrop-child');
+          }
+        });
+        // Modal dinámico reutilizable (padre)
         async function openModal(url, titulo) {
           const modalEl = document.getElementById('modalDynamic');
           const titleEl = document.getElementById('modalDynamicLabel');
           const bodyEl  = modalEl.querySelector('.modal-body');
           const modal   = bootstrap.Modal.getOrCreateInstance(modalEl);
 
-          // Título
           if (titleEl) titleEl.textContent = titulo || 'Detalle';
 
-          // Placeholder de carga
           bodyEl.innerHTML = `
             <div class="d-flex align-items-center justify-content-center py-5">
               <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
@@ -96,19 +110,10 @@
             const res  = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, cache: 'no-store' });
             const html = await res.text();
 
-            // Inyecta HTML
             bodyEl.innerHTML = html;
-
-            // Ejecuta <script> del HTML inyectado (por defecto no se ejecutan)
             runInlineScripts(bodyEl);
-
-            // Re-wire validación unobtrusive si está disponible
             wireUnobtrusiveValidation(bodyEl);
-
-            // Auto-focus
             focusFirstField(bodyEl);
-
-            // Enlaces y forms que recargan dentro del MISMO modal
             wireModalInternalLoads(bodyEl);
 
           } catch (e) {
@@ -119,70 +124,49 @@
             `;
           }
         }
-                // Delegación de click para botones dentro del contenido cargado por openModal
-        document.addEventListener('click', function (ev) {
-          const btn = ev.target.closest('[data-open-child]');
-          if (!btn) return;
 
-          ev.preventDefault();
-          const childSel = btn.getAttribute('data-open-child');
-          const parentEl = document.getElementById('#modalDynamic'); // <-- pon aquí tu id real
-          const childEl  = document.querySelector(childSel);
-          if (!parentEl || !childEl) return;
+        // === Helper sencillo: abrir modal hijo (swap básico) ===
+        // Úsalo así en el botón: onclick="openChildModal('#modalNuevoPuesto', this)"
+        function openChildModal(childSel, trigger) {
+          const childEl = document.querySelector(childSel);
+          if (!childEl) { console.warn('No se encontró el modal hijo:', childSel); return; }
+
+          // Evita conflictos de foco/aria
+          try { document.activeElement?.blur(); } catch {}
+
+          // Detectar modal padre real (ancestro .modal del botón)
+          const parentEl = trigger?.closest ? trigger.closest('.modal') : null;
+
+          // Si Register está como página normal (sin modal padre), abre el hijo directo
+          if (!parentEl) {
+            bootstrap.Modal.getOrCreateInstance(childEl).show();
+            return;
+          }
 
           const parent = bootstrap.Modal.getOrCreateInstance(parentEl);
-          // cuando el padre termine de ocultarse, abrimos el hijo
           parentEl.addEventListener('hidden.bs.modal', function onHidden() {
             parentEl.removeEventListener('hidden.bs.modal', onHidden);
-            const child = bootstrap.Modal.getOrCreateInstance(childEl);
-            child.show();
+            // Abrir hijo inmediatamente tras cerrar el padre
+            bootstrap.Modal.getOrCreateInstance(childEl).show();
           }, { once: true });
 
           parent.hide();
-        });
-
-                document.addEventListener('hidden.bs.modal', function (ev) {
-          const childEl = ev.target;
-          if (childEl.id !== 'modalNuevoPuesto') return; // solo actuamos al cerrar el hijo
-
-          const parentEl = document.getElementById('#modalDynamic'); // <-- tu id real
-          if (!parentEl) return;
-
-          const parent = bootstrap.Modal.getOrCreateInstance(parentEl);
-          parent.show();
-
-          // al reabrirse el padre, enfocamos el select de Puesto
-          parentEl.addEventListener('shown.bs.modal', function onShown() {
-            parentEl.removeEventListener('shown.bs.modal', onShown);
-            document.getElementById('PuestoId')?.focus();
-          }, { once: true });
-        });
-
+        }
 
         // ---- Helpers ----
-
         function runInlineScripts(scope) {
           const scripts = scope.querySelectorAll('script');
           scripts.forEach(s => {
             const newS = document.createElement('script');
-            // Copia atributos (p.ej. type="module")
             for (const attr of s.attributes) newS.setAttribute(attr.name, attr.value);
-            if (s.src) {
-              newS.src = s.src; // si vino con src, se vuelve a cargar
-            } else {
-              newS.textContent = s.textContent; // inline
-            }
-            // Inserta al final del body para asegurar ejecución
+            if (s.src) newS.src = s.src; else newS.textContent = s.textContent;
             document.body.appendChild(newS);
-            // Limpieza opcional
-            // setTimeout(() => newS.remove(), 0);
           });
         }
 
         function wireUnobtrusiveValidation(scope) {
           if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
             const $ = window.jQuery;
-            // limpia y vuelve a parsear
             $(scope).removeData("validator");
             $(scope).removeData("unobtrusiveValidation");
             $.validator.unobtrusive.parse(scope);
@@ -193,14 +177,10 @@
           const target =
             scope.querySelector('[autofocus]') ||
             scope.querySelector('input:not([type=hidden]):not([disabled]), select, textarea, button');
-          if (target) {
-            try { target.focus(); } catch {}
-          }
+          if (target) { try { target.focus(); } catch {} }
         }
 
-        // Permite dentro del modal:
-        //  - <a data-modal-load href="/ruta">…</a>   -> recarga el cuerpo del modal
-        //  - <form data-modal-post> … </form>        -> POST por fetch y reemplaza cuerpo
+        // Links internos y forms que recargan dentro del MISMO modal (padre)
         function wireModalInternalLoads(scope) {
           // Links
           scope.querySelectorAll('a[data-modal-load]').forEach(a => {
@@ -231,15 +211,13 @@
               const bodyEl = document.querySelector('#modalDynamic .modal-body');
               const fd = new FormData(form);
               const res = await fetch(form.action || window.location.href, {
-                method: form.method?.toUpperCase() || 'POST',
+                method: (form.method || 'POST').toUpperCase(),
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 body: fd
               });
               const ct = res.headers.get('content-type') || '';
               const txt = await res.text();
 
-              // Si el servidor devuelve HTML (errores o siguiente paso), lo inyectamos;
-              // si devuelve JSON { ok: true }, puedes cerrar el modal o mostrar success.
               if (ct.includes('text/html')) {
                 bodyEl.innerHTML = txt;
                 runInlineScripts(bodyEl);
@@ -250,7 +228,6 @@
                 try {
                   const data = JSON.parse(txt);
                   if (data?.ok) {
-                    // Ejemplo: cerrar modal
                     const modalEl = document.getElementById('modalDynamic');
                     bootstrap.Modal.getInstance(modalEl)?.hide();
                   } else {
@@ -266,13 +243,7 @@
           });
         }
     </script>
-    @await RenderSectionAsync("Modals", required: false)
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
-
-
-@section Modals {
-    @await Html.PartialAsync("_ModalNuevoPuesto")
-}
