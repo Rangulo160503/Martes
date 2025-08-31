@@ -24,19 +24,19 @@
         <span asp-validation-for="Nombre" class="text-danger"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="SegundoNombre" class="form-label"></label>
+        <label asp-for="SegundoNombre" class="form-label">Segundo nombre</label>
         <input asp-for="SegundoNombre" class="form-control" />
         <span asp-validation-for="SegundoNombre" class="text-danger"></span>
     </div>
 
     <!-- Apellidos -->
     <div class="col-md-4">
-        <label asp-for="Apellido1" class="form-label"></label>
+        <label asp-for="Apellido1" class="form-label">Apellido 1</label>
         <input asp-for="Apellido1" class="form-control" />
         <span asp-validation-for="Apellido1" class="text-danger"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="Apellido2" class="form-label"></label>
+        <label asp-for="Apellido2" class="form-label">Apellido 2</label>
         <input asp-for="Apellido2" class="form-control" />
         <span asp-validation-for="Apellido2" class="text-danger"></span>
     </div>
@@ -83,19 +83,19 @@
         <span asp-validation-for="Sexo" class="text-danger"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="FechaNacimiento" class="form-label"></label>
+        <label asp-for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
         <input asp-for="FechaNacimiento" type="date" class="form-control" />
         <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
     </div>
     <div class="col-md-4">
-        <label asp-for="FechaIngreso" class="form-label"></label>
+        <label asp-for="FechaIngreso" class="form-label">Fecha de ingreso</label>
         <input asp-for="FechaIngreso" type="date" class="form-control" />
         <span asp-validation-for="FechaIngreso" class="text-danger"></span>
     </div>
 
     <!-- Médicos / emergencia -->
     <div class="col-md-3">
-        <label asp-for="TipoSangre" class="form-label"></label>
+        <label asp-for="TipoSangre" class="form-label">Tipo de sangre</label>
         <input asp-for="TipoSangre" class="form-control" placeholder="O+, A-, AB..." />
         <span asp-validation-for="TipoSangre" class="text-danger"></span>
     </div>
@@ -105,7 +105,7 @@
         <span asp-validation-for="Alergias" class="text-danger"></span>
     </div>
     <div class="col-md-6">
-        <label asp-for="ContactoEmergenciaNombre" class="form-label"></label>
+        <label asp-for="ContactoEmergenciaNombre" class="form-label">Nombre teléfono de emergencia</label>
         <input asp-for="ContactoEmergenciaNombre" class="form-control" />
         <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
     </div>
@@ -118,22 +118,18 @@
         <span asp-validation-for="ContactoEmergenciaTelefono" class="text-danger"></span>
     </div>
     <div class="col-md-6">
-        <label asp-for="PolizaSeguro" class="form-label"></label>
+        <label asp-for="PolizaSeguro" class="form-label">Numero de poliza de seguro</label>
         <input asp-for="PolizaSeguro" class="form-control" />
         <span asp-validation-for="PolizaSeguro" class="text-danger"></span>
     </div>
 
     <!-- Puesto -->
     <div class="col-md-6">
-        <label asp-for="PuestoId" class="form-label"></label>
+        <label asp-for="PuestoId" class="form-label">Id de puesto</label>
         <div class="input-group">
             <select asp-for="PuestoId" asp-items="Model.Puestos" class="form-select" id="PuestoId">
                 <option value="">— Seleccione un puesto —</option>
             </select>
-            <button type="button" class="btn btn-outline-primary"
-                    data-bs-toggle="modal" data-bs-target="#modalNuevoPuesto">
-                Nuevo
-            </button>
         </div>
         <span asp-validation-for="PuestoId" class="text-danger"></span>
     </div>
@@ -144,10 +140,9 @@
     </div>
 </form>
 
-<!-- Modal: Nuevo Puesto (FUERA del form principal) -->
 <div class="modal fade" id="modalNuevoPuesto" tabindex="-1" aria-hidden="true"
      data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <form id="formNuevoPuesto" class="modal-content bg-white" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-header">
@@ -157,53 +152,60 @@
             <div class="modal-body">
                 <div class="row g-3">
                     <!-- Identificación -->
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-4">
                         <label class="form-label">Código</label>
                         <input name="Codigo" class="form-control" maxlength="20" required>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-12 col-sm-8">
                         <label class="form-label">Nombre</label>
                         <input name="Nombre" class="form-control" maxlength="100" required>
                     </div>
 
-                    <div class="col-md-6">
+                    <!-- Departamento / Nivel -->
+                    <div class="col-12 col-sm-6">
                         <label class="form-label">Departamento</label>
                         <input name="Departamento" class="form-control" maxlength="200">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-sm-6">
                         <label class="form-label">Nivel</label>
                         <input name="Nivel" class="form-control" maxlength="100" placeholder="Junior / Senior / Gerencial">
                     </div>
 
-                    <!-- Características -->
+                    <!-- Descripción -->
                     <div class="col-12">
                         <label class="form-label">Descripción</label>
                         <textarea name="Descripcion" class="form-control" maxlength="500" rows="2" required></textarea>
                     </div>
+
+                    <!-- Requisitos -->
                     <div class="col-12">
                         <label class="form-label">Requisitos</label>
                         <textarea name="Requisitos" class="form-control" maxlength="500" rows="2"></textarea>
                     </div>
 
-                    <!-- Condiciones -->
-                    <div class="col-md-4">
+                    <!-- Condiciones económicas -->
+                    <div class="col-12 col-sm-4">
                         <label class="form-label">Salario base</label>
                         <input name="SalarioBase" type="number" step="0.01" min="0" class="form-control">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-4">
                         <label class="form-label">Moneda</label>
                         <input name="Moneda" class="form-control" maxlength="50" value="CRC">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-4">
                         <label class="form-label">Jornada</label>
                         <input name="Jornada" class="form-control" maxlength="100" placeholder="Tiempo completo / Medio tiempo">
                     </div>
 
-                    <div class="col-12 form-check mt-2">
-                        <input class="form-check-input" type="checkbox" name="Activo" id="PuestoActivo" checked>
-                        <label class="form-check-label" for="PuestoActivo">Activo</label>
+                    <!-- Activo -->
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="Activo" id="PuestoActivo" checked>
+                            <label class="form-check-label" for="PuestoActivo">Activo</label>
+                        </div>
                     </div>
 
+                    <!-- Errores -->
                     <div class="col-12">
                         <div class="text-danger small d-none" id="errorNuevoPuesto"></div>
                     </div>

@@ -175,3 +175,4 @@ C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes2\CEGA\obj\Debug\net8.0
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes2\CEGA\obj\Debug\net8.0\CEGA.pdb
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes2\CEGA\obj\Debug\net8.0\CEGA.genruntimeconfig.cache
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes2\CEGA\obj\Debug\net8.0\ref\CEGA.dll
+C:\Users\rangulo\Documents\CEGAA\CEGA\CEGA\obj\Debug\net8.0\CEGA.sourcelink.json

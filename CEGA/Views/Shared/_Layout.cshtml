@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="app">
     @if (User?.Identity?.IsAuthenticated == true)
     {
         <header>
@@ -54,8 +54,182 @@
         </div>
     </footer>
 
+    <!-- Modal genérico -->
+    <div class="modal fade" id="modalDynamic" tabindex="-1" aria-hidden="true" aria-labelledby="modalDynamicLabel">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDynamicLabel">Cargando...</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-5 text-muted">Cargando contenido...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Modal dinámico reutilizable
+        async function openModal(url, titulo) {
+          const modalEl = document.getElementById('modalDynamic');
+          const titleEl = document.getElementById('modalDynamicLabel');
+          const bodyEl  = modalEl.querySelector('.modal-body');
+          const modal   = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+          // Título
+          if (titleEl) titleEl.textContent = titulo || 'Detalle';
+
+          // Placeholder de carga
+          bodyEl.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center py-5">
+              <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
+              <span>Cargando contenido…</span>
+            </div>
+          `;
+
+          modal.show();
+
+          try {
+            const res  = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, cache: 'no-store' });
+            const html = await res.text();
+
+            // Inyecta HTML
+            bodyEl.innerHTML = html;
+
+            // Ejecuta <script> del HTML inyectado (por defecto no se ejecutan)
+            runInlineScripts(bodyEl);
+
+            // Re-wire validación unobtrusive si está disponible
+            wireUnobtrusiveValidation(bodyEl);
+
+            // Auto-focus
+            focusFirstField(bodyEl);
+
+            // Enlaces y forms que recargan dentro del MISMO modal
+            wireModalInternalLoads(bodyEl);
+
+          } catch (e) {
+            bodyEl.innerHTML = `
+              <div class="alert alert-danger" role="alert">
+                No se pudo cargar el contenido. ${e?.message ? `<br><small class="text-muted">${e.message}</small>` : ''}
+              </div>
+            `;
+          }
+        }
+
+        // ---- Helpers ----
+
+        function runInlineScripts(scope) {
+          const scripts = scope.querySelectorAll('script');
+          scripts.forEach(s => {
+            const newS = document.createElement('script');
+            // Copia atributos (p.ej. type="module")
+            for (const attr of s.attributes) newS.setAttribute(attr.name, attr.value);
+            if (s.src) {
+              newS.src = s.src; // si vino con src, se vuelve a cargar
+            } else {
+              newS.textContent = s.textContent; // inline
+            }
+            // Inserta al final del body para asegurar ejecución
+            document.body.appendChild(newS);
+            // Limpieza opcional
+            // setTimeout(() => newS.remove(), 0);
+          });
+        }
+
+        function wireUnobtrusiveValidation(scope) {
+          if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
+            const $ = window.jQuery;
+            // limpia y vuelve a parsear
+            $(scope).removeData("validator");
+            $(scope).removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse(scope);
+          }
+        }
+
+        function focusFirstField(scope) {
+          const target =
+            scope.querySelector('[autofocus]') ||
+            scope.querySelector('input:not([type=hidden]):not([disabled]), select, textarea, button');
+          if (target) {
+            try { target.focus(); } catch {}
+          }
+        }
+
+        // Permite dentro del modal:
+        //  - <a data-modal-load href="/ruta">…</a>   -> recarga el cuerpo del modal
+        //  - <form data-modal-post> … </form>        -> POST por fetch y reemplaza cuerpo
+        function wireModalInternalLoads(scope) {
+          // Links
+          scope.querySelectorAll('a[data-modal-load]').forEach(a => {
+            a.addEventListener('click', async (e) => {
+              e.preventDefault();
+              const href = a.getAttribute('href');
+              if (!href) return;
+              const bodyEl = document.querySelector('#modalDynamic .modal-body');
+              bodyEl.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center py-4">
+                  <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
+                  <span>Cargando…</span>
+                </div>`;
+              const res  = await fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, cache: 'no-store' });
+              const html = await res.text();
+              bodyEl.innerHTML = html;
+              runInlineScripts(bodyEl);
+              wireUnobtrusiveValidation(bodyEl);
+              focusFirstField(bodyEl);
+              wireModalInternalLoads(bodyEl);
+            });
+          });
+
+          // Forms
+          scope.querySelectorAll('form[data-modal-post]').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              const bodyEl = document.querySelector('#modalDynamic .modal-body');
+              const fd = new FormData(form);
+              const res = await fetch(form.action || window.location.href, {
+                method: form.method?.toUpperCase() || 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: fd
+              });
+              const ct = res.headers.get('content-type') || '';
+              const txt = await res.text();
+
+              // Si el servidor devuelve HTML (errores o siguiente paso), lo inyectamos;
+              // si devuelve JSON { ok: true }, puedes cerrar el modal o mostrar success.
+              if (ct.includes('text/html')) {
+                bodyEl.innerHTML = txt;
+                runInlineScripts(bodyEl);
+                wireUnobtrusiveValidation(bodyEl);
+                focusFirstField(bodyEl);
+                wireModalInternalLoads(bodyEl);
+              } else if (ct.includes('application/json')) {
+                try {
+                  const data = JSON.parse(txt);
+                  if (data?.ok) {
+                    // Ejemplo: cerrar modal
+                    const modalEl = document.getElementById('modalDynamic');
+                    bootstrap.Modal.getInstance(modalEl)?.hide();
+                  } else {
+                    bodyEl.innerHTML = `<div class="alert alert-warning">Operación no completada.</div>`;
+                  }
+                } catch {
+                  bodyEl.innerHTML = `<div class="alert alert-warning">Respuesta inesperada del servidor.</div>`;
+                }
+              } else {
+                bodyEl.innerHTML = txt;
+              }
+            });
+          });
+        }
+    </script>
+    @await RenderSectionAsync("Modals", required: false)
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

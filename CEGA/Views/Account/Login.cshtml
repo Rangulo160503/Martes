@@ -42,7 +42,11 @@
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-success">Entrar</button>
-                                <a asp-action="Register" class="btn btn-outline-primary">Crear cuenta</a>
+                                <button type="button" class="btn btn-primary"
+                                        onclick="openModal('@Url.Action("Register", "Account")','Crear cuenta')">
+                                    Crear cuenta
+                                </button>
+
                             </div>
                         </form>
                     </div>

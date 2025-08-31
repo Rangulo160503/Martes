@@ -1,22 +1,50 @@
+/* —— Escala tipográfica (no puede ir “.app html”; debe ser global) —— */
 html {
-  font-size: 14px;
+    font-size: 16px; /* fijo para que rem = 16px en todo el sitio */
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
+    /* redundante, pero explícito */
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* —— Márgenes del body solo para tu app —— */
+/* Agrega class="app" al <body> si querés este margen solo en tu app */
+body.app {
+    margin-bottom: 60px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    /* —— Focus ring solo dentro de tu app —— */
+    body.app :is(.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus) {
+        box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem var(--bs-primary, #258cfb);
+        outline: 0;
+    }
+
+/* —— Dimming del modal padre (Register dentro de #modalDynamic) —— */
+#modalDynamic .modal-content.dimmed {
+    position: relative;
 }
 
-body {
-  margin-bottom: 60px;
+    /* El overlay bloquea clicks sobre el modal padre, pero deja pasar al hijo */
+    #modalDynamic .modal-content.dimmed::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        z-index: 1060; /* por debajo de un modal hijo en 1061 */
+        pointer-events: auto; /* bloquea interacción con el padre */
+    }
+
+    /* Opcional: leve blur para destacar el hijo */
+    #modalDynamic .modal-content.dimmed .modal-body {
+        filter: blur(1px);
+    }
+
+/* Asegura que el modal “hijo” esté por encima del overlay del padre */
+.modal.modal-foreground {
+    z-index: 1061;
 }
