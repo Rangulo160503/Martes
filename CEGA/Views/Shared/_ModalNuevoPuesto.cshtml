@@ -1,138 +1,84 @@
-﻿@* Modal global para crear Puesto *@
-<div class="modal fade modal-foreground" id="modalNuevoPuesto" tabindex="-1"
-     aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <form id="formNuevoPuesto" class="modal-content bg-white" method="post">
+﻿<div class="modal fade" id="modalNuevoPuesto" tabindex="-1" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modalNuevoPuestoLabel">
+    <div class="modal-dialog">
+        <form id="formNuevoPuesto" class="modal-content">
             @Html.AntiForgeryToken()
 
             <div class="modal-header">
-                <h5 class="modal-title">Crear puesto</h5>
+                <h5 class="modal-title" id="modalNuevoPuestoLabel">Crear puesto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <div class="modal-body">
-                <div class="row g-3">
-                    <!-- Identificación -->
-                    <div class="col-12 col-sm-4">
-                        <label class="form-label">Código</label>
-                        <input name="Codigo" class="form-control" maxlength="20" required>
-                    </div>
-                    <div class="col-12 col-sm-8">
-                        <label class="form-label">Nombre</label>
-                        <input name="Nombre" class="form-control" maxlength="100" required>
-                    </div>
-
-                    <!-- Departamento / Nivel -->
-                    <div class="col-12 col-sm-6">
-                        <label class="form-label">Departamento</label>
-                        <input name="Departamento" class="form-control" maxlength="200">
-                    </div>
-                    <div class="col-12 col-sm-6">
-                        <label class="form-label">Nivel</label>
-                        <input name="Nivel" class="form-control" maxlength="100" placeholder="Junior / Senior / Gerencial">
-                    </div>
-
-                    <!-- Descripción -->
-                    <div class="col-12">
-                        <label class="form-label">Descripción</label>
-                        <textarea name="Descripcion" class="form-control" maxlength="500" rows="2" required></textarea>
-                    </div>
-
-                    <!-- Requisitos -->
-                    <div class="col-12">
-                        <label class="form-label">Requisitos</label>
-                        <textarea name="Requisitos" class="form-control" maxlength="500" rows="2"></textarea>
-                    </div>
-
-                    <!-- Condiciones económicas -->
-                    <div class="col-12 col-sm-4">
-                        <label class="form-label">Salario base</label>
-                        <input name="SalarioBase" type="number" step="0.01" min="0" class="form-control">
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <label class="form-label">Moneda</label>
-                        <input name="Moneda" class="form-control" maxlength="50" value="CRC">
-                    </div>
-                    <div class="col-12 col-sm-4">
-                        <label class="form-label">Jornada</label>
-                        <input name="Jornada" class="form-control" maxlength="100" placeholder="Tiempo completo / Medio tiempo">
-                    </div>
-
-                    <!-- Activo -->
-                    <div class="col-12">
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" name="Activo" id="PuestoActivo" checked>
-                            <label class="form-check-label" for="PuestoActivo">Activo</label>
-                        </div>
-                    </div>
-
-                    <!-- Errores -->
-                    <div class="col-12">
-                        <div class="text-danger small d-none" id="errorNuevoPuesto"></div>
-                    </div>
+                <div class="mb-3">
+                    <label for="Puesto_Nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="Puesto_Nombre" name="Nombre" required />
+                    <div class="invalid-feedback">Campo obligatorio.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="Puesto_Codigo" class="form-label">Código (opcional)</label>
+                    <input type="text" class="form-control" id="Puesto_Codigo" name="Codigo" />
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    (function(){
-      const modal = document.getElementById('modalNuevoPuesto');
-      if (!modal) return;
-
-      // 1) Oscurecer SOLO el modal padre (Register dentro de #modalDynamic)
-      const parentModalContent = document.querySelector('#modalDynamic .modal-content');
-      modal.addEventListener('shown.bs.modal', () => parentModalContent?.classList.add('dimmed'));
-      modal.addEventListener('hidden.bs.modal', () => parentModalContent?.classList.remove('dimmed'));
-
-      // 2) Envío AJAX para crear Puesto y actualizar el <select> del Register
-      const form = modal.querySelector('#formNuevoPuesto');
-      const errorBox = modal.querySelector('#errorNuevoPuesto');
-
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('formNuevoPuesto');
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (errorBox) { errorBox.classList.add('d-none'); errorBox.textContent = ''; }
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
 
         try {
-          const res = await fetch('@Url.Action("CreateInline", "Puesto")', {
+          const res = await fetch('@Url.Action("CrearRapido", "Puesto")', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: new FormData(form)
           });
-          if (!res.ok) throw new Error(await res.text());
-          const { id, nombre } = await res.json();
+          if (!res.ok) throw new Error('No se pudo guardar el puesto.');
+          const { id, nombre } = await res.json(); // { id, nombre }
 
-          // Selecciona el <select> dentro del modal de Register
-          const select = document.querySelector('#modalDynamic #PuestoId') || document.getElementById('PuestoId');
-          if (select) {
-            let opt = Array.from(select.options).find(o => o.value == String(id));
+          const sel = document.getElementById('PuestoId');
+          if (sel) {
+            // 1) habilitar y limpiar placeholder si no había
+            if (sel.hasAttribute('disabled')) {
+              sel.removeAttribute('disabled');
+              sel.classList.remove('is-empty');
+              if (sel.options.length === 1 && sel.options[0].value === "") {
+                sel.options[0].text = "— Seleccione un puesto —";
+              }
+            }
+
+            // 2) agregar la opción nueva (y seleccionarla)
+            let opt = Array.from(sel.options).find(o => o.value == id);
             if (!opt) {
               opt = new Option(nombre, id, true, true);
-              select.add(opt);
+              sel.add(opt);
             } else {
               opt.selected = true;
             }
+            sel.value = id;
+            sel.dispatchEvent(new Event('change'));
           }
 
-          bootstrap.Modal.getInstance(modal)?.hide();
+          // 3) cerrar modal y resetear form
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevoPuesto')).hide();
           form.reset();
-          const moneda = form.querySelector('input[name="Moneda"]');
-          if (moneda) moneda.value = 'CRC';
-          const activo = form.querySelector('#PuestoActivo');
-          if (activo) activo.checked = true;
-
+          form.querySelector('input[name="Moneda"]').value = 'CRC'; // default
+          form.querySelector('#PuestoActivo').checked = true;       // default
         } catch (err) {
-          if (errorBox) {
-            errorBox.textContent = err?.message || 'No se pudo crear el puesto.';
-            errorBox.classList.remove('d-none');
-          }
+          alert(err.message || 'Error inesperado.');
+        } finally {
+          btn.disabled = false;
         }
       });
-    })();
+    });
 </script>

@@ -48,3 +48,17 @@ body.app {
 .modal.modal-foreground {
     z-index: 1061;
 }
+
+/* Select sin datos: look deshabilitado pero limpio */
+.form-select.is-empty {
+    background-color: #f8f9fa; /* gris suave */
+    color: #6c757d; /* texto más tenue */
+    opacity: 1; /* mantener contraste del texto */
+    cursor: not-allowed;
+}
+
+/* Unión visual perfecta con el botón del input-group */
+.input-group > .form-select + .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

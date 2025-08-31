@@ -119,6 +119,45 @@
             `;
           }
         }
+                // Delegación de click para botones dentro del contenido cargado por openModal
+        document.addEventListener('click', function (ev) {
+          const btn = ev.target.closest('[data-open-child]');
+          if (!btn) return;
+
+          ev.preventDefault();
+          const childSel = btn.getAttribute('data-open-child');
+          const parentEl = document.getElementById('#modalDynamic'); // <-- pon aquí tu id real
+          const childEl  = document.querySelector(childSel);
+          if (!parentEl || !childEl) return;
+
+          const parent = bootstrap.Modal.getOrCreateInstance(parentEl);
+          // cuando el padre termine de ocultarse, abrimos el hijo
+          parentEl.addEventListener('hidden.bs.modal', function onHidden() {
+            parentEl.removeEventListener('hidden.bs.modal', onHidden);
+            const child = bootstrap.Modal.getOrCreateInstance(childEl);
+            child.show();
+          }, { once: true });
+
+          parent.hide();
+        });
+
+                document.addEventListener('hidden.bs.modal', function (ev) {
+          const childEl = ev.target;
+          if (childEl.id !== 'modalNuevoPuesto') return; // solo actuamos al cerrar el hijo
+
+          const parentEl = document.getElementById('#modalDynamic'); // <-- tu id real
+          if (!parentEl) return;
+
+          const parent = bootstrap.Modal.getOrCreateInstance(parentEl);
+          parent.show();
+
+          // al reabrirse el padre, enfocamos el select de Puesto
+          parentEl.addEventListener('shown.bs.modal', function onShown() {
+            parentEl.removeEventListener('shown.bs.modal', onShown);
+            document.getElementById('PuestoId')?.focus();
+          }, { once: true });
+        });
+
 
         // ---- Helpers ----
 
@@ -229,7 +268,11 @@
     </script>
     @await RenderSectionAsync("Modals", required: false)
 
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+
+@section Modals {
+    @await Html.PartialAsync("_ModalNuevoPuesto")
+}
