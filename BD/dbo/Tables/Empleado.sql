@@ -1,5 +1,4 @@
 ﻿CREATE TABLE [dbo].[Empleado] (
-    [Cedula]                     NVARCHAR (12)  NOT NULL,
     [Nombre]                     NVARCHAR (100) NOT NULL,
     [SegundoNombre]              NVARCHAR (100) NULL,
     [Apellido1]                  NVARCHAR (100) NOT NULL,
@@ -19,7 +18,10 @@
     [ContactoEmergenciaTelefono] NVARCHAR (20)  NULL,
     [PolizaSeguro]               NVARCHAR (100) NULL,
     [PuestoId]                   INT            NOT NULL,
-    PRIMARY KEY CLUSTERED ([Cedula] ASC),
+    [Rol]                        TINYINT        CONSTRAINT [DF_Empleado_Rol] DEFAULT ((1)) NOT NULL,
+    [ResetTokenHash]             NVARCHAR (200) NULL,
+    [ResetTokenExpiraEn]         DATETIME2 (7)  NULL,
+    [Cedula]                     INT            NULL,
     CONSTRAINT [FK_Empleado_Puesto] FOREIGN KEY ([PuestoId]) REFERENCES [dbo].[Puesto] ([Id]) ON UPDATE CASCADE,
     UNIQUE NONCLUSTERED ([Email] ASC),
     UNIQUE NONCLUSTERED ([Username] ASC)
