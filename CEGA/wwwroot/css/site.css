@@ -3,7 +3,6 @@
    =========================== */
 :root {
     --brand: #184a3e; /* verde oscuro */
-    --brand-2: #1f6d52; /* verde medio */
     --brand-text: #eaf5f0; /* texto claro */
     --brand-border: #0f2f27; /* borde oscuro */
     --accent: #7fe3be; /* acento sutil */
@@ -37,9 +36,9 @@ body.app {
 /* ===========================
    Navbar CEGA (superior)
    =========================== */
+/* Verde sólido en topbar y sidebar */
 .navbar-cega {
-    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-2) 100%);
-    border-bottom: 1px solid var(--brand-border);
+    background: var(--brand); /* sólido */
 }
 
     .navbar-cega .navbar-brand {
@@ -142,7 +141,7 @@ body.app {
 /* Sidebar CEGA con misma paleta del topbar y alineado bajo el topbar */
 .sidebar-cega {
     width: 260px;
-    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-2) 100%);
+    background: var(--brand-2) 100%);
     color: #fff;
     position: sticky;
     top: var(--topbar-h); /* se “pega” bajo el topbar */
@@ -256,17 +255,6 @@ body.app {
         min-height: auto;
     }
 }
-
-/* Verde sólido en topbar y sidebar */
-.navbar-cega {
-    background: var(--brand) !important; /* sólido */
-}
-
 .sidebar-cega {
-    background: var(--brand) !important; /* sólido */
-}
-
-/* (opcional) si quieres otro tono, cambia esta variable */
-:root {
-    --brand: #184a3e; /* verde sólido principal */
+    background: var(--brand); /* sólido */
 }
