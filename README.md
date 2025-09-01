@@ -8,32 +8,44 @@ erDiagram
     %% ======================
     %%   MÓDULO DE EMPLEADOS
     %% ======================
-    EMPLEADO {
-        int Cedula PK "CR: 9 dígitos, solo números"
-        string Nombre
-        string SegundoNombre
-        string Apellido1
-        string Apellido2
-        string Username UK "inicial nombre + apellido1 + inicial apellido2; minúsculas; sin tildes/ñ"
-        string Email UK
-        string TelefonoPersonal "8 dígitos (UI agrega +506)"
-        string TelefonoEmergencia "8 dígitos (UI agrega +506)"
-        string Sexo "M/F/X/Prefiero no decir"
-        date   FechaNacimiento
-        date   FechaIngreso "≥ FechaNacimiento + 18 años"
-        string TipoSangre
-        string Alergias
-        string ContactoEmergenciaNombre
-        string ContactoEmergenciaTelefono
-        string PolizaSeguro
-        int    PuestoId FK "Obligatorio"
+      EMPLEADO {
+        int      Cedula PK
+        string   Nombre
+        string   SegundoNombre
+        string   Apellido1
+        string   Apellido2
+        string   Username UK
+        string   Email UK
+        string   PasswordHash
+        boolean  Activo
+        string   TelefonoPersonal
+        string   TelefonoEmergencia
+        string   Sexo
+        date     FechaNacimiento
+        date     FechaIngreso
+        string   TipoSangre
+        string   Alergias
+        string   ContactoEmergenciaNombre
+        string   ContactoEmergenciaTelefono
+        string   PolizaSeguro
+        int      PuestoId FK
+        tinyint  Rol
+        string   ResetTokenHash
+        datetime ResetTokenExpiraEn
     }
 
     PUESTO {
-        int    Id PK
-        string Nombre
-        string Descripcion
+        int     Id PK
+        string  Nombre
         boolean Activo
+        string  Codigo
+        string  Departamento
+        string  Descripcion
+        string  Requisitos
+        string  Nivel
+        decimal SalarioBase
+        string  Moneda
+        string  Jornada
     }
 
     SALARIO {
@@ -77,7 +89,7 @@ erDiagram
     }
 
     %% Relaciones (Empleados)
-    PUESTO   ||--o{ EMPLEADO    : "tiene"
+    PUESTO ||--o{ EMPLEADO : "asignado a"
     EMPLEADO ||--o{ SALARIO     : "tiene"
     PUESTO   ||--o{ SALARIO     : "aplica a"
     EMPLEADO ||--o{ VACACION    : "solicita"
