@@ -8,264 +8,149 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body class="app">
-    @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom mb-3">
-                <div class="container">
-                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">CEGA</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
 
-                    <div id="topNav" class="collapse navbar-collapse">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
-                            </li>
-                        </ul>
+    <!-- TOP NAVBAR (siempre visible) -->
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark navbar-cega sticky-top-cega shadow-sm mb-0">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">CEGA</a>
 
-                        <ul class="navbar-nav ms-auto">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div id="topNav" class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
                             <li class="nav-item">
                                 <span class="navbar-text me-2">Hola, @User.Identity!.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button class="btn btn-outline-secondary btn-sm">Cerrar sesión</button>
+                                    <button class="btn btn-outline-light btn-sm">Cerrar sesión</button>
                                 </form>
                             </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-    }
-
-    <div class="container">
-        <main role="main" class="pb-4">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top py-3 text-muted">
-        <div class="container">
-            &copy; 2025 - CEGA
-        </div>
-    </footer>
-
-    <!-- Modal genérico reutilizable -->
-    <div class="modal fade" id="modalDynamic" tabindex="-1" aria-hidden="true" aria-labelledby="modalDynamicLabel">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalDynamicLabel">Cargando...</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center py-5 text-muted">Cargando contenido...</div>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Registrarse</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    @* Punto de extensión para modales específicos de página *@
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <!-- SHELL con SIDEBAR + CONTENIDO -->
+        <div class="app-shell">
+            <!-- SIDEBAR (módulos) -->
+            <aside id="sidebar-cega" class="sidebar-cega">
+                <div class="sidebar-head">
+                    <button class="btn btn-sm btn-outline-light d-md-none" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#sidebarNav"
+                            aria-controls="sidebarNav" aria-expanded="false" aria-label="Menú">
+                        ☰
+                    </button>
+                </div>
+
+                <nav id="sidebarNav" class="collapse d-md-block">
+                    <a class="nav-link" asp-controller="Account" asp-action="ListaUsuarios">Gestión de Usuarios</a>
+                    <hr class="sidebar-sep" />
+                    <a class="nav-link" asp-controller="Empleados" asp-action="Empleados">Empleados</a>
+                    <hr class="sidebar-sep" />
+                    <a class="nav-link" asp-controller="Marketing" asp-action="Marketing">Marketing</a>
+                    <hr class="sidebar-sep" />
+
+                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-conta" aria-expanded="false">
+                        Contabilidad <span class="caret"></span>
+                    </button>
+                    <div id="mod-conta" class="collapse">
+                        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
+                        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
+                        <a class="nav-link nav-subitem" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
+                        <a class="nav-link nav-subitem" asp-controller="CierreDiario" asp-action="HistorialCierresRango">Reportes Financieros</a>
+                    </div>
+
+                    <hr class="sidebar-sep" />
+
+                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-report" aria-expanded="false">
+                        Reportería <span class="caret"></span>
+                    </button>
+                    <div id="mod-report" class="collapse">
+                        <a class="nav-link nav-subitem" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
+                        <a class="nav-link nav-subitem" asp-controller="ReporteIncidente" asp-action="Index">Incidentes</a>
+                    </div>
+
+                    <hr class="sidebar-sep" />
+
+                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-seg" aria-expanded="false">
+                        Seguimiento <span class="caret"></span>
+                    </button>
+                    <div id="mod-seg" class="collapse">
+                        <a class="nav-link nav-subitem" asp-controller="Proyecto" asp-action="Index">Proyectos</a>
+                        <a class="nav-link nav-subitem" asp-controller="Tarea" asp-action="Index">Tareas</a>
+                    </div>
+
+                    <hr class="sidebar-sep" />
+
+                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-pdf" aria-expanded="false">
+                        Módulo PDF <span class="caret"></span>
+                    </button>
+                    <div id="mod-pdf" class="collapse">
+                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="ListaPlanos">Lista de Planos</a>
+                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="SubirPlano">Subir Plano</a>
+                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="CompararPlanos">Comparar Planos</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- CONTENIDO -->
+            <div class="content-cega">
+                <main role="main" class="pb-4">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Sin autenticación: solo contenido (pero con top navbar arriba) -->
+        <div class="container">
+            <main role="main" class="pb-4">
+                @RenderBody()
+            </main>
+        </div>
+    }
+
+    <footer class="border-top py-3 text-muted">
+        <div class="container">&copy; 2025 - CEGA</div>
+    </footer>
+
     @RenderSection("Modals", required: false)
 
-    <!-- Librerías en el orden correcto -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-
-    <!-- Tu JS global -->
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <!-- Script inline (openModal, modal hijo y helpers) -->
-    <script>
-        // Si el modal hijo (ej. #modalNuevoPuesto) se abre sobre otro, marca el backdrop más reciente
-        document.addEventListener('shown.bs.modal', function (ev) {
-          if (ev.target.id === 'modalNuevoPuesto') {
-            const backs = document.querySelectorAll('.modal-backdrop');
-            backs[backs.length - 1]?.classList.add('modal-backdrop-child');
-          }
-        });
-
-        // Modal dinámico reutilizable (padre)
-        async function openModal(url, titulo) {
-          const modalEl = document.getElementById('modalDynamic');
-          const titleEl = document.getElementById('modalDynamicLabel');
-          const bodyEl  = modalEl.querySelector('.modal-body');
-          const modal   = bootstrap.Modal.getOrCreateInstance(modalEl);
-
-          if (titleEl) titleEl.textContent = titulo || 'Detalle';
-
-          bodyEl.innerHTML = `
-            <div class="d-flex align-items-center justify-content-center py-5">
-              <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
-              <span>Cargando contenido…</span>
-            </div>
-          `;
-
-          modal.show();
-
-          try {
-            const res  = await fetch(url, {
-              headers: { 'X-Requested-With': 'XMLHttpRequest' },
-              cache: 'no-store',
-              credentials: 'same-origin'
-            });
-            const html = await res.text();
-
-            bodyEl.innerHTML = html;
-            runInlineScripts(bodyEl);
-            wireUnobtrusiveValidation(bodyEl);
-            focusFirstField(bodyEl);
-            wireModalInternalLoads(bodyEl);
-
-          } catch (e) {
-            bodyEl.innerHTML = `
-              <div class="alert alert-danger" role="alert">
-                No se pudo cargar el contenido. ${e?.message ? `<br><small class="text-muted">${e.message}</small>` : ''}
-              </div>
-            `;
-          }
-        }
-
-        // Abre modal "hijo" desde un modal "padre"
-        function openChildModal(childSel, trigger) {
-          const childEl = document.querySelector(childSel);
-          if (!childEl) { console.warn('No se encontró el modal hijo:', childSel); return; }
-
-          try { document.activeElement?.blur(); } catch {}
-
-          const parentEl = trigger?.closest ? trigger.closest('.modal') : null;
-
-          if (!parentEl) {
-            bootstrap.Modal.getOrCreateInstance(childEl).show();
-            return;
-          }
-
-          const parent = bootstrap.Modal.getOrCreateInstance(parentEl);
-          parentEl.addEventListener('hidden.bs.modal', function onHidden() {
-            parentEl.removeEventListener('hidden.bs.modal', onHidden);
-            bootstrap.Modal.getOrCreateInstance(childEl).show();
-          }, { once: true });
-
-          parent.hide();
-        }
-
-        // ---- Helpers ----
-        function runInlineScripts(scope) {
-          const scripts = scope.querySelectorAll('script');
-          scripts.forEach(s => {
-            const newS = document.createElement('script');
-            for (const attr of s.attributes) newS.setAttribute(attr.name, attr.value);
-            if (s.src) newS.src = s.src; else newS.textContent = s.textContent;
-            document.body.appendChild(newS);
-          });
-        }
-
-        function wireUnobtrusiveValidation(scope) {
-          if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
-            const $ = window.jQuery;
-            $(scope).removeData("validator");
-            $(scope).removeData("unobtrusiveValidation");
-            $.validator.unobtrusive.parse(scope);
-          }
-        }
-
-        function focusFirstField(scope) {
-          const target =
-            scope.querySelector('[autofocus]') ||
-            scope.querySelector('input:not([type=hidden]):not([disabled]), select, textarea, button');
-          if (target) { try { target.focus(); } catch {} }
-        }
-
-        // Links y forms internos que recargan dentro del MISMO modal (padre)
-        function wireModalInternalLoads(scope) {
-          // Links
-          scope.querySelectorAll('a[data-modal-load]').forEach(a => {
-            a.addEventListener('click', async (e) => {
-              e.preventDefault();
-              const href = a.getAttribute('href');
-              if (!href) return;
-              const bodyEl = document.querySelector('#modalDynamic .modal-body');
-              bodyEl.innerHTML = `
-                <div class="d-flex align-items-center justify-content-center py-4">
-                  <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
-                  <span>Cargando…</span>
-                </div>`;
-              const res  = await fetch(href, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                cache: 'no-store',
-                credentials: 'same-origin'
-              });
-              const html = await res.text();
-              bodyEl.innerHTML = html;
-              runInlineScripts(bodyEl);
-              wireUnobtrusiveValidation(bodyEl);
-              focusFirstField(bodyEl);
-              wireModalInternalLoads(bodyEl);
-            });
-          });
-
-          // Forms (data-modal-post): envían por fetch y NO navegan
-          scope.querySelectorAll('form[data-modal-post]').forEach(form => {
-            form.addEventListener('submit', async (e) => {
-              e.preventDefault();
-              const bodyEl = document.querySelector('#modalDynamic .modal-body');
-              const fd = new FormData(form);
-              const token = form.querySelector('input[name="__RequestVerificationToken"]')?.value;
-
-              const res = await fetch(form.action || window.location.href, {
-                method: (form.method || 'POST').toUpperCase(),
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest',
-                  ...(token ? { 'RequestVerificationToken': token } : {})
-                },
-                credentials: 'same-origin',
-                body: fd
-              });
-
-              const ct  = (res.headers.get('content-type') || '').toLowerCase();
-              const txt = await res.text();
-
-              // 1) Si el servidor devuelve HTML, reinyecta (muestra validaciones)
-              if (ct.includes('text/html')) {
-                bodyEl.innerHTML = txt;
-                runInlineScripts(bodyEl);
-                wireUnobtrusiveValidation(bodyEl);
-                focusFirstField(bodyEl);
-                wireModalInternalLoads(bodyEl);
-                return;
-              }
-
-              // 2) Si devuelve JSON, procesa ok/redirect
-              let data = null;
-              if (ct.includes('application/json') || txt.trim().startsWith('{')) {
-                try { data = JSON.parse(txt); } catch {}
-              }
-
-              if (data && data.ok) {
-                if (data.redirectUrl) {
-                  // Redirige la página COMPLETA (evita que Home/Index se inyecte en el modal)
-                  window.location.href = data.redirectUrl;
-                  return;
-                }
-                // Sin redirect: sólo cierra el modal
-                const modalEl = document.getElementById('modalDynamic');
-                bootstrap.Modal.getInstance(modalEl)?.hide();
-                return;
-              }
-
-              // 3) Cualquier otra cosa: mensaje genérico
-              bodyEl.innerHTML = `<div class="alert alert-warning">Operación no completada.</div>`;
-            });
-          });
-        }
-    </script>
-
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>

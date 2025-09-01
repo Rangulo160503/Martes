@@ -1,65 +1,272 @@
-/* —— Escala tipográfica (no puede ir “.app html”; debe ser global) —— */
+/* ===========================
+   Variables de marca (unificadas)
+   =========================== */
+:root {
+    --brand: #184a3e; /* verde oscuro */
+    --brand-2: #1f6d52; /* verde medio */
+    --brand-text: #eaf5f0; /* texto claro */
+    --brand-border: #0f2f27; /* borde oscuro */
+    --accent: #7fe3be; /* acento sutil */
+    --topbar-h: 56px; /* altura del navbar superior (Bootstrap por defecto) */
+}
+
+/* ===========================
+   Tipografía / layout base
+   =========================== */
 html {
-    font-size: 16px; /* fijo para que rem = 16px en todo el sitio */
+    font-size: 16px;
     position: relative;
     min-height: 100%;
 }
 
-@media (min-width: 768px) {
+@media (min-width:768px) {
     html {
         font-size: 16px;
     }
-    /* redundante, pero explícito */
 }
 
-/* —— Márgenes del body solo para tu app —— */
-/* Agrega class="app" al <body> si querés este margen solo en tu app */
 body.app {
     margin-bottom: 60px;
 }
 
-    /* —— Focus ring solo dentro de tu app —— */
-    body.app :is(.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus) {
-        box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem var(--bs-primary, #258cfb);
+    body.app :is(.btn:focus,.btn:active:focus,.btn-link.nav-link:focus,.form-control:focus,.form-check-input:focus) {
+        box-shadow: 0 0 0 .1rem #fff,0 0 0 .25rem var(--accent);
         outline: 0;
     }
 
-/* —— Dimming del modal padre (Register dentro de #modalDynamic) —— */
+/* ===========================
+   Navbar CEGA (superior)
+   =========================== */
+.navbar-cega {
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-2) 100%);
+    border-bottom: 1px solid var(--brand-border);
+}
+
+    .navbar-cega .navbar-brand {
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+        .navbar-cega .navbar-brand:hover {
+            color: #fff;
+            opacity: .9;
+        }
+
+    .navbar-cega .nav-link {
+        color: var(--brand-text);
+        border-radius: .5rem;
+        padding-inline: .75rem;
+    }
+
+        .navbar-cega .nav-link:hover, .navbar-cega .nav-link.active {
+            color: #fff;
+            background: rgba(255,255,255,.08);
+        }
+
+    .navbar-cega .navbar-text {
+        color: var(--brand-text);
+    }
+
+    /* Botones coherentes en topbar */
+    .navbar-cega .btn-outline-secondary,
+    .navbar-cega .btn-outline-light {
+        color: #fff;
+        border-color: rgba(255,255,255,.35);
+    }
+
+        .navbar-cega .btn-outline-secondary:hover,
+        .navbar-cega .btn-outline-light:hover {
+            background: #fff;
+            color: var(--brand);
+        }
+
+.sticky-top-cega {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+/* ===========================
+   Modales (padre/hijo)
+   =========================== */
 #modalDynamic .modal-content.dimmed {
     position: relative;
 }
 
-    /* El overlay bloquea clicks sobre el modal padre, pero deja pasar al hijo */
     #modalDynamic .modal-content.dimmed::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.55);
-        z-index: 1060; /* por debajo de un modal hijo en 1061 */
-        pointer-events: auto; /* bloquea interacción con el padre */
+        background: rgba(0,0,0,.55);
+        z-index: 1060;
+        pointer-events: auto;
     }
 
-    /* Opcional: leve blur para destacar el hijo */
     #modalDynamic .modal-content.dimmed .modal-body {
         filter: blur(1px);
     }
 
-/* Asegura que el modal “hijo” esté por encima del overlay del padre */
 .modal.modal-foreground {
     z-index: 1061;
 }
 
-/* Select sin datos: look deshabilitado pero limpio */
+.modal-backdrop.modal-backdrop-child {
+    z-index: 1060 !important;
+}
+
+/* ===========================
+   Formularios
+   =========================== */
 .form-select.is-empty {
-    background-color: #f8f9fa; /* gris suave */
-    color: #6c757d; /* texto más tenue */
-    opacity: 1; /* mantener contraste del texto */
+    background: #f8f9fa;
+    color: #6c757d;
+    opacity: 1;
     cursor: not-allowed;
 }
 
-/* Unión visual perfecta con el botón del input-group */
 .input-group > .form-select + .btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
+/* ===========================
+   Layout con Sidebar
+   =========================== */
+.app-shell {
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - var(--topbar-h));
+}
+
+/* Sidebar CEGA con misma paleta del topbar y alineado bajo el topbar */
+.sidebar-cega {
+    width: 260px;
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-2) 100%);
+    color: #fff;
+    position: sticky;
+    top: var(--topbar-h); /* se “pega” bajo el topbar */
+    height: calc(100vh - var(--topbar-h)); /* ocupa todo el alto visible bajo el topbar */
+    align-self: flex-start;
+    padding: .75rem .75rem 1rem;
+    overflow-y: auto;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,.08);
+    border-right: 1px solid var(--brand-border);
+}
+
+    .sidebar-cega .sidebar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .25rem .25rem .5rem;
+    }
+
+    .sidebar-cega .brand {
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+/* Separadores */
+.sidebar-sep {
+    border-color: rgba(255,255,255,.12);
+    opacity: .6;
+    margin: .5rem 0;
+}
+
+/* Enlaces del sidebar */
+.sidebar-cega .nav-link {
+    color: rgba(255,255,255,.9);
+    padding: .6rem .7rem;
+    border-radius: .5rem;
+    display: block;
+}
+
+    .sidebar-cega .nav-link:hover,
+    .sidebar-cega .nav-link:focus {
+        color: #fff;
+        background: rgba(255,255,255,.08);
+        text-decoration: none;
+    }
+
+    .sidebar-cega .nav-link.active {
+        color: #0f2f27;
+        background: #fff;
+    }
+
+/* Subitems */
+.sidebar-cega .nav-subitem {
+    padding-left: 1.6rem;
+    font-size: .95rem;
+    color: rgba(255,255,255,.85);
+}
+
+/* Botones colapsables del sidebar */
+.sidebar-cega .nav-toggle {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    color: rgba(255,255,255,.9);
+    padding: .6rem .7rem;
+    border-radius: .5rem;
+}
+
+    .sidebar-cega .nav-toggle:hover {
+        background: rgba(255,255,255,.08);
+        color: #fff;
+    }
+
+    .sidebar-cega .nav-toggle .caret {
+        display: inline-block;
+        width: .55rem;
+        height: .55rem;
+        margin-left: .4rem;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(-45deg);
+        transition: transform .2s ease;
+    }
+
+    .sidebar-cega .nav-toggle[aria-expanded="true"] .caret {
+        transform: rotate(45deg);
+    }
+
+/* Cuenta */
+.sidebar-account .nav-subitem {
+    color: #fff;
+}
+
+/* Contenido */
+.content-cega {
+    flex: 1;
+    min-width: 0;
+    padding: 1rem 1rem 2rem;
+}
+
+/* Responsive: sidebar colapsable */
+@media (max-width:767.98px) {
+    .sidebar-cega {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: auto;
+    }
+
+    .app-shell {
+        min-height: auto;
+    }
+}
+
+/* Verde sólido en topbar y sidebar */
+.navbar-cega {
+    background: var(--brand) !important; /* sólido */
+}
+
+.sidebar-cega {
+    background: var(--brand) !important; /* sólido */
+}
+
+/* (opcional) si quieres otro tono, cambia esta variable */
+:root {
+    --brand: #184a3e; /* verde sólido principal */
+}

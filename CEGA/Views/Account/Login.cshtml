@@ -1,8 +1,11 @@
 ﻿@model CEGA.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Quiénes Somos";
+    if (Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+    {
+        Layout = null;
+    }
 }
-
 <!-- Hero -->
 <section class="py-5 bg-light border-bottom">
     <div class="container">
@@ -214,6 +217,9 @@
     </div>
 </section>
 
+@if (Layout != null)
+{
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+}
 }

@@ -1,6 +1,10 @@
 ﻿@model CEGA.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Crear cuenta";
+    if (Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+    {
+        Layout = null;
+    }
 }
 
 <h2 class="mb-3">Crear cuenta</h2>
@@ -232,6 +236,9 @@
         </form>
     </div>
 </div>
+
+@if (Layout != null)
+{
 @section Scripts {
     <script>
         (function () {
@@ -318,4 +325,5 @@
           }, false);
         })();
     </script>
+}
 }
