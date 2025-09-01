@@ -241,7 +241,15 @@ namespace CEGA.Controllers
 
             // Login directo
             await SignInEmpleadoAsync(emp, isPersistent: false);
+
+            // Si viene desde el modal (AJAX), responde JSON para que tu script redirija la página completa
+            var isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+            if (isAjax)
+                return Json(new { ok = true, redirectUrl = Url.Action("Index", "Home") });
+
+            // Si no es AJAX, navegación normal
             return RedirectToAction("Index", "Home");
+
         }
 
 
