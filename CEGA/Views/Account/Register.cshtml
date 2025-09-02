@@ -11,129 +11,13 @@
 
 <form asp-action="Register" method="post" class="row g-3" data-modal-post>
     @Html.AntiForgeryToken()
-    <!-- Identificación -->
-    <div class="col-md-4">
-        <label asp-for="Cedula" class="form-label"></label>
-        <input asp-for="Cedula" class="form-control" maxlength="9" inputmode="numeric" />
-        <span asp-validation-for="Cedula" class="text-danger"></span>
-    </div>
 
-    <!-- Nombres -->
-    <div class="col-md-4">
-        <label asp-for="Nombre" class="form-label"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="SegundoNombre" class="form-label">Segundo nombre</label>
-        <input asp-for="SegundoNombre" class="form-control" />
-        <span asp-validation-for="SegundoNombre" class="text-danger"></span>
-    </div>
+    @await Html.PartialAsync("Partials/_RegisterForm", Model)
 
-    <!-- Apellidos -->
-    <div class="col-md-4">
-        <label asp-for="Apellido1" class="form-label">Apellido 1</label>
-        <input asp-for="Apellido1" class="form-control" />
-        <span asp-validation-for="Apellido1" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Apellido2" class="form-label">Apellido 2</label>
-        <input asp-for="Apellido2" class="form-control" />
-        <span asp-validation-for="Apellido2" class="text-danger"></span>
-    </div>
-
-    <!-- Acceso -->
-    <div class="col-md-6">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" autocomplete="email" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" type="password" class="form-control" autocomplete="new-password" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="ConfirmPassword" class="form-label">Confirmar contraseña</label>
-        <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-
-    <!-- Contacto -->
-    <div class="col-md-6">
-        <label asp-for="TelefonoPersonal" class="form-label">Teléfono personal (+506)</label>
-        <div class="input-group">
-            <span class="input-group-text">+506</span>
-            <input asp-for="TelefonoPersonal" class="form-control" maxlength="8" inputmode="numeric" />
-        </div>
-        <span asp-validation-for="TelefonoPersonal" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="TelefonoEmergencia" class="form-label">Teléfono emergencia (+506)</label>
-        <div class="input-group">
-            <span class="input-group-text">+506</span>
-            <input asp-for="TelefonoEmergencia" class="form-control" maxlength="8" inputmode="numeric" />
-        </div>
-        <span asp-validation-for="TelefonoEmergencia" class="text-danger"></span>
-    </div>
-
-    <!-- Perfil -->
-    <div class="col-md-4">
-        <label asp-for="Sexo" class="form-label"></label>
-        <select asp-for="Sexo" class="form-select">
-            <option value="M">M</option>
-            <option value="F">F</option>
-            <option value="X">X</option>
-            <option value="Prefiero no decir">Prefiero no decir</option>
-        </select>
-        <span asp-validation-for="Sexo" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
-        <input asp-for="FechaNacimiento" type="date" class="form-control" />
-        <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="FechaIngreso" class="form-label">Fecha de ingreso</label>
-        <input asp-for="FechaIngreso" type="date" class="form-control" />
-        <span asp-validation-for="FechaIngreso" class="text-danger"></span>
-    </div>
-
-    <!-- Médicos / emergencia -->
-    <div class="col-md-3">
-        <label asp-for="TipoSangre" class="form-label">Tipo de sangre</label>
-        <input asp-for="TipoSangre" class="form-control" placeholder="O+, A-, AB..." />
-        <span asp-validation-for="TipoSangre" class="text-danger"></span>
-    </div>
-    <div class="col-md-9">
-        <label asp-for="Alergias" class="form-label"></label>
-        <input asp-for="Alergias" class="form-control" />
-        <span asp-validation-for="Alergias" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="ContactoEmergenciaNombre" class="form-label">Nombre Contacto de emergencia (Nombre de Aseguradora)</label>
-        <input asp-for="ContactoEmergenciaNombre" class="form-control" />
-        <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="ContactoEmergenciaTelefono" class="form-label">Contacto emergencia (Poliza)</label>
-        <div class="input-group">
-            <span class="input-group-text">+506</span>
-            <input asp-for="ContactoEmergenciaTelefono" class="form-control" maxlength="8" inputmode="numeric" />
-        </div>
-        <span asp-validation-for="ContactoEmergenciaTelefono" class="text-danger"></span>
-    </div>
-    <div class="col-md-6">
-        <label asp-for="PolizaSeguro" class="form-label">Numero de poliza de seguro</label>
-        <input asp-for="PolizaSeguro" class="form-control" />
-        <span asp-validation-for="PolizaSeguro" class="text-danger"></span>
-    </div>
-
-    <!-- Puesto -->
+    <!-- Puesto (se mantiene aquí) -->
     @{
         var hayPuestos = Model?.Puestos != null && Model.Puestos.Any();
     }
-
     <div class="col-md-6">
         <label asp-for="PuestoId" class="form-label">Puesto</label>
         <select asp-for="PuestoId"
@@ -163,7 +47,7 @@
     <pre class="alert alert-info" style="white-space:pre-wrap">@dbg</pre>
 }
 
-<!-- =============  Formulario inline: Crear Puesto  ============= -->
+<!-- =============  Formulario inline: Crear Puesto (se mantiene)  ============= -->
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <h5 class="card-title mb-3">Crear nuevo puesto</h5>
@@ -239,91 +123,92 @@
 
 @if (Layout != null)
 {
-@section Scripts {
-    <script>
-        (function () {
-          // 1) Intercepta el submit del formulario "Guardar puesto" (AJAX, sin navegar)
-          document.addEventListener('submit', async function (e) {
-            const form = e.target;
-            if (!form || form.id !== 'formNuevoPuestoInline') return;
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            (function () {
+              // 1) Intercepta el submit del formulario "Guardar puesto" (AJAX, sin navegar)
+              document.addEventListener('submit', async function (e) {
+                const form = e.target;
+                if (!form || form.id !== 'formNuevoPuestoInline') return;
 
-            e.preventDefault();
-            e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
 
-            const btn = form.querySelector('button[type="submit"]');
-            const msg = document.getElementById('puestoInlineMsg');
-            if (btn) btn.disabled = true;
-            if (msg) { msg.className = 'small'; msg.textContent = ''; }
+                const btn = form.querySelector('button[type="submit"]');
+                const msg = document.getElementById('puestoInlineMsg');
+                if (btn) btn.disabled = true;
+                if (msg) { msg.className = 'small'; msg.textContent = ''; }
 
-            try {
-              const res = await fetch(form.action, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                credentials: 'same-origin',
-                body: new FormData(form) // incluye __RequestVerificationToken
-              });
+                try {
+                  const res = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                    body: new FormData(form) // incluye __RequestVerificationToken
+                  });
 
-              const ct = res.headers.get('content-type') || '';
-              if (!res.ok) {
-                const txt = await res.text().catch(() => '');
-                console.error('POST', form.action, '->', res.status, txt);
-                throw new Error('No se pudo guardar el puesto.');
-              }
-              if (!ct.includes('application/json')) {
-                const txt = await res.text().catch(() => '');
-                console.error('Respuesta no JSON. status:', res.status, 'ct:', ct, 'url:', res.url, '\n', txt);
-                throw new Error('Respuesta inesperada del servidor.');
-              }
-
-              const data = await res.json();
-              if (data?.error) throw new Error(data.error);
-
-              const { id, nombre } = data;
-
-              // Actualiza el <select id="PuestoId">
-              const selPuesto = document.getElementById('PuestoId');
-              if (selPuesto) {
-                if (selPuesto.hasAttribute('disabled')) {
-                  selPuesto.removeAttribute('disabled');
-                  selPuesto.classList.remove('is-empty');
-                  if (selPuesto.options.length === 1 && selPuesto.options[0].value === '') {
-                    selPuesto.options[0].text = '— Seleccione un puesto —';
+                  const ct = res.headers.get('content-type') || '';
+                  if (!res.ok) {
+                    const txt = await res.text().catch(() => '');
+                    console.error('POST', form.action, '->', res.status, txt);
+                    throw new Error('No se pudo guardar el puesto.');
                   }
+                  if (!ct.includes('application/json')) {
+                    const txt = await res.text().catch(() => '');
+                    console.error('Respuesta no JSON. status:', res.status, 'ct:', ct, 'url:', res.url, '\n', txt);
+                    throw new Error('Respuesta inesperada del servidor.');
+                  }
+
+                  const data = await res.json();
+                  if (data?.error) throw new Error(data.error);
+
+                  const { id, nombre } = data;
+
+                  // Actualiza el <select id="PuestoId">
+                  const selPuesto = document.getElementById('PuestoId');
+                  if (selPuesto) {
+                    if (selPuesto.hasAttribute('disabled')) {
+                      selPuesto.removeAttribute('disabled');
+                      selPuesto.classList.remove('is-empty');
+                      if (selPuesto.options.length === 1 && selPuesto.options[0].value === '') {
+                        selPuesto.options[0].text = '— Seleccione un puesto —';
+                      }
+                    }
+                    let opt = Array.from(selPuesto.options).find(o => o.value == String(id));
+                    if (!opt) {
+                      opt = new Option(nombre, String(id), true, true);
+                      selPuesto.add(opt);
+                    } else {
+                      opt.selected = true;
+                    }
+                    selPuesto.value = String(id);
+                    selPuesto.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+
+                  // Reset + feedback
+                  form.reset();
+                  const m = form.querySelector('input[name="Moneda"]'); if (m) m.value = 'CRC';
+                  const a = form.querySelector('#PuestoActivo'); if (a) a.checked = true;
+                  if (msg) { msg.className = 'small text-success'; msg.textContent = 'Puesto creado y seleccionado.'; }
+
+                } catch (err) {
+                  console.error(err);
+                  if (msg) { msg.className = 'small text-danger'; msg.textContent = (err && err.message) ? err.message : 'Error inesperado.'; }
+                  else { alert((err && err.message) ? err.message : 'Error inesperado.'); }
+                } finally {
+                  if (btn) btn.disabled = false;
                 }
-                let opt = Array.from(selPuesto.options).find(o => o.value == String(id));
-                if (!opt) {
-                  opt = new Option(nombre, String(id), true, true);
-                  selPuesto.add(opt);
-                } else {
-                  opt.selected = true;
-                }
-                selPuesto.value = String(id);
-                selPuesto.dispatchEvent(new Event('change', { bubbles: true }));
-              }
+              }, false);
 
-              // Reset + feedback
-              form.reset();
-              const m = form.querySelector('input[name="Moneda"]'); if (m) m.value = 'CRC';
-              const a = form.querySelector('#PuestoActivo'); if (a) a.checked = true;
-              if (msg) { msg.className = 'small text-success'; msg.textContent = 'Puesto creado y seleccionado.'; }
-
-            } catch (err) {
-              console.error(err);
-              if (msg) { msg.className = 'small text-danger'; msg.textContent = (err && err.message) ? err.message : 'Error inesperado.'; }
-              else { alert((err && err.message) ? err.message : 'Error inesperado.'); }
-            } finally {
-              if (btn) btn.disabled = false;
-            }
-          }, false);
-
-          // 2) Antes de enviar el formulario de registro, habilita el select (los disabled no se postean)
-          document.addEventListener('submit', function (e) {
-            const form = e.target;
-            if (!form || form.id === 'formNuevoPuestoInline') return; // no aplicar al inline
-            const selPuesto = document.getElementById('PuestoId');
-            if (selPuesto && selPuesto.disabled) selPuesto.disabled = false;
-          }, false);
-        })();
-    </script>
-}
+              // 2) Antes de enviar el formulario de registro, habilita el select (los disabled no se postean)
+              document.addEventListener('submit', function (e) {
+                const form = e.target;
+                if (!form || form.id === 'formNuevoPuestoInline') return; // no aplicar al inline
+                const selPuesto = document.getElementById('PuestoId');
+                if (selPuesto && selPuesto.disabled) selPuesto.disabled = false;
+              }, false);
+            })();
+        </script>
+    }
 }
