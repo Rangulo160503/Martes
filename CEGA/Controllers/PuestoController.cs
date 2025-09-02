@@ -1,5 +1,6 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
+using CEGA.Models.ViewModels.Empleados;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,94 +1,16 @@
-﻿@model dynamic
+﻿@using CEGA.Models.ViewModels.Empleados
 @{
     ViewData["Title"] = "Gestión de Empleados";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var salarios = ViewBag.Salarios as IEnumerable<CEGA.Models.EmpleadosSalarios>;
-    var vacaciones = ViewBag.Vacaciones as IEnumerable<CEGA.Models.VacacionesEmpleado>;
-    var puestos = ViewBag.Puestos as IEnumerable<CEGA.Models.PuestoEmpleado>;
-    var incapacidades = ViewBag.Incapacidades as IEnumerable<CEGA.Models.IncapacidadEmpleado>;
-    var crearEmpVm = ViewBag.CrearEmpleadoVm as CEGA.Models.ViewModels.RegisterViewModel
-                        ?? new CEGA.Models.ViewModels.RegisterViewModel();
-
-    int salCount = salarios?.Count() ?? 0;
-    int vacCount = vacaciones?.Count() ?? 0;
-    int pueCount = puestos?.Count() ?? 0;
-    int incCount = incapacidades?.Count() ?? 0;
+    // Cast seguro desde ViewBag
+    var vmPuestos = ViewBag.PuestosVm as CambiarPuestoVM ?? new CambiarPuestoVM();
 }
 
-<!-- Encabezado -->
-<div class="py-4 text-white mb-4" style="background: var(--brand); border-radius:.75rem;">
-    <div class="container">
-        <h2 class="fw-bold mb-1">Módulo de Empleados</h2>
-        <p class="mb-0">Administra salarios, vacaciones, puestos e incapacidades; y crea nuevos empleados.</p>
-    </div>
-</div>
+<div class="container my-4">
+    <h2 class="fw-bold mb-3">Gestión de Empleados</h2>
 
-<!-- Alertas -->
-<div class="container mb-3">
-    @if (TempData["Mensaje"] is string ok && !string.IsNullOrWhiteSpace(ok))
-    {
-        <div class="alert alert-success">@ok</div>
-    }
-    @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
-    {
-        <div class="alert alert-danger">@err</div>
-    }
-</div>
-
-<!-- Tabs + contenido -->
-<div class="container">
-    <div class="card card-lg">
-        <div class="card-header p-0">
-            <ul class="nav nav-tabs card-header-tabs nav-fill" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab-salarios" data-bs-toggle="tab" data-bs-target="#pane-salarios" type="button" role="tab" aria-controls="pane-salarios" aria-selected="true">
-                        Salarios <span class="badge bg-success ms-1">@salCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-vacaciones" data-bs-toggle="tab" data-bs-target="#pane-vacaciones" type="button" role="tab" aria-controls="pane-vacaciones" aria-selected="false">
-                        Vacaciones <span class="badge bg-success ms-1">@vacCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-puestos" data-bs-toggle="tab" data-bs-target="#pane-puestos" type="button" role="tab" aria-controls="pane-puestos" aria-selected="false">
-                        Puestos <span class="badge bg-success ms-1">@pueCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-incapacidades" data-bs-toggle="tab" data-bs-target="#pane-incapacidades" type="button" role="tab" aria-controls="pane-incapacidades" aria-selected="false">
-                        Incapacidades <span class="badge bg-success ms-1">@incCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-crear" data-bs-toggle="tab" data-bs-target="#pane-crear" type="button" role="tab" aria-controls="pane-crear" aria-selected="false">
-                        Crear Empleado
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-        <div class="card-body">
-            <div class="tab-content mt-2">
-                <div class="tab-pane fade show active" id="pane-salarios" role="tabpanel" aria-labelledby="tab-salarios">
-                    @await Html.PartialAsync("Partials/_Salarios", salarios)
-                </div>
-                <div class="tab-pane fade" id="pane-vacaciones" role="tabpanel" aria-labelledby="tab-vacaciones">
-                    @await Html.PartialAsync("Partials/_Vacaciones", vacaciones)
-                </div>
-                <div class="tab-pane fade" id="pane-puestos" role="tabpanel" aria-labelledby="tab-puestos">
-                    @await Html.PartialAsync("Partials/_Puestos", puestos)
-                </div>
-                <div class="tab-pane fade" id="pane-incapacidades" role="tabpanel" aria-labelledby="tab-incapacidades">
-                    @await Html.PartialAsync("Partials/_Incapacidades", incapacidades)
-                </div>
-                <div class="tab-pane fade" id="pane-crear" role="tabpanel" aria-labelledby="tab-crear">
-                    @await Html.PartialAsync("Partials/_CrearEmpleado", crearEmpVm)
-                </div>
-            </div>
-        </div>
-    </div>
+    @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
 </div>
 
 @section Scripts {

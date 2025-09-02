@@ -1,5 +1,23 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model CEGA.Models.ViewModels.Empleados.CambiarPuestoVM
+
+<div class="card">
+    <div class="card-header">Cambiar puesto</div>
+    <div class="card-body">
+        <form asp-controller="Empleados" asp-action="CambiarPuesto" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Empleado</label>
+                    <select asp-for="Cedula" asp-items="Model.Empleados" class="form-select"></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nuevo puesto</label>
+                    <select asp-for="PuestoId" asp-items="Model.Puestos" class="form-select"></select>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
