@@ -219,7 +219,22 @@
 
 @if (Layout != null)
 {
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            window.openModal = async function (url, title) {
+              const el = document.getElementById('modalDynamic');
+              if (!el) { location.href = url; return; } // fallback si no existe el modal
+
+              el.querySelector('.modal-title').textContent = title || '';
+              const body = el.querySelector('.modal-body');
+              body.innerHTML = '<div class="p-3 text-center">Cargando…</div>';
+
+              const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+              body.innerHTML = await res.text();
+
+              bootstrap.Modal.getOrCreateInstance(el).show();
+            };
+        </script>
+    }
 }

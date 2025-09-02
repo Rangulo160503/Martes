@@ -49,19 +49,34 @@ namespace CEGA.Controllers
 
             // 4) Proyección a UsuarioListaVM
             var lista = empleados
-                .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
-                .Select(e => new CEGA.Models.ViewModels.UsuarioListaVM
-                {
-                    NombreCompleto = string.Join(" ",
-                        new[] { e.Nombre, e.SegundoNombre, e.Apellido1, e.Apellido2 }
-                        .Where(s => !string.IsNullOrWhiteSpace(s))),
-                    Username = e.Username!,
-                    Email = e.Email!,
-                    TelefonoPersonal = e.TelefonoPersonal,
-                    Rol = e.Rol.ToString(),
-                    Activo = e.Activo
-                })
-                .ToList();
+    .AsNoTracking()
+    .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
+    .Select(e => new {
+        e.Cedula,
+        e.Nombre,
+        e.SegundoNombre,
+        e.Apellido1,
+        e.Apellido2,
+        e.Username,
+        e.Email,
+        e.TelefonoPersonal,
+        e.Rol,
+        e.Activo
+    })
+    .ToList() // ← ejecuta en SQL
+    .Select(e => new CEGA.Models.ViewModels.UsuarioListaVM
+    {
+        Cedula = e.Cedula,
+        NombreCompleto = string.Join(" ", new[] { e.Nombre, e.SegundoNombre, e.Apellido1, e.Apellido2 }
+                                     .Where(s => !string.IsNullOrWhiteSpace(s))),
+        Username = e.Username ?? "",
+        Email = e.Email ?? "",
+        TelefonoPersonal = e.TelefonoPersonal,
+        Rol = e.Rol.ToString(),
+        Activo = e.Activo
+    })
+    .ToList();
+
 
             // 5) ViewModel de la vista
             var vm = new CEGA.Models.ViewModels.Usuarios.BuscarUsuarioFiltroViewModel
