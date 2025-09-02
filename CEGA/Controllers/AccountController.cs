@@ -252,6 +252,8 @@ namespace CEGA.Controllers
 
         }
 
+        [HttpGet]
+        public IActionResult PuestoForm() => PartialView("Partials/_PuestoForm");
 
 
         // =====================

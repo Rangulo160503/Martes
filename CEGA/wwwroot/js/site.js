@@ -72,6 +72,18 @@
                 if (body) body.innerHTML = html;
             } else if (ct.includes('application/json')) {
                 const data = await res.json();
+                if (data.id && data.nombre) {
+                    const sel = document.getElementById('PuestoId');
+                    if (sel) { /* actualizar select como ya haces */ modal?.instance.hide(); return; }
+                    openModal('/Account/Register?selectPuestoId=' + data.id, 'Crear cuenta'); // si estás dentro del modal
+                    return;
+                }
+
+                if (data.error) {
+                    const msg = document.querySelector('#puestoModalMsg') || document.querySelector('#puestoInlineMsg');
+                    if (msg) { msg.className = 'small text-danger'; msg.textContent = data.error; }
+                    return;
+                }
                 const url = data.redirectUrl || data.redirectTo;   // ← clave
                 if (url) { modal?.instance.hide(); window.location.href = url; return; }
                 if (data.html && body) body.innerHTML = data.html;

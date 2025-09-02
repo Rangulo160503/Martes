@@ -1,10 +1,7 @@
 ﻿@model CEGA.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Crear cuenta";
-    if (Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-    {
-        Layout = null;
-    }
+    if (Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest") { Layout = null; }
 }
 
 <h2 class="mb-3">Crear cuenta</h2>
@@ -14,19 +11,25 @@
 
     @await Html.PartialAsync("Partials/_RegisterForm", Model)
 
-    <!-- Puesto (se mantiene aquí) -->
     @{
         var hayPuestos = Model?.Puestos != null && Model.Puestos.Any();
     }
-    <div class="col-md-6">
+    <div class="col-md-8">
         <label asp-for="PuestoId" class="form-label">Puesto</label>
-        <select asp-for="PuestoId"
-                asp-items="Model.Puestos"
-                id="PuestoId"
-                class="form-select @(hayPuestos ? "" : "is-empty")"
-                disabled="@(hayPuestos ? (bool?)null : true)">
-            <option value="">@(hayPuestos ? "— Seleccione un puesto —" : "— Sin puestos disponibles —")</option>
-        </select>
+        <div class="input-group">
+            <select asp-for="PuestoId"
+                    asp-items="Model.Puestos"
+                    id="PuestoId"
+                    class="form-select @(hayPuestos ? "" : "is-empty")"
+                    disabled="@(hayPuestos ? (bool?)null : true)">
+                <option value="">@(hayPuestos ? "— Seleccione un puesto —" : "— Sin puestos disponibles —")</option>
+            </select>
+            <button type="button"
+                    class="btn btn-outline-primary"
+                    onclick="openModal('@Url.Action("PuestoForm", "Account")','Crear puesto')">
+                Nuevo puesto
+            </button>
+        </div>
         @if (!hayPuestos)
         {
             <div class="form-text">Crea el primero para habilitar la selección.</div>
@@ -40,88 +43,11 @@
     </div>
 </form>
 
-<hr class="my-4" />
-
 @if (TempData["DbgRegister"] is string dbg && !string.IsNullOrWhiteSpace(dbg))
 {
+    <hr class="my-4" />
     <pre class="alert alert-info" style="white-space:pre-wrap">@dbg</pre>
 }
-
-<!-- =============  Formulario inline: Crear Puesto (se mantiene)  ============= -->
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title mb-3">Crear nuevo puesto</h5>
-
-        <form id="formNuevoPuestoInline"
-              method="post"
-              action="@Url.Action("CrearPuestoRapido","Puesto")"
-              class="row g-3"
-              data-modal-post>
-            @Html.AntiForgeryToken()
-
-            <div class="col-12 col-md-4">
-                <label class="form-label">Código</label>
-                <input name="Codigo" class="form-control" maxlength="20" required />
-            </div>
-
-            <div class="col-12 col-md-8">
-                <label class="form-label">Nombre</label>
-                <input name="Nombre" class="form-control" maxlength="100" required />
-            </div>
-
-            <div class="col-12 col-md-6">
-                <label class="form-label">Departamento</label>
-                <input name="Departamento" class="form-control" maxlength="200" />
-            </div>
-
-            <div class="col-12 col-md-6">
-                <label class="form-label">Nivel</label>
-                <input name="Nivel" class="form-control" maxlength="100" placeholder="Junior / Senior / Gerencial" />
-            </div>
-
-            <div class="col-12">
-                <label class="form-label">Descripción</label>
-                <textarea name="Descripcion" class="form-control" maxlength="500" rows="2" required></textarea>
-            </div>
-
-            <div class="col-12">
-                <label class="form-label">Requisitos</label>
-                <textarea name="Requisitos" class="form-control" maxlength="500" rows="2"></textarea>
-            </div>
-
-            <div class="col-12 col-md-4">
-                <label class="form-label">Salario base</label>
-                <input name="SalarioBase" type="number" step="0.01" min="0" class="form-control" />
-            </div>
-
-            <div class="col-12 col-md-4">
-                <label class="form-label">Moneda</label>
-                <input name="Moneda" class="form-control" maxlength="50" value="CRC" />
-            </div>
-
-            <div class="col-12 col-md-4">
-                <label class="form-label">Jornada</label>
-                <input name="Jornada" class="form-control" maxlength="100" placeholder="Tiempo completo / Medio tiempo" />
-            </div>
-
-            <div class="col-12">
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" name="Activo" id="PuestoActivo" checked />
-                    <label class="form-check-label" for="PuestoActivo">Activo</label>
-                </div>
-            </div>
-
-            <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Guardar puesto</button>
-                <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
-            </div>
-
-            <div class="col-12">
-                <div id="puestoInlineMsg" class="small"></div>
-            </div>
-        </form>
-    </div>
-</div>
 
 @if (Layout != null)
 {
