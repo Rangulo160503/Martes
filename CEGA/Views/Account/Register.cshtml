@@ -43,11 +43,6 @@
     </div>
 </form>
 
-@if (TempData["DbgRegister"] is string dbg && !string.IsNullOrWhiteSpace(dbg))
-{
-    <hr class="my-4" />
-    <pre class="alert alert-info" style="white-space:pre-wrap">@dbg</pre>
-}
 
 @if (Layout != null)
 {

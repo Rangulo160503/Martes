@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+using System.Globalization; // CharUnicodeInfo
 using System.Security.Claims;
-using System.Text;
+using System.Text;         // NormalizationForm
 
 namespace CEGA.Controllers
 {
@@ -31,11 +31,15 @@ namespace CEGA.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var input = model.UserOrEmail?.Trim();
-            if (string.IsNullOrWhiteSpace(input)) { ModelState.AddModelError("", "Ingrese usuario o correo."); return View(model); }
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                ModelState.AddModelError("", "Ingrese usuario o correo.");
+                return View(model);
+            }
 
             var inputLower = input.ToLowerInvariant();
             var byEmail = input.Contains("@");
-            var isDigits = input.All(char.IsDigit); // si quieres permitir login por cédula
+            var isDigits = input.All(char.IsDigit);
 
             var emp = await _context.Empleados.FirstOrDefaultAsync(e =>
                 byEmail ? e.Email.ToLower() == inputLower :
@@ -48,7 +52,6 @@ namespace CEGA.Controllers
                 return View(model);
             }
 
-            // Verificar password (bcrypt)
             if (!BCrypt.Net.BCrypt.Verify(model.Password!, emp.PasswordHash))
             {
                 ModelState.AddModelError("", "Usuario o contraseña inválidos.");
@@ -82,7 +85,6 @@ namespace CEGA.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Repoblar combo si algo falla
             async Task LoadPuestosAsync()
             {
                 model.Puestos = await _context.Puestos
@@ -92,26 +94,13 @@ namespace CEGA.Controllers
                     .ToListAsync();
             }
 
-            // ---- DEBUG: conexión efectiva de EF ----
-            try
-            {
-                var dbConn = _context.Database.GetDbConnection();
-                TempData["DbgRegister"] = $"POST Register OK | DB={dbConn.Database} @ {dbConn.DataSource}";
-            }
-            catch { /* ignora si falla */ }
-
             if (!ModelState.IsValid) { await LoadPuestosAsync(); return View(model); }
 
-            // ===============================
-            // Validaciones de negocio mínimas
-            // ===============================
-
-            // Cédula 9 dígitos
+            // Validaciones mínimas
             var cedStr = model.Cedula.ToString();
             if (model.Cedula < 100000000 || model.Cedula > 999999999 || cedStr.Length != 9)
                 ModelState.AddModelError(nameof(model.Cedula), "Cédula debe tener 9 dígitos.");
 
-            // Teléfonos: 8 dígitos exactos
             bool TelOk(string? s) => !string.IsNullOrWhiteSpace(s) &&
                                      System.Text.RegularExpressions.Regex.IsMatch(s!, @"^\d{8}$");
             if (!TelOk(model.TelefonoPersonal))
@@ -119,11 +108,9 @@ namespace CEGA.Controllers
             if (!TelOk(model.TelefonoEmergencia))
                 ModelState.AddModelError(nameof(model.TelefonoEmergencia), "Teléfono emergencia: 8 dígitos.");
 
-            // Mayor de 18 a la fecha de ingreso
             if (model.FechaNacimiento.AddYears(18) > model.FechaIngreso)
                 ModelState.AddModelError(nameof(model.FechaIngreso), "Debe ser mayor de 18 años a la fecha de ingreso.");
 
-            // Puesto seleccionado y válido
             if (!model.PuestoId.HasValue)
             {
                 ModelState.AddModelError(nameof(model.PuestoId), "Debe seleccionar un puesto.");
@@ -136,18 +123,13 @@ namespace CEGA.Controllers
                     ModelState.AddModelError(nameof(model.PuestoId), "El puesto seleccionado no es válido o está inactivo.");
             }
 
-            // ===============================
-            // Unicidad (email normalizado)
-            // ===============================
-            var emailNorm = (model.Email ?? string.Empty).Trim().ToLower();
+            var emailNorm = (model.Email ?? string.Empty).Trim().ToLowerInvariant();
             if (await _context.Empleados.AnyAsync(e => e.Cedula == model.Cedula))
                 ModelState.AddModelError(nameof(model.Cedula), "Ya existe un empleado con esa cédula.");
             if (await _context.Empleados.AnyAsync(e => e.Email.ToLower() == emailNorm))
                 ModelState.AddModelError(nameof(model.Email), "Email ya registrado.");
 
-            // ===============================
             // Username único
-            // ===============================
             var username = GenerarUsername(model.Nombre!, model.Apellido1!, model.Apellido2);
             if (await _context.Empleados.AnyAsync(e => e.Username == username))
             {
@@ -156,32 +138,15 @@ namespace CEGA.Controllers
                 {
                     var baseU = username;
                     int suf = 2;
-                    while (await _context.Empleados.AnyAsync(e => e.Username == $"{baseU}{suf}"))
-                        suf++;
+                    while (await _context.Empleados.AnyAsync(e => e.Username == $"{baseU}{suf}")) suf++;
                     username = $"{baseU}{suf}";
                 }
             }
 
-            if (!ModelState.IsValid)
-            {
-                // ---- DEBUG: lista de errores ----
-                try
-                {
-                    var errores = ModelState
-                        .Where(kv => kv.Value.Errors.Count > 0)
-                        .Select(kv => $"{kv.Key}: {string.Join(" | ", kv.Value.Errors.Select(e => e.ErrorMessage))}");
-                    TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + "\nModelState INVALIDO:\n" + string.Join("\n", errores);
-                }
-                catch { }
-                await LoadPuestosAsync();
-                return View(model);
-            }
+            if (!ModelState.IsValid) { await LoadPuestosAsync(); return View(model); }
 
-            // ===============================
-            // Hash de contraseña (bcrypt)
-            // ===============================
+            // Crear empleado
             var hash = BCrypt.Net.BCrypt.HashPassword(model.Password!);
-
             var emp = new Empleado
             {
                 Cedula = model.Cedula,
@@ -190,7 +155,7 @@ namespace CEGA.Controllers
                 Apellido1 = model.Apellido1!,
                 Apellido2 = model.Apellido2,
                 Username = username,
-                Email = model.Email!, // se guarda como lo ingresó; unicidad con emailNorm
+                Email = model.Email!,
                 PasswordHash = hash,
                 Activo = true,
                 TelefonoPersonal = model.TelefonoPersonal!,
@@ -204,36 +169,23 @@ namespace CEGA.Controllers
                 ContactoEmergenciaTelefono = model.ContactoEmergenciaTelefono,
                 PolizaSeguro = model.PolizaSeguro,
                 PuestoId = model.PuestoId,
-                // Si tu columna Rol es NOT NULL, asigna explícito:
-                Rol = RolEmpleado.Colaborador,
-                // ResetToken* se quedan nulos al registrarse
+                Rol = RolEmpleado.Colaborador
             };
 
             try
             {
                 _context.Empleados.Add(emp);
-                var rows = await _context.SaveChangesAsync();
-
-                // ---- DEBUG: confirma filas afectadas y existencia ----
-                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + $"\nSaveChanges OK (rows={rows}).";
-
-                var exists = await _context.Empleados.AsNoTracking()
-                                  .AnyAsync(e => e.Cedula == model.Cedula);
-                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + $"\nExiste tras guardar: {exists}";
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
                 var msg = ex.InnerException?.Message ?? ex.Message;
-
                 if (msg.Contains("UQ_EMPLEADO_Username", StringComparison.OrdinalIgnoreCase))
                     ModelState.AddModelError("", "El nombre de usuario generado ya está en uso. Intente nuevamente.");
                 else if (msg.Contains("UQ_EMPLEADO_Email", StringComparison.OrdinalIgnoreCase))
                     ModelState.AddModelError(nameof(model.Email), "Email en uso.");
                 else
-                    ModelState.AddModelError("", "No se pudo registrar el empleado. " + msg); // expón detalle
-
-                // ---- DEBUG: expón mensaje real de SQL ----
-                TempData["DbgRegister"] = (TempData["DbgRegister"] ?? "") + "\nDbUpdateException: " + msg;
+                    ModelState.AddModelError("", "No se pudo registrar el empleado. " + msg);
 
                 await LoadPuestosAsync();
                 return View(model);
@@ -242,19 +194,16 @@ namespace CEGA.Controllers
             // Login directo
             await SignInEmpleadoAsync(emp, isPersistent: false);
 
-            // Si viene desde el modal (AJAX), responde JSON para que tu script redirija la página completa
+            // AJAX: JSON para que el modal redirija; no-AJAX: redirect normal
             var isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
             if (isAjax)
                 return Json(new { ok = true, redirectUrl = Url.Action("Index", "Home") });
 
-            // Si no es AJAX, navegación normal
             return RedirectToAction("Index", "Home");
-
         }
 
         [HttpGet]
         public IActionResult PuestoForm() => PartialView("Partials/_PuestoForm");
-
 
         // =====================
         //       LOGOUT
@@ -276,7 +225,7 @@ namespace CEGA.Controllers
                 new Claim(ClaimTypes.NameIdentifier, emp.Cedula.ToString()),
                 new Claim(ClaimTypes.Name, emp.Username),
                 new Claim(ClaimTypes.Email, emp.Email),
-                new Claim(ClaimTypes.Role, emp.Rol.ToString()) // AdminSistema/RRHH/...
+                new Claim(ClaimTypes.Role, emp.Rol.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -315,9 +264,7 @@ namespace CEGA.Controllers
                 .Replace('ñ', 'n')
                 .Replace('Ñ', 'n');
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
+
+        public IActionResult Index() => View();
     }
 }

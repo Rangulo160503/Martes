@@ -11,5 +11,7 @@ namespace CEGA.Data
 
         public DbSet<Puesto> Puestos { get; set; } = null!;
         public DbSet<Empleado> Empleados { get; set; } = null!;
+        public DbSet<EmpleadosSalarios> EmpleadosSalarios { get; set; } = null!;
+
     }
 }
