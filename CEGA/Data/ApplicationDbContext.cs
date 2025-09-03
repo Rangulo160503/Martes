@@ -11,6 +11,8 @@ namespace CEGA.Data
 
         public DbSet<Puesto> Puestos { get; set; } = null!;
         public DbSet<Empleado> Empleados { get; set; } = null!;
-
+        public DbSet<Incapacidad> Incapacidades { get; set; } = null!;
+        // DbSet
+        public DbSet<VacacionesEmpleado> Vacaciones { get; set; } = null!;
     }
 }

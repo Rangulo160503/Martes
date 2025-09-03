@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CEGA")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+69e2e114a2d21bff9d641a0b7b9589304c01a4c7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+784a5073350006be092ee305b831590ce0aca2cb")]
 [assembly: System.Reflection.AssemblyProductAttribute("CEGA")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CEGA")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

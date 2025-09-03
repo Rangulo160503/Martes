@@ -1,0 +1,56 @@
+﻿@using System.Globalization
+@model IEnumerable<CEGA.Models.ViewModels.Empleados.ResumenSalariosVM>
+
+<div class="card">
+    <div class="card-header">Resumen de empleados</div>
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Empleado</th>
+                            <th>Estado</th>
+                            <th>Puesto</th>
+                            <th class="text-end">Salario base</th>
+                            <th class="text-end">Vacaciones tomadas</th>
+                            <th>Incapacidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>@r.Cedula</td>
+                                <td>@r.NombreCompleto</td>
+                                <td>
+                                    @if (r.Activo)
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    }
+                                </td>
+                                <td>@r.PuestoNombre</td>
+                                <td class="text-end">
+                                    @((r.SalarioBase ?? 0m).ToString("C", CultureInfo.GetCultureInfo("es-CR")))
+                                </td>
+                                <td class="text-end">@r.VacacionesTomadas</td>
+                                <td>@(r.TieneIncapacidad ? "Sí" : "No")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-3 text-muted">No hay datos para mostrar.</div>
+        }
+    </div>
+</div>

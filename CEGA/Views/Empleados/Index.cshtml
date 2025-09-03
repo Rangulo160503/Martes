@@ -1,16 +1,61 @@
-﻿@using CEGA.Models.ViewModels.Empleados
+﻿@using CEGA.Models
+@using CEGA.Models.ViewModels.Empleados
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+
 @{
     ViewData["Title"] = "Gestión de Empleados";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // Cast seguro desde ViewBag
+    // Casts seguros desde ViewBag
     var vmPuestos = ViewBag.PuestosVm as CambiarPuestoVM ?? new CambiarPuestoVM();
+    var puestos = ViewBag.Puestos as IEnumerable<Puesto> ?? Enumerable.Empty<Puesto>();
+    var incapacidades = ViewBag.Incapacidades as IEnumerable<Incapacidad> ?? Enumerable.Empty<Incapacidad>();
+    var vacaciones = ViewBag.Vacaciones as IEnumerable<VacacionesEmpleado> ?? Enumerable.Empty<VacacionesEmpleado>();
+
+    // Lista de empleados para dropdowns en parciales (_Incapacidades / _Vacaciones)
+    var empleadosSelect = ViewBag.EmpleadosSelect as IEnumerable<SelectListItem>
+                          ?? (vmPuestos.Empleados ?? Enumerable.Empty<SelectListItem>());
 }
 
 <div class="container my-4">
     <h2 class="fw-bold mb-3">Gestión de Empleados</h2>
 
+    <!-- Partial: cambiar puesto -->
     @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
+
+    <hr class="my-4" />
+
+    <!-- Partial: salarios (editar salario base por puesto) -->
+    @await Html.PartialAsync("Partials/_Salarios", puestos)
+
+    <hr class="my-4" />
+
+    <!-- Partial: incapacidades (subir archivo + listado) -->
+    <hr class="my-4" />
+
+    @{
+        var vd = new ViewDataDictionary(ViewData);
+        if (vd.ContainsKey("Empleados")) vd.Remove("Empleados"); // evita duplicado
+        vd["Empleados"] = empleadosSelect;                       // setea la lista
+    }
+    @await Html.PartialAsync("Partials/_Incapacidades", incapacidades, vd)
+
+    <hr class="my-4" />
+
+    @{
+        var vdVac = new ViewDataDictionary(ViewData);
+        if (vdVac.ContainsKey("Empleados")) vdVac.Remove("Empleados"); // evita duplicado
+        vdVac["Empleados"] = empleadosSelect;                           // setea la lista
+    }
+    @await Html.PartialAsync("Partials/_Vacaciones", vacaciones, vdVac)
+
+    <hr class="my-4" />
+    @{
+        var resumen = ViewBag.ResumenEmpleados as IEnumerable<ResumenSalariosVM>
+        ?? Enumerable.Empty<ResumenSalariosVM>();
+    }
+    @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
 </div>
 
 @section Scripts {

@@ -1,5 +1,136 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<CEGA.Models.VacacionesEmpleado>
+@using CEGA.Models.ViewModels.Empleados
+@using Microsoft.AspNetCore.Mvc.Rendering
+
 @{
+    // Dropdown de empleados que viene desde el Index via ViewData
+    var empleados = ViewData["Empleados"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    // Resumen (si algún día lo calculas en el controller)
+    var resumen = ViewBag.ResumenVacaciones as IEnumerable<VacacionesResumenVM> ?? Enumerable.Empty<VacacionesResumenVM>();
 }
+
+@if (resumen?.Any() == true)
+{
+    <div class="card mb-3">
+        <div class="card-header">Resumen por empleado (ciclo vigente)</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Empleado</th>
+                            <th>Ingreso</th>
+                            <th>Ciclo</th>
+                            <th class="text-end">Acumulados</th>
+                            <th class="text-end">Tomados</th>
+                            <th class="text-end">Disponibles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in resumen.OrderBy(x => x.NombreCompleto))
+                        {
+                            <tr>
+                                <td>@r.Cedula</td>
+                                <td>@r.NombreCompleto</td>
+                                <td>@r.FechaIngreso:yyyy-MM-dd</td>
+                                <td>@r.CicloInicio:yyyy-MM-dd — @r.CicloFin:yyyy-MM-dd</td>
+                                <td class="text-end">@r.DiasAcumuladosAlDia / @r.DiasAnuales</td>
+                                <td class="text-end">@r.DiasTomadosEnCiclo</td>
+                                <td class="text-end">@r.DiasDisponibles</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ============ ALTA (crear día de vacaciones) ============ -->
+<div class="card mb-3">
+    <div class="card-header">Registrar día de vacaciones</div>
+    <div class="card-body">
+        <form asp-controller="Empleados" asp-action="CrearVacacion" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <div class="col-md-6">
+                <label class="form-label" for="Cedula">Empleado</label>
+                <select id="Cedula" name="Cedula" class="form-select" required asp-items="empleados">
+                    <option value="">— Seleccione —</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" for="Fecha">Fecha</label>
+                <input id="Fecha" name="Fecha" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============ LISTADO + EDIT/DELETE ============ -->
+<div class="card">
+    <div class="card-header">Solicitudes registradas</div>
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Cédula</th>
+                            <th>Empleado</th>
+                            <th style="width: 210px;">Fecha</th>
+                            <th style="width: 220px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.OrderByDescending(x => x.Fecha))
+                        {
+                            var nombre = v.Empleado != null
+                            ? $"{v.Empleado.Nombre} {v.Empleado.Apellido1} {v.Empleado.Apellido2}".Trim()
+                            : "";
+
+                            <tr>
+                                <td>@v.Cedula</td>
+                                <td>@nombre</td>
+
+                                <!-- Editar fecha (form por fila) -->
+                                <td>
+                                    <form asp-controller="Empleados" asp-action="ActualizarVacacion" method="post" class="d-flex gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@v.Id" />
+                                        <input type="date" name="Fecha" class="form-control form-control-sm"
+                                               value="@v.Fecha.ToString("yyyy-MM-dd")" required />
+                                        <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                                    </form>
+                                </td>
+
+                                <!-- Eliminar -->
+                                <td>
+                                    <form asp-controller="Empleados" asp-action="EliminarVacacion" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@v.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('¿Eliminar este registro?');">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-3 text-muted">No hay solicitudes registradas.</div>
+        }
+    </div>
+</div>

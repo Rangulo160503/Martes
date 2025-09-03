@@ -1,5 +1,105 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<CEGA.Models.Incapacidad>
+
 @{
+    var empleados = ViewBag.Empleados as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="card">
+    <div class="card-header">Subir incapacidad</div>
+    <div class="card-body">
+        <form asp-controller="Empleados"
+              asp-action="SubirIncapacidad"
+              method="post"
+              enctype="multipart/form-data"
+              class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <div class="col-md-6">
+                <label class="form-label">Empleado</label>
+                <select name="Cedula" class="form-select" required>
+                    <option value="">— Seleccione —</option>
+                    @foreach (var e in empleados)
+                    {
+                        <option value="@e.Value">@e.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Archivo</label>
+                <input type="file" name="Archivo" class="form-control" required
+                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" />
+                <div class="form-text">PDF o imagen/documento escaneado.</div>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card mt-3">
+        <div class="card-header">Incapacidades cargadas</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Empleado</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model)
+                        {
+                            var nombre = i.Empleado is null
+                            ? ""
+                            : string.Join(" ", new[] { i.Empleado.Nombre, i.Empleado.SegundoNombre, i.Empleado.Apellido1, i.Empleado.Apellido2 }
+                            .Where(s => !string.IsNullOrWhiteSpace(s)));
+                            <tr>
+                                <td>@i.Cedula</td>
+                                <td>@nombre</td>
+                                <td>@i.Empleado?.Email</td>
+                                <td class="text-nowrap">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       asp-controller="Empleados"
+                                       asp-action="DescargarIncapacidad"
+                                       asp-route-cedula="@i.Cedula">
+                                        Descargar
+                                    </a>
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            onclick="openModal('@Url.Action("EditarIncapacidad", "Empleados", new { cedula = i.Cedula })',
+                                       'Reemplazar incapacidad (@i.Cedula)')">
+                                        Reemplazar
+                                    </button>
+
+                                    <form class="d-inline" method="post"
+                                          asp-controller="Empleados" asp-action="EliminarIncapacidad">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cedula" value="@i.Cedula" />
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('¿Eliminar incapacidad de @i.Cedula?');">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info mt-3 mb-0">Aún no hay incapacidades registradas.</div>
 }

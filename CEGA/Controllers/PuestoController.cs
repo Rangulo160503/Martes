@@ -73,5 +73,25 @@ namespace CEGA.Controllers
                 return BadRequest(new { error = "No se pudo crear el puesto.", detalle = msg });
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarSalario(int id, decimal? salarioBase, string? moneda)
+        {
+            var p = await _context.Puestos.FindAsync(id);
+            if (p == null)
+            {
+                TempData["Error"] = "Puesto no encontrado.";
+                return RedirectToAction("Index", "Empleados");
+            }
+
+            p.SalarioBase = salarioBase; // puede ser null si así lo quieres permitir
+            if (!string.IsNullOrWhiteSpace(moneda))
+                p.Moneda = moneda.Trim().ToUpperInvariant();
+
+            await _context.SaveChangesAsync();
+            TempData["Mensaje"] = $"Salario de \"{p.Nombre}\" actualizado.";
+            return RedirectToAction("Index", "Empleados");
+        }
     }
 }

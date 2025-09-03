@@ -10,6 +10,7 @@ namespace CEGA.Models
         [Range(100000000, 999999999)]
         public int Cedula { get; set; }
 
+
         [Required, MaxLength(50)] public string Nombre { get; set; } = "";
         [MaxLength(50)] public string? SegundoNombre { get; set; }
         [Required, MaxLength(50)] public string Apellido1 { get; set; } = "";
