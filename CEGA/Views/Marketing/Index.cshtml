@@ -1,5 +1,30 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model CEGA.Models.ViewModels.MarketingPageVM
+@using CEGA.Models
+
 @{
+    ViewData["Title"] = "Clientes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-0">Clientes</h2>
+</div>
+
+<!-- Alertas -->
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger  mb-3">@TempData["Error"]</div>
+}
+
+<!-- Solo Clientes -->
+@await Html.PartialAsync("Partials/_ClientesPartial",
+Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>())
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
