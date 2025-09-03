@@ -24,6 +24,7 @@
     [Cedula]                     INT            NULL,
     CONSTRAINT [FK_Empleado_Puesto] FOREIGN KEY ([PuestoId]) REFERENCES [dbo].[Puesto] ([Id]) ON UPDATE CASCADE,
     UNIQUE NONCLUSTERED ([Email] ASC),
-    UNIQUE NONCLUSTERED ([Username] ASC)
+    UNIQUE NONCLUSTERED ([Username] ASC),
+    CONSTRAINT [UQ_Empleado_Cedula] UNIQUE NONCLUSTERED ([Cedula] ASC)
 );
 
