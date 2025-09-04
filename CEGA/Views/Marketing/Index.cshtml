@@ -2,13 +2,13 @@
 @using CEGA.Models
 
 @{
-    ViewData["Title"] = "Clientes";
+    ViewData["Title"] = "Marketing";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!-- Header -->
 <div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
-    <h2 class="fw-bold mb-0">Clientes</h2>
+    <h2 class="fw-bold mb-0">Marketing</h2>
 </div>
 
 <!-- Alertas -->
@@ -21,9 +21,14 @@
     <div class="alert alert-danger  mb-3">@TempData["Error"]</div>
 }
 
-<!-- Solo Clientes -->
+<!-- Clientes -->
 @await Html.PartialAsync("Partials/_ClientesPartial",
 Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>())
+
+<hr class="my-4" />
+
+<!-- Pools de correos -->
+@await Html.PartialAsync("Partials/_PoolsPartial", Model)
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -15,7 +15,9 @@ namespace CEGA.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var vm = new MarketingPageVM { Clientes = await GetClientesAsync() };
+            var vm = new MarketingPageVM { Clientes = await GetClientesAsync(),
+                Pools = await GetPoolsAsync()
+            };
             return View(vm);
         }
 
@@ -135,6 +137,79 @@ namespace CEGA.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearPoolCorreo(
+    [FromForm] string Nombre,
+    [FromForm] string? Mensaje,
+    [FromForm] string Correos,
+    IFormFile? ArchivoAdjunto)
+        {
+            // Nota: si en tu vista el textarea aún tiene name="Descripcion", tomalo de ahí:
+            if (string.IsNullOrWhiteSpace(Mensaje))
+                Mensaje = Request.Form["Descripcion"];
 
+            if (string.IsNullOrWhiteSpace(Nombre) ||
+                string.IsNullOrWhiteSpace(Mensaje) ||
+                string.IsNullOrWhiteSpace(Correos))
+            {
+                TempData["Error"] = "Nombre, Mensaje y Correos son obligatorios.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            byte[]? archivoBytes = null;
+            if (ArchivoAdjunto != null && ArchivoAdjunto.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await ArchivoAdjunto.CopyToAsync(ms);
+                archivoBytes = ms.ToArray();
+            }
+
+            try
+            {
+                using var con = new SqlConnection(_cs);
+                await con.OpenAsync();
+                using var cmd = new SqlCommand(@"
+            INSERT INTO dbo.Pools (Nombre, Mensaje, Correos, Archivo)
+            VALUES (@Nombre, @Mensaje, @Correos, @Archivo)", con);
+
+                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                cmd.Parameters.AddWithValue("@Mensaje", Mensaje);
+                cmd.Parameters.AddWithValue("@Correos", Correos);
+                cmd.Parameters.Add("@Archivo", System.Data.SqlDbType.VarBinary, -1)
+                              .Value = (object?)archivoBytes ?? DBNull.Value;
+
+                await cmd.ExecuteNonQueryAsync();
+                TempData["Mensaje"] = "Pool creado.";
+            }
+            catch (SqlException)
+            {
+                TempData["Error"] = "No se pudo crear el pool.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<IEnumerable<PoolCorreo>> GetPoolsAsync()
+        {
+            var list = new List<PoolCorreo>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand(
+                "SELECT Id, Nombre, Mensaje, Correos FROM dbo.Pools ORDER BY Id DESC", con);
+            await con.OpenAsync();
+            using var rd = await cmd.ExecuteReaderAsync();
+            while (await rd.ReadAsync())
+            {
+                list.Add(new PoolCorreo
+                {
+                    Id = rd.GetInt32(0),
+                    Nombre = rd.GetString(1),
+                    Mensaje = rd.GetString(2),
+                    Correos = rd.GetString(3),
+                    // Archivo no se carga en listado (ahorra memoria)
+                });
+            }
+            return list;
+        }
     }
 }
