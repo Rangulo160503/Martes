@@ -16,8 +16,11 @@ namespace CEGA.Controllers
         public async Task<IActionResult> Index()
         {
             var vm = new MarketingPageVM { Clientes = await GetClientesAsync(),
-                Pools = await GetPoolsAsync()
+                Pools = await GetPoolsAsync(),
+                Campanias = await GetCampaniasAsync()
+
             };
+            ViewBag.Pools = vm.Pools;
             return View(vm);
         }
 
@@ -207,6 +210,82 @@ namespace CEGA.Controllers
                     Mensaje = rd.GetString(2),
                     Correos = rd.GetString(3),
                     // Archivo no se carga en listado (ahorra memoria)
+                });
+            }
+            return list;
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearCampania(
+    [FromForm] string Nombre,
+    [FromForm] string AsuntoCorreo,
+    [FromForm] string Descripcion,
+    [FromForm] string NombrePool)
+        {
+            if (string.IsNullOrWhiteSpace(Nombre) ||
+                string.IsNullOrWhiteSpace(AsuntoCorreo) ||
+                string.IsNullOrWhiteSpace(Descripcion) ||
+                string.IsNullOrWhiteSpace(NombrePool))
+            {
+                TempData["Error"] = "Todos los campos de la campaña son obligatorios.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                using var con = new SqlConnection(_cs);
+                await con.OpenAsync();
+
+                // (Opcional) valida que exista el pool por nombre
+                using (var chk = new SqlCommand("SELECT 1 FROM dbo.Pools WHERE Nombre=@NombrePool", con))
+                {
+                    chk.Parameters.AddWithValue("@NombrePool", NombrePool);
+                    var ok = await chk.ExecuteScalarAsync();
+                    if (ok == null)
+                    {
+                        TempData["Error"] = "El pool seleccionado no existe.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+                using (var cmd = new SqlCommand(@"
+            INSERT INTO dbo.Campanias (Nombre, AsuntoCorreo, Descripcion, NombrePool)
+            VALUES (@Nombre, @AsuntoCorreo, @Descripcion, @NombrePool)", con))
+                {
+                    cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                    cmd.Parameters.AddWithValue("@AsuntoCorreo", AsuntoCorreo);
+                    cmd.Parameters.AddWithValue("@Descripcion", Descripcion);
+                    cmd.Parameters.AddWithValue("@NombrePool", NombrePool);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                TempData["Mensaje"] = "Campaña creada.";
+            }
+            catch (SqlException)
+            {
+                TempData["Error"] = "No se pudo crear la campaña.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<IEnumerable<CampMarketing>> GetCampaniasAsync()
+        {
+            var list = new List<CampMarketing>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand(
+                "SELECT Id, Nombre, AsuntoCorreo, Descripcion, NombrePool FROM dbo.Campanias ORDER BY Id DESC", con);
+            await con.OpenAsync();
+            using var rd = await cmd.ExecuteReaderAsync();
+            while (await rd.ReadAsync())
+            {
+                list.Add(new CampMarketing
+                {
+                    Id = rd.GetInt32(0),
+                    Nombre = rd.GetString(1),
+                    AsuntoCorreo = rd.GetString(2),
+                    Descripcion = rd.GetString(3),
+                    NombrePool = rd.GetString(4)
                 });
             }
             return list;

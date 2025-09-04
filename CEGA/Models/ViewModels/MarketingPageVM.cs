@@ -9,5 +9,7 @@ namespace CEGA.Models.ViewModels
 
         public IEnumerable<CEGA.Models.PoolCorreo> Pools { get; set; }
             = System.Linq.Enumerable.Empty<CEGA.Models.PoolCorreo>();
+        public IEnumerable<CEGA.Models.CampMarketing> Campanias { get; set; }
+    = System.Linq.Enumerable.Empty<CEGA.Models.CampMarketing>();
     }
 }

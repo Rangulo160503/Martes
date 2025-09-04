@@ -30,6 +30,14 @@ Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>())
 <!-- Pools de correos -->
 @await Html.PartialAsync("Partials/_PoolsPartial", Model)
 
+<hr class="my-4" />
+@{
+    ViewBag.Pools = Model?.Pools ?? Enumerable.Empty<PoolCorreo>();
+}
+@await Html.PartialAsync("Partials/_CampaniasPartial",
+Model?.Campanias ?? Enumerable.Empty<CEGA.Models.CampMarketing>())
+
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

@@ -1,0 +1,88 @@
+﻿@model IEnumerable<CEGA.Models.CampMarketing>
+@using CEGA.Models
+
+@{
+    var count = Model?.Count() ?? 0;
+    var pools = (ViewBag.Pools as IEnumerable<PoolCorreo>) ?? Enumerable.Empty<PoolCorreo>();
+}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+    <h4 class="mb-0">Campañas registradas</h4>
+    <span class="text-muted small">@count registro(s)</span>
+</div>
+
+<!-- Alta de campaña -->
+<div class="card card-lg mb-3">
+    <div class="card-header">Crear campaña</div>
+    <div class="card-body">
+        <form asp-action="CrearCampania" asp-controller="Marketing" method="post" class="row g-2" novalidate>
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+            <div class="col-md-3">
+                <label class="form-label" for="Nombre">Nombre</label>
+                <input id="Nombre" name="Nombre" class="form-control" placeholder="Nombre de la campaña" required />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" for="AsuntoCorreo">Asunto</label>
+                <input id="AsuntoCorreo" name="AsuntoCorreo" class="form-control" placeholder="Asunto del correo" required />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" for="NombrePool">Pool</label>
+                <select id="NombrePool" name="NombrePool" class="form-select" required>
+                    <option value="">— Selecciona un pool —</option>
+                    @foreach (var p in pools.OrderBy(x => x.Nombre))
+                    {
+                        <option value="@p.Nombre">@p.Nombre</option>
+                    }
+                </select>
+                <div class="form-text">Se enviará a los correos de este pool.</div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" for="Descripcion">Descripción / Cuerpo</label>
+                <textarea id="Descripcion" name="Descripcion" class="form-control" rows="3" placeholder="Contenido del correo..." required></textarea>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-accent">Crear</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Listado -->
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Asunto</th>
+                    <th style="min-width:200px;">Pool</th>
+                    <th style="min-width:280px;">Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var camp in Model)
+                {
+                    var poolOk = !string.IsNullOrWhiteSpace(camp.NombrePool);
+                    <tr>
+                        <td class="fw-semibold">@camp.Nombre</td>
+                        <td>@camp.AsuntoCorreo</td>
+                        <td>@(poolOk? camp.NombrePool: "—")</td>
+                        <td class="text-truncate" style="max-width:420px;">@camp.Descripcion</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mt-3 mb-0">No hay campañas registradas.</div>
+}
