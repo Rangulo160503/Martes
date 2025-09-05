@@ -10,6 +10,15 @@
 <div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
     <h2 class="fw-bold mb-0">Marketing</h2>
 </div>
+<form asp-action="TestEmail" asp-controller="Marketing" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-accent">Enviar correo de prueba (Graph)</button>
+</form>
+
+<form asp-action="TestEmailSmtp" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-accent">Enviar correo de prueba (SMTP)</button>
+</form>
 
 <!-- Alertas -->
 @if (TempData["Mensaje"] != null)

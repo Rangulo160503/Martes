@@ -1,17 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using CEGA.Models;
+﻿using CEGA.Models;
 using CEGA.Models.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CEGA.Controllers
 {
     public class MarketingController : Controller
     {
+        private readonly ITokenAcquisition _tokenAcquisition;
         private readonly string _cs;
-        public MarketingController(IConfiguration cfg) => _cs = cfg.GetConnectionString("DefaultConnection");
+        private readonly IConfiguration _cfg;
 
+        public MarketingController(IConfiguration cfg, ITokenAcquisition tokenAcquisition)
+        {
+            _cfg = cfg;
+            _cs = cfg.GetConnectionString("DefaultConnection");
+            _tokenAcquisition = tokenAcquisition;
+        }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -289,6 +304,55 @@ namespace CEGA.Controllers
                 });
             }
             return list;
+        }
+        [HttpGet, HttpPost]
+        public async Task<IActionResult> TestEmail() // <-- Graph
+        {
+            var scopes = new[] { "Mail.Send" };
+            string token;
+            try
+            {
+                token = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes, authenticationScheme: "GraphOIDC");
+            }
+            catch (Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException)
+            {
+                // fuerza login/consent con el esquema secundario y vuelve a esta acción
+                return Challenge(new AuthenticationProperties { RedirectUri = Url.Action(nameof(TestEmail))! }, "GraphOIDC");
+            }
+            catch (Microsoft.Identity.Client.MsalUiRequiredException)
+            {
+                var props = new AuthenticationProperties { RedirectUri = Url.Action(nameof(TestEmail))! };
+                props.Items[Microsoft.Identity.Web.Constants.Scope] = "Mail.Send";
+                return Challenge(props, "GraphOIDC");
+            }
+
+
+
+            // destinatario: tu propio correo
+            var to = _cfg["Email:User"];
+
+            var payload = new
+            {
+                message = new
+                {
+                    subject = "Prueba CEGA (Graph)",
+                    body = new { contentType = "Text", content = "Prueba con Microsoft Graph." },
+                    toRecipients = new[] { new { emailAddress = new { address = to } } }
+                },
+                saveToSentItems = true
+            };
+
+            using var http = new HttpClient();
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var content = new StringContent(JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+
+            var resp = await http.PostAsync("https://graph.microsoft.com/v1.0/me/sendMail", content);
+            if (resp.IsSuccessStatusCode)
+                TempData["Mensaje"] = "Correo de prueba enviado (Graph).";
+            else
+                TempData["Error"] = $"Graph sendMail falló: {(int)resp.StatusCode} {resp.ReasonPhrase}";
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
