@@ -1,0 +1,19 @@
+﻿@model CEGA.Models.ViewModels.TareaCrearVM
+@{
+    ViewData["Title"] = "Seguimiento de Tareas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tareas = (IEnumerable<CEGA.Models.Seguimiento.Tarea>)(ViewBag.Tareas ?? Enumerable.Empty<CEGA.Models.Seguimiento.Tarea>());
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        @await Html.PartialAsync("Partials/_CrearTareaPartial", Model)
+    </div>
+    <div class="col-lg-7">
+        @await Html.PartialAsync("Partials/_TareasTablaPartial", tareas)
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

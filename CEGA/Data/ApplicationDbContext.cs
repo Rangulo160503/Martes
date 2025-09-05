@@ -1,4 +1,5 @@
 ﻿using CEGA.Models;
+using CEGA.Models.Seguimiento;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
@@ -14,5 +15,7 @@ namespace CEGA.Data
         public DbSet<Incapacidad> Incapacidades { get; set; } = null!;
         // DbSet
         public DbSet<VacacionesEmpleado> Vacaciones { get; set; } = null!;
+        public DbSet<Tarea> Tareas { get; set; } = null!;
+
     }
 }

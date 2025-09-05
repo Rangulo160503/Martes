@@ -1,0 +1,37 @@
+﻿@model CEGA.Models.ViewModels.TareaCrearVM
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Nueva tarea</h5>
+
+        <form asp-action="CrearTarea" asp-controller="Seguimiento" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-12">
+                <label asp-for="Titulo" class="form-label"></label>
+                <input asp-for="Titulo" class="form-control" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="CedulaEmpleado" class="form-label"></label>
+                <select asp-for="CedulaEmpleado" asp-items="Model.Empleados" class="form-select">
+                    <option value="">-- Seleccione empleado --</option>
+                </select>
+                <span asp-validation-for="CedulaEmpleado" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Comentario" class="form-label"></label>
+                <textarea asp-for="Comentario" rows="4" class="form-control"></textarea>
+                <span asp-validation-for="Comentario" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
