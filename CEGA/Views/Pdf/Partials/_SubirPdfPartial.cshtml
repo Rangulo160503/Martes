@@ -1,0 +1,7 @@
+﻿@model CEGA.Models.ViewModels.PdfUploadVM
+<form asp-action="Subir" asp-controller="Pdf" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input asp-for="Cedula" />
+    <input asp-for="PdfFile" type="file" accept="application/pdf" />
+    <button type="submit">Subir</button>
+</form>

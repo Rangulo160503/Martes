@@ -75,15 +75,7 @@
                     <hr class="sidebar-sep" />
                     <a class="nav-link" asp-controller="Seguimiento" asp-action="Index">Seguimiento</a>
                     <hr class="sidebar-sep" />
-
-                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-pdf" aria-expanded="false">
-                        Módulo PDF <span class="caret"></span>
-                    </button>
-                    <div id="mod-pdf" class="collapse">
-                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="ListaPlanos">Lista de Planos</a>
-                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="SubirPlano">Subir Plano</a>
-                        <a class="nav-link nav-subitem" asp-controller="Pdf" asp-action="CompararPlanos">Comparar Planos</a>
-                    </div>
+                    <a class="nav-link" asp-controller="Pdf" asp-action="Index">Módulo PDF</a>
                 </nav>
             </aside>
 

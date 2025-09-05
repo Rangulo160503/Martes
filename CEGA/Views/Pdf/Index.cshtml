@@ -1,0 +1,29 @@
+﻿@using CEGA.Models
+@using CEGA.Models.ViewModels
+@{
+    ViewData["Title"] = "Módulo PDF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-0">Módulo PDF</h2>
+</div>
+
+<!-- Alertas -->
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
+}
+
+<!-- Subir PDF -->
+@await Html.PartialAsync("~/Views/Pdf/Partials/_SubirPdfPartial.cshtml",
+new PdfUploadVM())
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
