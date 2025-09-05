@@ -1,0 +1,18 @@
+﻿@model CEGA.Models.ViewModels.IncapacidadesPorEmpleadoVM
+@using CEGA.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Reportería – Incapacidades";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-0">Incapacidades</h2>
+</div>
+
+<!-- Partial con la tabla de resultados -->
+<partial name="Partials/_IncapacidadesPorEmpleadoPartial" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

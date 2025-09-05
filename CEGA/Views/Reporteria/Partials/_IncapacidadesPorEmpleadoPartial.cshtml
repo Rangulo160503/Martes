@@ -1,0 +1,38 @@
+﻿@model CEGA.Models.ViewModels.IncapacidadesPorEmpleadoVM
+
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="p-3 bg-light border rounded">
+            <div class="small text-muted">Total incapacidades</div>
+            <div class="h4 mb-0">@Model.Total</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-sm align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Empleado</th>
+                <th>Cédula</th>
+                <th class="text-end">Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var it in Model.Items)
+            {
+                <tr>
+                    <td>@it.NombreCompleto</td>
+                    <td>@it.Cedula</td>
+                    <td class="text-end fw-semibold">@it.Cantidad</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="table-light">
+                <th colspan="2">Total</th>
+                <th class="text-end">@Model.Total</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

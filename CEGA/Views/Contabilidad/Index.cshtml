@@ -1,0 +1,39 @@
+﻿@model CEGA.Models.ViewModels.ContabilidadPageVM
+@using CEGA.Models
+@using CEGA.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Contabilidad";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-0">Contabilidad</h2>
+</div>
+
+
+<!-- 1) Resumen financiero (KPIs) -->
+<partial name="Partials/_ResumenFinancieroPartial"
+         model="Model?.Resumen ?? new ResumenFinanciero()" />
+
+<hr class="my-4" />
+
+<!-- 2) Ingresos (incluye fijos como 'CR - Datafonos') -->
+<partial name="Partials/_IngresosPartial"
+         model="Model?.Ingresos ?? Enumerable.Empty<MovimientoContable>()" />
+
+<hr class="my-4" />
+
+<!-- 3) Gastos -->
+<partial name="Partials/_GastosPartial"
+         model="Model?.Gastos ?? Enumerable.Empty<MovimientoContable>()" />
+
+<hr class="my-4" />
+
+<!-- 4) Cuentas bancarias (saldos/conciliación) -->
+<partial name="Partials/_CuentasBancariasPartial"
+         model="Model?.Cuentas ?? Enumerable.Empty<CuentaBancaria>()" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

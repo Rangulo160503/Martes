@@ -69,27 +69,9 @@
                     <hr class="sidebar-sep" />
                     <a class="nav-link" asp-controller="Marketing" asp-action="Index">Marketing</a>
                     <hr class="sidebar-sep" />
-
-                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-conta" aria-expanded="false">
-                        Contabilidad <span class="caret"></span>
-                    </button>
-                    <div id="mod-conta" class="collapse">
-                        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Ingresos">Ingresos</a>
-                        <a class="nav-link nav-subitem" asp-controller="Contabilidad" asp-action="Egresos">Egresos</a>
-                        <a class="nav-link nav-subitem" asp-controller="CierreDiario" asp-action="Index">Cierres Diarios</a>
-                        <a class="nav-link nav-subitem" asp-controller="CierreDiario" asp-action="HistorialCierresRango">Reportes Financieros</a>
-                    </div>
-
+                    <a class="nav-link" asp-controller="Contabilidad" asp-action="Index">Contabilidad</a>
                     <hr class="sidebar-sep" />
-
-                    <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-report" aria-expanded="false">
-                        Reportería <span class="caret"></span>
-                    </button>
-                    <div id="mod-report" class="collapse">
-                        <a class="nav-link nav-subitem" asp-controller="ReporteIncapacidad" asp-action="Index">Incapacidades</a>
-                        <a class="nav-link nav-subitem" asp-controller="ReporteIncidente" asp-action="Index">Incidentes</a>
-                    </div>
-
+                    <a class="nav-link" asp-controller="Reporteria" asp-action="Index">Reportería</a>
                     <hr class="sidebar-sep" />
 
                     <button class="nav-link nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-seg" aria-expanded="false">

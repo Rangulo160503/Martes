@@ -40,6 +40,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_CuentasBancariasPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9DdWVudGFzQmFuY2FyaWFzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_GastosPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9HYXN0b3NQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_IngresosPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9JbmdyZXNvc1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_ResumenFinancieroPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9SZXN1bWVuRmluYW5jaWVyb1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Empleados/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -94,6 +114,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Marketing/Partials/_PoolsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFya2V0aW5nXFBhcnRpYWxzXF9Qb29sc1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Reporteria/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0ZXJpYVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Reporteria/Partials/_IncapacidadesPorEmpleadoPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0ZXJpYVxQYXJ0aWFsc1xfSW5jYXBhY2lkYWRlc1BvckVtcGxlYWRvUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Shared/Error.cshtml]

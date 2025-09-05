@@ -1,0 +1,47 @@
+﻿@model IEnumerable<CEGA.Models.ViewModels.MovimientoContable>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Gastos</span>
+        <div class="d-flex gap-2">
+            <a asp-action="CrearGasto" asp-controller="Contabilidad" class="btn btn-sm btn-outline-secondary">Nuevo</a>
+            <a asp-action="ImportarGastos" asp-controller="Contabilidad" class="btn btn-sm btn-outline-secondary">Importar</a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="p-3 text-muted">Sin gastos registrados.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Monto</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model)
+                        {
+                            <tr>
+                                <td>@m.Fecha.ToString("yyyy-MM-dd")</td>
+                                <td>@m.Concepto</td>
+                                <td>@m.Categoria</td>
+                                <td class="text-end">@m.Monto:N2 @m.Moneda</td>
+                                <td class="text-end">
+                                    <a asp-action="EditarGasto" asp-route-id="@m.Id" class="btn btn-sm btn-link">Editar</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
