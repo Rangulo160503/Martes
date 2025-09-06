@@ -44,8 +44,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_CuentasBancariasPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9DdWVudGFzQmFuY2FyaWFzUGFydGlhbC5jc2h0bWw=
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_CierreDiarioPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9DaWVycmVEaWFyaW9QYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Contabilidad/Partials/_GastosPartial.cshtml]
@@ -122,6 +122,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Pdf/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Pdf/Partials/_AsociarPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9Bc29jaWFyUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes2/CEGA/Views/Pdf/Partials/_SubirPdfPartial.cshtml]

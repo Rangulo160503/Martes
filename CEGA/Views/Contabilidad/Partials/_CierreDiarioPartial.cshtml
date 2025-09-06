@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CEGA.Models.ViewModels.CierreDiarioVM>
+
+<div id="CierreDiarioSection" class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Cierres diarios</span>
+        <form asp-action="GenerarCierre" asp-controller="Contabilidad" method="post" class="mb-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="fecha" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <button class="btn btn-sm btn-primary" type="submit">Cierre de hoy</button>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="p-2 text-muted">Todavía no hay cierres generados.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th class="text-end">Ingresos</th>
+                            <th class="text-end">Gastos</th>
+                            <th class="text-end">Saldo</th>
+                            <th>Generado en</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cierre in Model.OrderByDescending(c => c.Fecha))
+                        {
+                            <tr>
+                                <td>@cierre.Fecha.ToString("yyyy-MM-dd")</td>
+                                <td class="text-end">@cierre.TotalIngresos.ToString("N2")</td>
+                                <td class="text-end">@cierre.TotalGastos.ToString("N2")</td>
+                                <td class="text-end fw-bold">@(cierre.SaldoDia >= 0 ? "+" : "")@cierre.SaldoDia.ToString("N2")</td>
+                                <td><small class="text-muted">@cierre.CreadoEn.ToString("yyyy-MM-dd HH:mm")</small></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

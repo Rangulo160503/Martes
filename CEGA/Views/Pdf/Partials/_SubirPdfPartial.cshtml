@@ -1,7 +1,32 @@
 ﻿@model CEGA.Models.ViewModels.PdfUploadVM
-<form asp-action="Subir" asp-controller="Pdf" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
-    <input asp-for="Cedula" />
-    <input asp-for="PdfFile" type="file" accept="application/pdf" />
-    <button type="submit">Subir</button>
-</form>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Subir PDF</h5>
+
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-success">@ViewBag.Success</div>
+        }
+
+        <form asp-action="Subir" asp-controller="Pdf" method="post" enctype="multipart/form-data" class="row g-3">
+            @Html.AntiForgeryToken()
+
+            <div class="col-12">
+                <label asp-for="PdfFile" class="form-label">Archivo PDF</label>
+                <input asp-for="PdfFile" type="file" accept="application/pdf" class="form-control" />
+                <span class="form-text">Máx 20&nbsp;MB.</span>
+                <span asp-validation-for="PdfFile" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Subir</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

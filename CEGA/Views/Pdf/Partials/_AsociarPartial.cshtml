@@ -1,0 +1,112 @@
+﻿@model CEGA.Models.ViewModels.PdfAsociacionesVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<form asp-action="Asociar" asp-controller="Pdf" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdPdf" />
+
+    <div class="col-12">
+        <h5 class="mb-1">Asociar elementos al PDF #@Model.IdPdf</h5>
+        <small class="text-muted">Usa los dropdowns para <strong>agregar</strong> o <strong>quitar</strong> y luego “Guardar cambios”.</small>
+    </div>
+
+    <!-- PROYECTOS -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="mb-3">Proyectos</h6>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Quitar del PDF</label>
+                        <select name="ProyectosQuitarIds" class="form-select" multiple size="8">
+                            @if (!Model.ProyectosAsociados.Any())
+                            {
+                                <option disabled>(Sin proyectos asociados)</option>
+                            }
+                            else
+                            {
+                                foreach (var p in Model.ProyectosAsociados)
+                                {
+                                    <option value="@p.Id">@p.Titulo</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Agregar al PDF</label>
+                        <select name="ProyectosAgregarIds" class="form-select" multiple size="8">
+                            @if (!Model.ProyectosDisponibles.Any())
+                            {
+                                <option disabled>(No hay proyectos disponibles)</option>
+                            }
+                            else
+                            {
+                                foreach (var p in Model.ProyectosDisponibles)
+                                {
+                                    <option value="@p.Id">@p.Titulo</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="mb-3">Tareas</h6>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Quitar del PDF</label>
+                        <select name="TareasQuitarIds" class="form-select" multiple size="8">
+                            @if (!Model.TareasAsociadas.Any())
+                            {
+                                <option disabled>(Sin tareas asociadas)</option>
+                            }
+                            else
+                            {
+                                foreach (var t in Model.TareasAsociadas)
+                                {
+                                    <option value="@t.Id">@t.Titulo</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Agregar al PDF</label>
+                        <select name="TareasAgregarIds" class="form-select" multiple size="8">
+                            @if (!Model.TareasDisponibles.Any())
+                            {
+                                <option disabled>(No hay tareas disponibles)</option>
+                            }
+                            else
+                            {
+                                foreach (var t in Model.TareasDisponibles)
+                                {
+                                    <option value="@t.Id">@t.Titulo</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="col-12 d-flex gap-2 justify-content-end">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a class="btn btn-outline-secondary" href="javascript:history.back()">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

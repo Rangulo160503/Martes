@@ -30,9 +30,10 @@
 
 <hr class="my-4" />
 
-<!-- 4) Cuentas bancarias (saldos/conciliación) -->
-<partial name="Partials/_CuentasBancariasPartial"
-         model="Model?.Cuentas ?? Enumerable.Empty<CuentaBancaria>()" />
+<!-- 5) Cierre diario -->
+<partial name="Partials/_CierreDiarioPartial"
+         model="Model?.Cierres ?? Enumerable.Empty<CEGA.Models.ViewModels.CierreDiarioVM>()" />
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

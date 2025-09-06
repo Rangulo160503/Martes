@@ -44,16 +44,14 @@
                         <th>Teléfono</th>
                         <th>Rol</th>
                         <th>Activo</th>
-                        <th></th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var u in Model.UsuariosFiltrados)
                     {
                         <tr>
-                            <td class="fw-semibold">
-                                @u.NombreCompleto
-                            </td>
+                            <td class="fw-semibold">@u.NombreCompleto</td>
                             <td>@u.Username</td>
                             <td>@u.Email</td>
                             <td>@u.TelefonoPersonal</td>
@@ -81,9 +79,19 @@
                                 }
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-success shadow-sm">
-                                    Guardar
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-success shadow-sm">
+                                        Guardar
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger shadow-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteModal"
+                                            data-user-cedula="@u.Cedula"
+                                            data-user-name="@u.NombreCompleto">
+                                        Eliminar
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -98,3 +106,54 @@
         </div>
     }
 </div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <form asp-controller="Usuarios" asp-action="Eliminar" method="post" class="modal-content">
+            @Html.AntiForgeryToken()
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" name="cedula" id="deleteCedula" />
+                <p class="mb-0">
+                    ¿Seguro que deseas eliminar al usuario
+                    <strong id="deleteUserName"></strong>?
+                    Esta acción no se puede deshacer.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-danger">
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('confirmDeleteModal');
+            if (!modalEl) return;
+
+            modalEl.addEventListener('show.bs.modal', (event) => {
+                const button = event.relatedTarget;
+                const cedula = button.getAttribute('data-user-cedula');
+                const nombre = button.getAttribute('data-user-name');
+
+                document.getElementById('deleteCedula').value = cedula;
+                document.getElementById('deleteUserName').textContent = nombre;
+            });
+        });
+    </script>
+}

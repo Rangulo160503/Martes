@@ -3,9 +3,10 @@
     public class ContabilidadPageVM
     {
         public ResumenFinanciero Resumen { get; set; } = new();
+
         public IEnumerable<MovimientoContable> Ingresos { get; set; } = Enumerable.Empty<MovimientoContable>();
         public IEnumerable<MovimientoContable> Gastos { get; set; } = Enumerable.Empty<MovimientoContable>();
-        public IEnumerable<CuentaBancaria> Cuentas { get; set; } = Enumerable.Empty<CuentaBancaria>();
+        public IEnumerable<CierreDiarioVM> Cierres { get; set; } = Enumerable.Empty<CierreDiarioVM>();
     }
 
     public class ResumenFinanciero
@@ -20,20 +21,19 @@
     {
         public int Id { get; set; }
         public DateTime Fecha { get; set; }
-        public string Concepto { get; set; } = "";
-        public string Categoria { get; set; } = ""; // p.ej. “CR - Datafonos”, “Ventas”, “Servicios”
+        public string Concepto { get; set; } = string.Empty;
+        public string Categoria { get; set; } = string.Empty; // Ej: "CR - Datafonos"
         public decimal Monto { get; set; }
         public string Moneda { get; set; } = "CRC";
-        public bool EsFijo { get; set; } // true para “CR - Datafonos”
+        public bool EsFijo { get; set; }
     }
 
-    public class CuentaBancaria
+    public class CierreDiarioVM
     {
-        public int Id { get; set; }
-        public string Banco { get; set; } = "";
-        public string Numero { get; set; } = "";
-        public decimal Saldo { get; set; }
-        public string Moneda { get; set; } = "CRC";
-        public DateTime ActualizadoEn { get; set; }
+        public DateTime Fecha { get; set; }
+        public decimal TotalIngresos { get; set; }
+        public decimal TotalGastos { get; set; }
+        public decimal SaldoDia { get; set; }
+        public DateTime CreadoEn { get; set; }
     }
 }

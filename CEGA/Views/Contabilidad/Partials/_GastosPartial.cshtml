@@ -1,22 +1,46 @@
 ﻿@model IEnumerable<CEGA.Models.ViewModels.MovimientoContable>
+@{
+    var categorias = ViewBag.Categorias as IEnumerable<CEGA.Models.CategoriaMovimiento>;
+    var categoriasGastos = categorias?.Where(c => c.Tipo == "G") ?? Enumerable.Empty<CEGA.Models.CategoriaMovimiento>();
+}
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span class="fw-semibold">Gastos</span>
-        <div class="d-flex gap-2">
-            <a asp-action="CrearGasto" asp-controller="Contabilidad" class="btn btn-sm btn-outline-secondary">Nuevo</a>
-            <a asp-action="ImportarGastos" asp-controller="Contabilidad" class="btn btn-sm btn-outline-secondary">Importar</a>
-        </div>
-    </div>
-    <div class="card-body p-0">
+<div id="GastosSection" class="card mb-3">
+    <div class="card-header fw-semibold">Gastos</div>
+    <div class="card-body">
+        <!-- Formulario inline para crear gasto -->
+        <form asp-action="CrearGasto" asp-controller="Contabilidad" method="post" class="row g-2 mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <input type="date" name="Fecha" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="Concepto" class="form-control" placeholder="Concepto" required />
+            </div>
+            <div class="col-md-3">
+                <select name="CategoriaId" class="form-select" required>
+                    <option value="">-- Categoría --</option>
+                    @foreach (var cat in categoriasGastos)
+                    {
+                        <option value="@cat.CategoriaId">@cat.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" step="0.01" name="Monto" class="form-control" placeholder="Monto" required />
+            </div>
+            <div class="col-md-1 d-grid">
+                <button class="btn btn-primary" type="submit">+</button>
+            </div>
+        </form>
+
         @if (Model == null || !Model.Any())
         {
-            <div class="p-3 text-muted">Sin gastos registrados.</div>
+            <div class="p-2 text-muted">Sin gastos registrados.</div>
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table table-sm mb-0 align-middle">
+            <div class="table-responsive mb-4">
+                <table class="table table-sm table-striped mb-0">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -33,15 +57,65 @@
                                 <td>@m.Fecha.ToString("yyyy-MM-dd")</td>
                                 <td>@m.Concepto</td>
                                 <td>@m.Categoria</td>
-                                <td class="text-end">@m.Monto:N2 @m.Moneda</td>
+                                <td class="text-end">@m.Monto.ToString("N2") @m.Moneda</td>
                                 <td class="text-end">
-                                    <a asp-action="EditarGasto" asp-route-id="@m.Id" class="btn btn-sm btn-link">Editar</a>
+                                    <form asp-action="EliminarGasto" asp-controller="Contabilidad" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@m.Id" />
+                                        <button class="btn btn-sm btn-link text-danger" type="submit">Eliminar</button>
+                                    </form>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+        }
+
+        <!-- CRUD rápido de Categorías de Gasto -->
+        <h6 class="mt-4">Categorías de Gasto</h6>
+        <form asp-action="CrearCategoria" asp-controller="Categorias" method="post" class="row g-2 mb-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Tipo" value="G" />
+            <div class="col-md-6">
+                <input type="text" name="Nombre" class="form-control" placeholder="Nueva categoría" required />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-secondary" type="submit">Agregar</button>
+            </div>
+        </form>
+
+        @if (!categoriasGastos.Any())
+        {
+            <div class="p-2 text-muted">Sin categorías de gasto.</div>
+        }
+        else
+        {
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Es fijo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cat in categoriasGastos)
+                    {
+                        <tr>
+                            <td>@cat.Nombre</td>
+                            <td>@(cat.EsFijo ? "✔" : "✖")</td>
+                            <td>
+                                <form asp-action="EliminarCategoria" asp-controller="Categorias" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@cat.CategoriaId" />
+                                    <button class="btn btn-sm btn-link text-danger" type="submit">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
     </div>
 </div>

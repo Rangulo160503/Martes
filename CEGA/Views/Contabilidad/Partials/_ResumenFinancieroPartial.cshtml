@@ -1,31 +1,31 @@
 ﻿@model CEGA.Models.ViewModels.ResumenFinanciero
 
-<div class="card">
+<div id="ResumenFinancieroSection" class="card mb-3">
     <div class="card-header fw-semibold">Resumen financiero</div>
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-3">
                 <div class="p-3 border rounded-3">
                     <div class="text-muted">Saldo total</div>
-                    <div class="fs-4 fw-bold">@Model.SaldoTotal:N2</div>
+                    <div class="fs-4 fw-bold">@Model.SaldoTotal.ToString("N2")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="p-3 border rounded-3">
                     <div class="text-muted">Ingresos del mes</div>
-                    <div class="fs-4 fw-bold">@Model.IngresosMes:N2</div>
+                    <div class="fs-4 fw-bold">@Model.IngresosMes.ToString("N2")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="p-3 border rounded-3">
                     <div class="text-muted">Gastos del mes</div>
-                    <div class="fs-4 fw-bold">@Model.GastosMes:N2</div>
+                    <div class="fs-4 fw-bold">@Model.GastosMes.ToString("N2")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="p-3 border rounded-3">
                     <div class="text-muted">Variación</div>
-                    <div class="fs-4 fw-bold">@Model.VariacionMes:N2</div>
+                    <div class="fs-4 fw-bold">@Model.VariacionMes.ToString("N2")</div>
                 </div>
             </div>
         </div>

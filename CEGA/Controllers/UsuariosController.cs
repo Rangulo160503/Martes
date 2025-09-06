@@ -36,7 +36,6 @@ namespace CEGA.Controllers
             }
             if (!string.IsNullOrWhiteSpace(rol))
             {
-                // rol viene como string (nombre del enum o número); aquí lo tratamos como texto del enum
                 empleados = empleados.Where(e => e.Rol.ToString() == rol);
             }
 
@@ -49,34 +48,34 @@ namespace CEGA.Controllers
 
             // 4) Proyección a UsuarioListaVM
             var lista = empleados
-    .AsNoTracking()
-    .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
-    .Select(e => new {
-        e.Cedula,
-        e.Nombre,
-        e.SegundoNombre,
-        e.Apellido1,
-        e.Apellido2,
-        e.Username,
-        e.Email,
-        e.TelefonoPersonal,
-        e.Rol,
-        e.Activo
-    })
-    .ToList() // ← ejecuta en SQL
-    .Select(e => new CEGA.Models.ViewModels.UsuarioListaVM
-    {
-        Cedula = e.Cedula,
-        NombreCompleto = string.Join(" ", new[] { e.Nombre, e.SegundoNombre, e.Apellido1, e.Apellido2 }
-                                     .Where(s => !string.IsNullOrWhiteSpace(s))),
-        Username = e.Username ?? "",
-        Email = e.Email ?? "",
-        TelefonoPersonal = e.TelefonoPersonal,
-        Rol = e.Rol.ToString(),
-        Activo = e.Activo
-    })
-    .ToList();
-
+                .AsNoTracking()
+                .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
+                .Select(e => new
+                {
+                    e.Cedula,
+                    e.Nombre,
+                    e.SegundoNombre,
+                    e.Apellido1,
+                    e.Apellido2,
+                    e.Username,
+                    e.Email,
+                    e.TelefonoPersonal,
+                    e.Rol,
+                    e.Activo
+                })
+                .ToList() // ← ejecuta en SQL
+                .Select(e => new CEGA.Models.ViewModels.UsuarioListaVM
+                {
+                    Cedula = e.Cedula,
+                    NombreCompleto = string.Join(" ", new[] { e.Nombre, e.SegundoNombre, e.Apellido1, e.Apellido2 }
+                                                 .Where(s => !string.IsNullOrWhiteSpace(s))),
+                    Username = e.Username ?? "",
+                    Email = e.Email ?? "",
+                    TelefonoPersonal = e.TelefonoPersonal,
+                    Rol = e.Rol.ToString(),
+                    Activo = e.Activo
+                })
+                .ToList();
 
             // 5) ViewModel de la vista
             var vm = new CEGA.Models.ViewModels.Usuarios.BuscarUsuarioFiltroViewModel
@@ -102,7 +101,6 @@ namespace CEGA.Controllers
             var empleado = await _context.Empleados.FindAsync(model.Cedula);
             if (empleado == null) return RedirectToAction(nameof(Index));
 
-            // Validar que el tinyint recibido existe en el enum
             if (!Enum.IsDefined(typeof(RolEmpleado), model.Rol)) return RedirectToAction(nameof(Index));
 
             empleado.Rol = (RolEmpleado)model.Rol;   // tinyint → enum
@@ -112,5 +110,37 @@ namespace CEGA.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =============================
+        //       eliminar (DELETE)
+        // =============================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Eliminar(int cedula)
+        {
+            // Buscar por cédula (clave natural en tu VM)
+            var empleado = await _context.Empleados
+                .SingleOrDefaultAsync(e => e.Cedula == cedula);
+
+            if (empleado == null)
+            {
+                TempData["error"] = "El usuario ya no existe.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Empleados.Remove(empleado);
+                await _context.SaveChangesAsync();
+                TempData["ok"] = $"Usuario {cedula} eliminado correctamente.";
+            }
+            catch (DbUpdateException)
+            {
+                // Usualmente por FK que impide DELETE
+                TempData["error"] = "No se pudo eliminar el usuario porque tiene datos relacionados. " +
+                                    "Revisa dependencias o configura eliminación en cascada.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
