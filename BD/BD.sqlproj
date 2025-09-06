@@ -58,11 +58,26 @@
     <Folder Include="Properties" />
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Puesto.sql" />
     <Build Include="dbo\Tables\Empleado.sql" />
     <Build Include="dbo\Tables\VacacionesEmpleado.sql" />
     <Build Include="dbo\Tables\Incapacidad.sql" />
+    <Build Include="dbo\Tables\Tareas.sql" />
+    <Build Include="dbo\Tables\Proyecto.sql" />
+    <Build Include="dbo\Tables\Pools.sql" />
+    <Build Include="dbo\Tables\PdfTarea.sql" />
+    <Build Include="dbo\Tables\PdfProyecto.sql" />
+    <Build Include="dbo\Tables\Pdf.sql" />
+    <Build Include="dbo\Tables\Movimiento.sql" />
+    <Build Include="dbo\Tables\Clientes.sql" />
+    <Build Include="dbo\Tables\CierreDiario.sql" />
+    <Build Include="dbo\Tables\CategoriaMovimiento.sql" />
+    <Build Include="dbo\Tables\Campanias.sql" />
+    <Build Include="dbo\Tables\Anotaciones.sql" />
+    <Build Include="dbo\Tables\Accidentes.sql" />
+    <Build Include="dbo\Stored Procedures\GenerarCierreDiario.sql" />
   </ItemGroup>
 </Project>

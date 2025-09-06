@@ -4,8 +4,10 @@
     [Fecha]  DATE           NOT NULL,
     [Notas]  NVARCHAR (500) NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_VacacionesEmpleado_Empleado] FOREIGN KEY ([Cedula]) REFERENCES [dbo].[Empleado] ([Cedula])
+    CONSTRAINT [FK_VacacionesEmpleado_Empleado] FOREIGN KEY ([Cedula]) REFERENCES [dbo].[Empleado] ([Cedula]) ON DELETE CASCADE
 );
+
+
 
 
 GO
