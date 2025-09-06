@@ -8,8 +8,11 @@ namespace CEGA.Models.ViewModels
         [Required, StringLength(120)]
         [Display(Name = "Título de la tarea")]
         public string Titulo { get; set; } = "";
+        // ← NUEVO: Proyecto opcional
+        public int? ProyectoId { get; set; }
+        public IEnumerable<SelectListItem> Proyectos { get; set; } = Enumerable.Empty<SelectListItem>();
 
-        [Required]                  // <- quitar StringLength aquí
+        [Required]
         [Display(Name = "Empleado asignado")]
         public int CedulaEmpleado { get; set; }
 

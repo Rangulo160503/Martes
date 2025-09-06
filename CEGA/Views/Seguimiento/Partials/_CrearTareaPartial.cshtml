@@ -7,13 +7,18 @@
         <form asp-action="CrearTarea" asp-controller="Seguimiento" method="post" class="row g-3">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
             <div class="col-12">
                 <label asp-for="Titulo" class="form-label"></label>
                 <input asp-for="Titulo" class="form-control" />
                 <span asp-validation-for="Titulo" class="text-danger"></span>
             </div>
-
+            <div class="col-12">
+                <label asp-for="ProyectoId" class="form-label">Proyecto</label>
+                <select asp-for="ProyectoId" asp-items="Model.Proyectos" class="form-select">
+                    <option value="">-- (Opcional) Seleccione proyecto --</option>
+                </select>
+                <span asp-validation-for="ProyectoId" class="text-danger"></span>
+            </div>
             <div class="col-12">
                 <label asp-for="CedulaEmpleado" class="form-label"></label>
                 <select asp-for="CedulaEmpleado" asp-items="Model.Empleados" class="form-select">
@@ -21,13 +26,11 @@
                 </select>
                 <span asp-validation-for="CedulaEmpleado" class="text-danger"></span>
             </div>
-
             <div class="col-12">
                 <label asp-for="Comentario" class="form-label"></label>
                 <textarea asp-for="Comentario" rows="4" class="form-control"></textarea>
                 <span asp-validation-for="Comentario" class="text-danger"></span>
             </div>
-
             <div class="col-12 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>

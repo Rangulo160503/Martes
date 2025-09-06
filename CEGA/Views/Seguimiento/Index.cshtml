@@ -2,10 +2,26 @@
 @{
     ViewData["Title"] = "Seguimiento de Tareas";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
     var tareas = (IEnumerable<CEGA.Models.Seguimiento.Tarea>)(ViewBag.Tareas ?? Enumerable.Empty<CEGA.Models.Seguimiento.Tarea>());
+    var proyectos = (IEnumerable<CEGA.Models.ViewModels.ProyectoFilaVM>)(ViewBag.Proyectos ?? Enumerable.Empty<CEGA.Models.ViewModels.ProyectoFilaVM>());
+    var proyectoVM = (CEGA.Models.ViewModels.ProyectoCrearVM)(ViewBag.ProyectoVM ?? new CEGA.Models.ViewModels.ProyectoCrearVM());
 }
 
 <div class="row g-4">
+    <!-- Fila de PROYECTOS -->
+    <div class="col-lg-5">
+        @await Html.PartialAsync("Partials/_CrearProyectoPartial", proyectoVM)
+    </div>
+    <div class="col-lg-7">
+        @await Html.PartialAsync("Partials/_ProyectosTablaPartial", proyectos)
+    </div>
+</div>
+
+<hr class="my-4" />
+
+<div class="row g-4">
+    <!-- Fila de TAREAS -->
     <div class="col-lg-5">
         @await Html.PartialAsync("Partials/_CrearTareaPartial", Model)
     </div>

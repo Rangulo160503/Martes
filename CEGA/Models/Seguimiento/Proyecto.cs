@@ -1,8 +1,7 @@
-﻿using CEGA.Models.Seguimiento;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CEGA.Models
+namespace CEGA.Models.Seguimiento
 {
     [Table("Proyecto")]
     public class Proyecto

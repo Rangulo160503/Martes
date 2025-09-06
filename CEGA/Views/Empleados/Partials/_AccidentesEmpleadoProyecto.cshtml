@@ -1,0 +1,163 @@
+﻿@model CEGA.Models.ViewModels.AccidenteCrearVM
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using CEGA.Models.ViewModels
+
+@{
+    var empleados = (ViewData["Empleados"] as IEnumerable<SelectListItem>)
+                     ?? (ViewBag.EmpleadosSelect as IEnumerable<SelectListItem>)
+                     ?? Enumerable.Empty<SelectListItem>();
+
+    var proyectos = (ViewData["Proyectos"] as IEnumerable<SelectListItem>)
+                     ?? (ViewBag.ProyectosSelect as IEnumerable<SelectListItem>)
+                     ?? Enumerable.Empty<SelectListItem>();
+
+    var lista = (ViewData["Accidentes"] as IEnumerable<AccidenteFilaVM>)
+                     ?? (ViewBag.Accidentes as IEnumerable<AccidenteFilaVM>)
+                     ?? Enumerable.Empty<AccidenteFilaVM>();
+
+    var qs = Context.Request.Query;
+    var filtroFecha = qs["accFecha"].FirstOrDefault();   // yyyy-MM-dd
+    var editIdStr = qs["accEditId"].FirstOrDefault();
+    int? editId = int.TryParse(editIdStr, out var xx) ? xx : (int?)null;
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Accidentes (empleado / proyecto / fecha)</h5>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <label class="form-label">Fecha</label>
+                <input type="date" name="accFecha" value="@filtroFecha" class="form-control" />
+            </div>
+            <div class="col-md-2 d-flex gap-2 align-items-end">
+                <button class="btn btn-outline-primary w-100">Aplicar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+
+        <form asp-action="CrearAccidente" asp-controller="Empleados" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-4">
+                <label asp-for="Fecha" class="form-label"></label>
+                <input asp-for="Fecha" type="datetime-local" class="form-control" />
+                <span asp-validation-for="Fecha" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ProyectoId" class="form-label">Proyecto</label>
+                <select asp-for="ProyectoId" class="form-select" asp-items="proyectos">
+                    <option value="">(Sin proyecto)</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="CedulaEmpleado" class="form-label">Empleado</label>
+                <select asp-for="CedulaEmpleado" class="form-select" asp-items="empleados"></select>
+                <span asp-validation-for="CedulaEmpleado" class="text-danger"></span>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="mb-0">Accidentes reportados</h6>
+            <span class="text-muted">@lista.Count() en total</span>
+        </div>
+
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width:70px">#</th>
+                    <th style="width:160px">Fecha</th>
+                    <th>Proyecto</th>
+                    <th>Empleado</th>
+                    <th class="text-end" style="width:210px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in lista)
+                {
+                    var editing = (editId == a.Id);
+
+                    if (!editing)
+                    {
+                        <tr>
+                            <td>@a.Id</td>
+                            <td>@a.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@(a.ProyectoNombre ?? "—")</td>
+                            <td>@(a.EmpleadoNombre ?? a.CedulaEmpleado.ToString())</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="Index" asp-controller="Empleados"
+                                   asp-route-accEditId="@a.Id">
+                                    Editar
+                                </a>
+
+                                <form asp-action="EliminarAccidente" asp-controller="Empleados" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@a.Id" />
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('¿Eliminar accidente #@a.Id?');">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr class="table-warning">
+                            <td>@a.Id</td>
+                            <td colspan="3">
+                                <form asp-action="ActualizarAccidenteInline" asp-controller="Empleados" method="post" class="row g-2 align-items-end">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@a.Id" />
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Fecha</label>
+                                        <input type="datetime-local" name="Fecha" class="form-control"
+                                               value="@a.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Proyecto</label>
+                                        <select name="ProyectoId" class="form-select">
+                                            <option value="">(Sin proyecto)</option>
+                                            @foreach (var p in proyectos)
+                                            {
+                                                <option value="@p.Value" selected="@(a.ProyectoId?.ToString() == p.Value)">@p.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Empleado</label>
+                                        <select name="CedulaEmpleado" class="form-select">
+                                            @foreach (var e in empleados)
+                                            {
+                                                <option value="@e.Value" selected="@(a.CedulaEmpleado.ToString() == e.Value)">@e.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 d-flex gap-2 justify-content-end">
+                                        <button class="btn btn-primary btn-sm">Guardar</button>
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                           asp-action="Index" asp-controller="Empleados"
+                                           asp-route-accEditId="@a.Id">
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

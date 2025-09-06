@@ -22,5 +22,6 @@ namespace CEGA.Data
         public DbSet<Proyecto> Proyectos { get; set; } = null!;
         public DbSet<ProyectoEmpleado> ProyectoEmpleados { get; set; } = null!;
         public DbSet<Descarga> Descargas { get; set; } = null!;
+        public DbSet<Accidente> Accidentes { get; set; } = null!;
     }
 }

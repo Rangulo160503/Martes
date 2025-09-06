@@ -1,35 +1,147 @@
 ﻿@model IEnumerable<CEGA.Models.Seguimiento.Tarea>
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var proyectoId = Context.Request.Query["proyectoId"].FirstOrDefault();
+    var editId = Context.Request.Query["editId"].FirstOrDefault();
+    var empleados = ViewBag.EmpleadosSelect as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var proyectos = ViewBag.ProyectosSelect as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    int? editIdInt = null;
+    if (int.TryParse(editId, out var _tmp)) editIdInt = _tmp;
+}
 
 <div class="d-flex align-items-center justify-content-between mb-2">
-    <h5 class="mb-0">Tareas creadas</h5>
+    <h5 class="mb-0">Tareas</h5>
     <span class="text-muted">@Model.Count() en total</span>
 </div>
 
 <table class="table table-sm table-hover align-middle">
     <thead class="table-light">
         <tr>
-            <th>#</th>
+            <th style="width:70px">#</th>
             <th>Título</th>
-            <th>Cédula Empleado</th>
+            <th style="width:200px">Proyecto</th>
+            <th style="width:160px">Empleado</th>
             <th>Comentario</th>
+            <th style="width:200px" class="text-end"></th>
         </tr>
     </thead>
     <tbody>
-        @if (Model.Any())
+        @foreach (var t in Model)
         {
-            foreach (var t in Model)
+            var isEditing = (editIdInt.HasValue && editIdInt.Value == t.Id);
+
+            if (!isEditing)
             {
                 <tr>
                     <td>@t.Id</td>
-                    <td>@t.Titulo</td>
-                    <td>@t.CedulaEmpleado</td>
-                    <td>@t.ComentarioInicial</td>
+                    <td class="fw-medium">@t.Titulo</td>
+                    <td>
+                        @{
+                            var pText = proyectos.FirstOrDefault(p => p.Value == t.ProyectoId?.ToString())?.Text;
+                        }
+                        @if (!string.IsNullOrWhiteSpace(pText))
+                        {
+                            @pText
+                        }
+                        else
+                        {
+
+                            <em>—</em>
+                        }
+                    </td>
+                    <td>
+                        @{
+                            var eText = empleados.FirstOrDefault(e => e.Value == t.CedulaEmpleado.ToString())?.Text;
+                        }
+                        @if (!string.IsNullOrWhiteSpace(eText))
+                        {
+                            @eText
+                        }
+                        else
+                        {
+
+                            @t.CedulaEmpleado
+                        }
+                    </td>
+                    <td class="text-truncate" style="max-width:420px">@t.ComentarioInicial</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-action="Index" asp-controller="Seguimiento"
+                           asp-route-proyectoId="@proyectoId"
+                           asp-route-editId="@t.Id">
+                            Editar
+                        </a>
+
+                        <form asp-action="EliminarTarea" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@t.Id" />
+                            <input type="hidden" name="returnProyectoId" value="@proyectoId" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('¿Eliminar la tarea #@t.Id?');">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr><td colspan="4" class="text-center text-muted py-4">No hay tareas aún.</td></tr>
+            else
+            {
+                <!-- Fila en modo edición inline -->
+                <tr class="table-warning">
+                    <td>@t.Id</td>
+                    <td colspan="5">
+                        <form asp-action="ActualizarTareaInline" method="post" class="row g-2 align-items-end">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Id" value="@t.Id" />
+                            <input type="hidden" name="ReturnProyectoId" value="@proyectoId" />
+
+                            <div class="col-md-4">
+                                <label class="form-label">Título</label>
+                                <input name="Titulo" class="form-control" value="@t.Titulo" maxlength="120" required />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Proyecto</label>
+                                <select name="ProyectoId" class="form-select">
+                                    <option value="">(Sin proyecto)</option>
+                                    @foreach (var p in proyectos)
+                                    {
+                                        <option value="@p.Value" selected="@(t.ProyectoId?.ToString()==p.Value)">
+                                            @p.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Empleado</label>
+                                <select name="CedulaEmpleado" class="form-select" required>
+                                    @foreach (var e in empleados)
+                                    {
+                                        <option value="@e.Value" selected="@(t.CedulaEmpleado.ToString()==e.Value)">
+                                            @e.Text
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Comentario</label>
+                                <textarea name="Comentario" class="form-control" rows="2" maxlength="1000">@t.ComentarioInicial</textarea>
+                            </div>
+
+                            <div class="col-12 d-flex gap-2 justify-content-end">
+                                <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+                                <a class="btn btn-outline-secondary btn-sm"
+                                   asp-action="Index" asp-controller="Seguimiento"
+                                   asp-route-proyectoId="@proyectoId">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>

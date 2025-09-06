@@ -1,12 +1,15 @@
 ﻿using CEGA.Data;
 using CEGA.Models;                      // Empleado, Puesto, Incapacidad
+using CEGA.Models.Seguimiento;
 using CEGA.Models.ViewModels;
 using CEGA.Models.ViewModels.Empleados; // CambiarPuestoVM
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.IO;                        // MemoryStream
+using System.Data;
+using System.IO;
+using System.Text.RegularExpressions;                        // MemoryStream
 
 namespace CEGA.Controllers
 {
@@ -91,8 +94,162 @@ namespace CEGA.Controllers
             ViewBag.Vacaciones = vacaciones;
             ViewBag.ResumenEmpleados = resumenEmpleados; // ← NUEVO
 
+            if (ViewBag.EmpleadosSelect == null)
+            {
+                ViewBag.EmpleadosSelect = await _context.Empleados
+                    .AsNoTracking()
+                    .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Cedula.ToString(),
+                        Text = ($"{e.Cedula} — {e.Nombre} {e.SegundoNombre} {e.Apellido1} {e.Apellido2}")
+                                .Replace("  ", " ").Trim()
+                    }).ToListAsync();
+            }
+
+            // Dropdowns para el partial
+            ViewBag.ProyectosSelect = await _context.Set<Proyecto>()
+                .AsNoTracking()
+                .OrderBy(p => p.Nombre)
+                .Select(p => new SelectListItem { Value = p.IdProyecto.ToString(), Text = p.Nombre })
+                .ToListAsync();
+
+            
+            // Filtros
+            DateTime? accFecha = DateTime.TryParse(Request.Query["accFecha"], out var f)
+                                 ? f.Date : (DateTime?)null;
+
+            var aq = _context.Accidentes.AsNoTracking();
+            if (accFecha.HasValue)
+            {
+                var d = accFecha.Value;
+                aq = aq.Where(a => a.Fecha >= d && a.Fecha < d.AddDays(1));
+            }
+
+            ViewBag.Accidentes = await (
+                from a in aq
+                join p in _context.Set<Proyecto>().AsNoTracking() on a.ProyectoId equals p.IdProyecto into pj
+                from p in pj.DefaultIfEmpty()
+                join e in _context.Empleados.AsNoTracking() on a.CedulaEmpleado equals e.Cedula
+                orderby a.Fecha descending, a.Id descending
+                select new AccidenteFilaVM
+                {
+                    Id = a.Id,
+                    Fecha = a.Fecha,
+                    ProyectoId = a.ProyectoId,
+                    ProyectoNombre = p != null ? p.Nombre : null,
+                    CedulaEmpleado = a.CedulaEmpleado,
+                    EmpleadoNombre = (e.Nombre + " " + e.SegundoNombre + " " + e.Apellido1 + " " + e.Apellido2)
+                                        .Replace("  ", " ").Trim()
+                }
+            ).ToListAsync();
+
+            // VM para el form de crear
+            ViewBag.AccidentesVm = new AccidenteCrearVM
+            {
+                Empleados = (IEnumerable<SelectListItem>)ViewBag.EmpleadosSelect,
+                Proyectos = (IEnumerable<SelectListItem>)ViewBag.ProyectosSelect
+            };
+
+
             return View();
         }
+        // POST: crear accidente
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearAccidente(AccidenteCrearVM vm)
+        {
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+
+            var nuevo = new Accidente
+            {
+                Fecha = vm.Fecha,
+                ProyectoId = vm.ProyectoId,
+                CedulaEmpleado = vm.CedulaEmpleado
+            };
+
+            _context.Accidentes.Add(nuevo);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index), new { accFecha = vm.Fecha.ToString("yyyy-MM-dd") });
+
+        }
+        // POST: actualizar accidente (inline)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarAccidenteInline(AccidenteEditarInlinePost vm)
+        {
+            var a = await _context.Accidentes.FindAsync(vm.Id);
+            if (a == null) return NotFound();
+
+            a.Fecha = vm.Fecha;
+            a.ProyectoId = vm.ProyectoId;
+            a.CedulaEmpleado = vm.CedulaEmpleado;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index), new { accFecha = vm.Fecha.ToString("yyyy-MM-dd") });
+
+        }
+        // POST: eliminar accidente
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarAccidente(int id, int? returnCedula, int? returnProyectoId, string? desde, string? hasta)
+        {
+            var a = await _context.Accidentes.FindAsync(id);
+            if (a != null)
+            {
+                _context.Accidentes.Remove(a);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index), new { accFecha = ("yyyy-MM-dd") });
+        }
+        // Helper dentro del controller
+        private async Task<List<string>> GetAllowedValuesFromCheckAsync(string tableName, string columnName)
+        {
+            const string sql = @"
+SELECT cc.definition
+FROM sys.check_constraints cc
+JOIN sys.columns col
+  ON col.object_id = cc.parent_object_id
+ AND col.column_id = cc.parent_column_id
+WHERE OBJECT_NAME(cc.parent_object_id) = @table
+  AND col.name = @column";
+
+            await _context.Database.OpenConnectionAsync();   // ← abrir conexión del contexto
+            try
+            {
+                using var cmd = _context.Database.GetDbConnection().CreateCommand();
+                cmd.CommandText = sql;
+
+                var p1 = cmd.CreateParameter(); p1.ParameterName = "@table"; p1.Value = tableName;
+                var p2 = cmd.CreateParameter(); p2.ParameterName = "@column"; p2.Value = columnName;
+                cmd.Parameters.Add(p1);
+                cmd.Parameters.Add(p2);
+
+                var defObj = await cmd.ExecuteScalarAsync();
+                if (defObj == null || defObj == DBNull.Value) return new List<string>();
+
+                var def = defObj.ToString() ?? string.Empty;
+                var inIdx = def.IndexOf("IN", StringComparison.OrdinalIgnoreCase);
+                if (inIdx < 0) return new List<string>();
+                var open = def.IndexOf('(', inIdx);
+                var close = def.IndexOf(')', open + 1);
+                if (open < 0 || close < 0 || close <= open) return new List<string>();
+
+                var inner = def.Substring(open + 1, close - open - 1);
+                var matches = Regex.Matches(inner, "N?'([^']*)'");
+                return matches.Select(m => m.Groups[1].Value)
+                              .Where(v => !string.IsNullOrWhiteSpace(v))
+                              .ToList();
+            }
+            finally
+            {
+                await _context.Database.CloseConnectionAsync(); // ← cerrar conexión del contexto
+            }
+        }
+
 
         // POST: /Empleados/CambiarPuesto
         [HttpPost]

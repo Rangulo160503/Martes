@@ -56,6 +56,28 @@
         ?? Enumerable.Empty<ResumenSalariosVM>();
     }
     @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
+    <hr class="my-4" />
+
+    @{
+        // ViewModels / listas para el partial de accidentes
+        var accVm = ViewBag.AccidentesVm as CEGA.Models.ViewModels.AccidenteCrearVM
+        ?? new CEGA.Models.ViewModels.AccidenteCrearVM();
+
+        var accidentes = ViewBag.Accidentes as IEnumerable<CEGA.Models.ViewModels.AccidenteFilaVM>
+        ?? Enumerable.Empty<CEGA.Models.ViewModels.AccidenteFilaVM>();
+
+        var proyectosSelect = ViewBag.ProyectosSelect as IEnumerable<SelectListItem>
+        ?? Enumerable.Empty<SelectListItem>();
+
+        // ya tenés empleadosSelect arriba (lo reutilizamos)
+        var vdAcc = new ViewDataDictionary(ViewData);
+        vdAcc["Empleados"] = empleadosSelect;     // dropdown Empleados
+        vdAcc["Proyectos"] = proyectosSelect;     // dropdown Proyectos
+        vdAcc["Accidentes"] = accidentes;         // tabla
+    }
+
+    @await Html.PartialAsync("Partials/_AccidentesEmpleadoProyecto", accVm, vdAcc)
+
 </div>
 
 @section Scripts {

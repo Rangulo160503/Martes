@@ -1,0 +1,128 @@
+﻿@model CEGA.Models.ViewModels.ProyectoCrearVM
+@{
+    var asignar = ViewBag.Asignar as CEGA.Models.ViewModels.ProyectoAsignarVM; // si viene proyectoId
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Nuevo proyecto</h5>
+        <form asp-action="CrearProyecto" asp-controller="Seguimiento" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-12">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (asignar != null)
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-1">Proyecto: @asignar.NombreProyecto</h5>
+            <div class="small text-muted mb-3">ID: @asignar.IdProyecto</div>
+
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="border rounded-3 p-3 h-100">
+                        <h6 class="mb-3">Nueva tarea para este proyecto</h6>
+                        <form asp-action="CrearTarea" asp-controller="Seguimiento" method="post" class="row g-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="ProyectoId" value="@asignar.NuevaTarea.ProyectoId" />
+
+                            <div class="col-12">
+                                <label class="form-label" for="Titulo">Título</label>
+                                <input class="form-control" name="Titulo" id="Titulo" maxlength="120" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="CedulaEmpleado">Asignar a</label>
+                                <select class="form-select" name="CedulaEmpleado" id="CedulaEmpleado"
+                                        asp-items="asignar.NuevaTarea.Empleados" required>
+                                    <option value="">-- Seleccione empleado --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label" for="Comentario">Comentario</label>
+                                <textarea class="form-control" name="Comentario" id="Comentario" rows="4" maxlength="1000"></textarea>
+                            </div>
+
+                            <div class="col-12 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Guardar tarea</button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">Cerrar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="mb-4">
+                        <h6 class="mb-3">Tareas en este proyecto (@asignar.TareasDelProyecto.Count())</h6>
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light"><tr><th>#</th><th>Título</th><th>Cédula</th><th>Comentario</th></tr></thead>
+                            <tbody>
+                                @if (asignar.TareasDelProyecto.Any())
+                                {
+                                    foreach (var t in asignar.TareasDelProyecto)
+                                    {
+                                        <tr><td>@t.Id</td><td>@t.Titulo</td><td>@t.CedulaEmpleado</td><td>@t.ComentarioInicial</td></tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" class="text-center text-muted py-4">No hay tareas aún.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h6 class="mb-3">Tareas sin proyecto (@asignar.TareasSinProyecto.Count())</h6>
+                        <form asp-action="AsignarTareas" asp-controller="Seguimiento" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="proyectoId" value="@asignar.IdProyecto" />
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr><th style="width:40px"></th><th>#</th><th>Título</th><th>Cédula</th><th>Comentario</th></tr>
+                                </thead>
+                                <tbody>
+                                    @if (asignar.TareasSinProyecto.Any())
+                                    {
+                                        foreach (var t in asignar.TareasSinProyecto)
+                                        {
+                                            <tr>
+                                                <td><input type="checkbox" name="tareaIds" value="@t.Id" /></td>
+                                                <td>@t.Id</td>
+                                                <td>@t.Titulo</td>
+                                                <td>@t.CedulaEmpleado</td>
+                                                <td>@t.ComentarioInicial</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="5" class="text-center text-muted py-4">No hay tareas libres.</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Asignar seleccionadas</button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
