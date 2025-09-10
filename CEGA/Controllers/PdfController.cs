@@ -1,5 +1,6 @@
 ﻿using CEGA.Data;
 using CEGA.Models.ViewModels;
+using CEGA.Models.ViewModels.Pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -214,6 +215,123 @@ namespace CEGA.Controllers
 
             ViewBag.Success = "Asociaciones actualizadas.";
             return PartialView("~/Views/Pdf/Partials/_AsociarPartial.cshtml", vm);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ResumenAsociaciones(int id, CancellationToken ct) // id = IdPdf
+        {
+            // ¿Existe el PDF?
+            var existePdf = await _db.Pdfs.AsNoTracking().AnyAsync(p => p.IdPdf == id, ct);
+            if (!existePdf) return NotFound($"No existe el PDF {id}");
+
+            // Nombre mostrado (si no tienes nombre de archivo, usamos un fallback)
+            var pdfNombre = $"PDF #{id}";
+
+            // Totales
+            var totalProyectos = await _db.PdfProyectos
+                .Where(x => x.IdPdf == id)
+                .Select(x => x.IdProyecto)
+                .Distinct()
+                .CountAsync(ct);
+
+            var totalTareas = await _db.PdfTareas
+                .Where(x => x.IdPdf == id)
+                .Select(x => x.IdTarea)
+                .Distinct()
+                .CountAsync(ct);
+
+            var totalAnotaciones = await _db.Anotaciones
+                .Where(a => a.IdPdf == id)
+                .CountAsync(ct);
+
+            // TOP 5 Proyectos (por nombre)
+            var proyectosTop5 = await _db.PdfProyectos
+                .Where(pp => pp.IdPdf == id)
+                .Join(_db.Proyectos,
+                      pp => pp.IdProyecto,
+                      pr => pr.IdProyecto,
+                      (pp, pr) => pr.Nombre)
+                .OrderBy(n => n)
+                .Take(5)
+                .ToListAsync(ct);
+
+            // TOP 5 Tareas (por título)
+            var tareasTop5 = await _db.PdfTareas
+                .Where(pt => pt.IdPdf == id)
+                .Join(_db.Tareas,
+                      pt => pt.IdTarea,
+                      t => t.Id,
+                      (pt, t) => t.Titulo)
+                .OrderBy(t => t)
+                .Take(5)
+                .ToListAsync(ct);
+
+            // TOP 5 Anotaciones (últimas)
+            var anotacionesTop5 = await _db.Anotaciones
+                .Where(a => a.IdPdf == id)
+                .OrderByDescending(a => a.IdAnotacion)
+                .Select(a => a.Texto)
+                .Take(5)
+                .ToListAsync(ct);
+
+            var vm = new ResumenAsociacionesVM
+            {
+                PdfId = id,
+                PdfNombre = pdfNombre,
+                TotalProyectos = totalProyectos,
+                TotalTareas = totalTareas,
+                TotalAnotaciones = totalAnotaciones,
+                Proyectos = proyectosTop5,
+                Tareas = tareasTop5,
+                Anotaciones = anotacionesTop5
+            };
+
+            return PartialView("~/Views/Pdf/Partials/_ResumenAsociaciones.cshtml", vm);
+        }
+        // Sirve el PDF como FileStreamResult para <iframe> / <object>
+        [HttpGet]
+        public async Task<IActionResult> Archivo(int id, CancellationToken ct)
+        {
+            var pdf = await _db.Pdfs.AsNoTracking().FirstOrDefaultAsync(p => p.IdPdf == id, ct);
+            if (pdf is null) return NotFound();
+
+            var bytes = pdf.PdfArchivo ?? Array.Empty<byte>();
+            return File(bytes, "application/pdf");
+        }
+
+        // Descarga con Content-Disposition: attachment
+        [HttpGet]
+        public async Task<IActionResult> Descargar(int id, CancellationToken ct)
+        {
+            var pdf = await _db.Pdfs.AsNoTracking().FirstOrDefaultAsync(p => p.IdPdf == id, ct);
+            if (pdf is null) return NotFound();
+
+            var bytes = pdf.PdfArchivo ?? Array.Empty<byte>();
+            var fileName = $"PDF_{id}.pdf";
+            return File(bytes, "application/pdf", fileName);
+        }
+
+        // Vista del visor (usa PdfVisorVM)
+        [HttpGet]
+        public async Task<IActionResult> VerPlano(int id, CancellationToken ct)
+        {
+            var existe = await _db.Pdfs.AsNoTracking().AnyAsync(p => p.IdPdf == id, ct);
+            if (!existe) return NotFound();
+
+            var vm = new CEGA.Models.ViewModels.Pdf.PdfVisorVM
+            {
+                IdPdf = id,
+                Titulo = $"PDF #{id}",
+                VerUrl = Url.Action(nameof(Archivo), "Pdf", new { id })!,
+                DescargarUrl = Url.Action(nameof(Descargar), "Pdf", new { id })!
+            };
+            return View("~/Views/Pdf/VerPlano.cshtml", vm);
+        }
+        // Abre el Index y precarga el PDF indicado en el combo
+        [HttpGet]
+        public IActionResult Gestionar(int id)
+        {
+            // Simplemente manda al Index con querystring ?id=...
+            return RedirectToAction(nameof(Index), new { id });
         }
 
     }

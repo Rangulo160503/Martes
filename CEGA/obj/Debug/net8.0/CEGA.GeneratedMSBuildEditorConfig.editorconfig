@@ -128,8 +128,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9Bc29jaWFyUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Partials/_ResumenAsociaciones.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9SZXN1bWVuQXNvY2lhY2lvbmVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Partials/_SubirPdfPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9TdWJpclBkZlBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/VerPlano.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFZlclBsYW5vLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Reporteria/Index.cshtml]
