@@ -1,8 +1,164 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Header con fondo -->
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand-mid); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">Usuarios vs Proyectos</h2>
+    <p class="mb-0 fs-5">
+        Visualiza cuántos <span class="fw-semibold">proyectos distintos</span> toca cada usuario (según sus tareas).
+    </p>
 </div>
+
+<!-- Alertas -->
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
+}
+
+<!-- Tarjeta con tabs (arte de Marketing) -->
+<div class="card card-lg">
+    <div class="card-header p-0">
+        <ul class="nav nav-tabs card-header-tabs nav-fill" id="dashTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="graficos-tab" data-bs-toggle="tab" data-bs-target="#graficos"
+                        type="button" role="tab" aria-controls="graficos" aria-selected="true">
+                    Gráficos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen"
+                        type="button" role="tab" aria-controls="resumen" aria-selected="false">
+                    Resumen
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <div class="tab-content mt-2">
+            <!-- Tab: Gráficos -->
+            <div class="tab-pane fade show active" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="text-muted small">Usuarios con actividad</div>
+                                <div id="kpiUsuarios" class="h3 mb-0">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="text-muted small">Proyectos totales</div>
+                                <div id="kpiProyectos" class="h3 mb-0">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-7">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Proyectos por usuario (Top)</h5>
+                                    <select id="topN" class="form-select form-select-sm" style="width:auto">
+                                        <option value="5">Top 5</option>
+                                        <option value="10" selected>Top 10</option>
+                                        <option value="15">Top 15</option>
+                                        <option value="25">Top 25</option>
+                                    </select>
+                                </div>
+                                <div style="height:420px"><canvas id="chartBar"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Participación (Top N)</h5>
+                                <div style="height:420px"><canvas id="chartPie"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Resumen -->
+            <div class="tab-pane fade" id="resumen" role="tabpanel" aria-labelledby="resumen-tab">
+                <div class="alert alert-info mb-0">
+                    Este panel cuenta <strong>proyectos distintos por usuario</strong> a partir de sus tareas.
+                    Cambia el “Top N” para ajustar los gráficos.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (async function () {
+            const elBar = document.getElementById('chartBar');
+            const elPie = document.getElementById('chartPie');
+            const topN  = document.getElementById('topN');
+            const kpiUsuarios  = document.getElementById('kpiUsuarios');
+            const kpiProyectos = document.getElementById('kpiProyectos');
+
+            let barChart, pieChart;
+
+            async function loadData() {
+                const top = topN.value || 10;
+                const res = await fetch(`/Home/UsuariosProyectosData?top=${encodeURIComponent(top)}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            }
+
+            function renderCharts({ labels, data, kpis }) {
+                // KPIs
+                if (kpis) {
+                    kpiUsuarios.textContent  = kpis.totalUsuarios ?? '—';
+                    kpiProyectos.textContent = kpis.totalProyectos ?? '—';
+                }
+
+                // BAR
+                if (barChart) barChart.destroy();
+                barChart = new Chart(elBar, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: '# Proyectos', data }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    }
+                });
+
+                // PIE
+                if (pieChart) pieChart.destroy();
+                pieChart = new Chart(elPie, {
+                    type: 'pie',
+                    data: { labels, datasets: [{ data }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            async function refresh() {
+                try { renderCharts(await loadData()); }
+                catch (e) { console.error(e); alert('No se pudieron cargar los datos del dashboard.'); }
+            }
+
+            topN.addEventListener('change', refresh);
+            await refresh();
+        })();
+    </script>
+}
