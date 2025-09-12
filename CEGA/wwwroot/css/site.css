@@ -1,4 +1,4 @@
-/* ===========================
+ï»¿/* ===========================
    Variables de marca (unificadas)
    =========================== */
 :root {
@@ -10,7 +10,7 @@
 }
 
 /* ===========================
-   Tipografía / layout base
+   TipografÃ­a / layout base
    =========================== */
 html {
     font-size: 16px;
@@ -36,9 +36,9 @@ body.app {
 /* ===========================
    Navbar CEGA (superior)
    =========================== */
-/* Verde sólido en topbar y sidebar */
+/* Verde sÃ³lido en topbar y sidebar */
 .navbar-cega {
-    background: var(--brand); /* sólido */
+    background: var(--brand); /* sÃ³lido */
 }
 
     .navbar-cega .navbar-brand {
@@ -144,7 +144,7 @@ body.app {
     background: var(--brand-2) 100%);
     color: #fff;
     position: sticky;
-    top: var(--topbar-h); /* se “pega” bajo el topbar */
+    top: var(--topbar-h); /* se â€œpegaâ€ bajo el topbar */
     height: calc(100vh - var(--topbar-h)); /* ocupa todo el alto visible bajo el topbar */
     align-self: flex-start;
     padding: .75rem .75rem 1rem;
@@ -256,5 +256,29 @@ body.app {
     }
 }
 .sidebar-cega {
-    background: var(--brand); /* sólido */
+    background: var(--brand); /* sÃ³lido */
 }
+
+/* Footer con misma paleta que navbar/sidebar */
+body > footer {
+    background: var(--brand);
+    color: var(--brand-text);
+    border-top: 1px solid var(--brand-border);
+}
+
+    /* El layout trae `text-muted`; forzamos color legible en el footer */
+    body > footer .text-muted {
+        color: var(--brand-text) !important;
+        opacity: .9;
+    }
+
+    /* Enlaces en el footer */
+    body > footer a {
+        color: var(--brand-text);
+        text-decoration: none;
+    }
+
+        body > footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }

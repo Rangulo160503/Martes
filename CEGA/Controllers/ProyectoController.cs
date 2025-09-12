@@ -126,5 +126,128 @@ namespace CEGA.Controllers
             // Volver al Index con el panel de asignación abierto
             return RedirectToAction(nameof(Index), new { id });
         }
+        // Tabla (partial) para recargar por AJAX
+        [HttpGet]
+        public async Task<IActionResult> ProyectosTablaPartial(CancellationToken ct)
+        {
+            var filas = await _db.Proyectos.AsNoTracking()
+                .OrderBy(p => p.IdProyecto)
+                .Select(p => new ProyectoFilaVM
+                {
+                    IdProyecto = p.IdProyecto,
+                    Nombre = p.Nombre,
+                    CantidadTareas = _db.Tareas.Count(t => t.ProyectoId == p.IdProyecto)
+                })
+                .ToListAsync(ct);
+
+            return PartialView("~/Views/Seguimiento/Partials/_ProyectosTablaPartial.cshtml", filas);
+        }
+
+        // GET: form crear
+        [HttpGet]
+        public IActionResult ProyectoCrearPartial()
+        {
+            var vm = new ProyectoFormVM
+            {
+                FormAction = Url.Action(nameof(CrearProyecto), "Seguimiento")!,
+                SubmitText = "Crear"
+            };
+            return PartialView("~/Views/Seguimiento/Partials/_ProyectoFormPartial.cshtml", vm);
+        }
+
+        // GET: form editar
+        [HttpGet]
+        public async Task<IActionResult> ProyectoEditarPartial(int id, CancellationToken ct)
+        {
+            var p = await _db.Proyectos.AsNoTracking().FirstOrDefaultAsync(x => x.IdProyecto == id, ct);
+            if (p is null) return NotFound();
+
+            var vm = new ProyectoFormVM
+            {
+                IdProyecto = p.IdProyecto,
+                Nombre = p.Nombre,
+                FormAction = Url.Action(nameof(EditarProyecto), "Seguimiento")!,
+                SubmitText = "Actualizar"
+            };
+            return PartialView("~/Views/Seguimiento/Partials/_ProyectoFormPartial.cshtml", vm);
+        }
+
+        // POST: crear (soporta AJAX y no-AJAX)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearProyecto(ProyectoFormVM vm, CancellationToken ct)
+        {
+            bool isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+            if (!ModelState.IsValid)
+            {
+                if (isAjax)
+                {
+                    vm.FormAction = Url.Action(nameof(CrearProyecto), "Seguimiento")!;
+                    vm.SubmitText = "Crear";
+                    Response.StatusCode = 400;
+                    return PartialView("~/Views/Seguimiento/Partials/_ProyectoFormPartial.cshtml", vm);
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            var p = new Proyecto { Nombre = vm.Nombre.Trim() };
+            _db.Add(p);
+            await _db.SaveChangesAsync(ct);
+
+            if (isAjax) return Ok(new { ok = true, id = p.IdProyecto });
+            return RedirectToAction(nameof(Index), new { proyectoId = p.IdProyecto });
+        }
+
+        // POST: editar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarProyecto(ProyectoFormVM vm, CancellationToken ct)
+        {
+            bool isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+            if (!ModelState.IsValid || vm.IdProyecto is null)
+            {
+                if (isAjax)
+                {
+                    vm.FormAction = Url.Action(nameof(EditarProyecto), "Seguimiento")!;
+                    vm.SubmitText = "Actualizar";
+                    Response.StatusCode = 400;
+                    return PartialView("~/Views/Seguimiento/Partials/_ProyectoFormPartial.cshtml", vm);
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            var p = await _db.Proyectos.FirstOrDefaultAsync(x => x.IdProyecto == vm.IdProyecto.Value, ct);
+            if (p is null) return NotFound();
+
+            p.Nombre = vm.Nombre.Trim();
+            await _db.SaveChangesAsync(ct);
+
+            if (isAjax) return Ok(new { ok = true, id = p.IdProyecto });
+            return RedirectToAction(nameof(Index), new { proyectoId = p.IdProyecto });
+        }
+
+        // POST: eliminar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarProyecto(int id, CancellationToken ct)
+        {
+            bool isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+            var p = await _db.Proyectos.FirstOrDefaultAsync(x => x.IdProyecto == id, ct);
+            if (p is null) return NotFound();
+
+            // opcional: impedir eliminar si tiene tareas
+            // if (await _db.Tareas.AnyAsync(t => t.ProyectoId == id, ct))
+            //     return BadRequest("No se puede eliminar: el proyecto tiene tareas asignadas.");
+
+            _db.Proyectos.Remove(p);
+            await _db.SaveChangesAsync(ct);
+
+            if (isAjax) return Ok(new { ok = true });
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

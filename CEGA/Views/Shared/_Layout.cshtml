@@ -24,12 +24,17 @@
                 </button>
 
                 <div id="topNav" class="collapse navbar-collapse">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                    </ul>
+                    @* Menú izquierdo: solo cuando hay sesión *@
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Gráficos</a>
+                            </li>
+                        </ul>
+                    }
 
+                    @* Menú derecho *@
                     <ul class="navbar-nav ms-auto align-items-center">
                         @if (User?.Identity?.IsAuthenticated == true)
                         {

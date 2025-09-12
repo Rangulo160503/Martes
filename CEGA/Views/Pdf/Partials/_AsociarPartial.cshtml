@@ -1,112 +1,327 @@
 ﻿@model CEGA.Models.ViewModels.PdfAsociacionesVM
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<form asp-action="Asociar" asp-controller="Pdf" method="post" class="row g-3">
+<form asp-action="Asociar" asp-controller="Pdf" method="post" class="row g-3" id="asociacionesForm">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="IdPdf" />
 
     <div class="col-12">
         <h5 class="mb-1">Asociar elementos al PDF #@Model.IdPdf</h5>
-        <small class="text-muted">Usa los dropdowns para <strong>agregar</strong> o <strong>quitar</strong> y luego “Guardar cambios”.</small>
+        <small class="text-muted">Arrastra, usa los botones o los atajos (A = agregar, Q = quitar, Ctrl/⌘ + click = multiselección). El sistema calculará automáticamente qué <strong>agregar</strong> y qué <strong>quitar</strong> al guardar.</small>
     </div>
 
-    <!-- PROYECTOS -->
-    <div class="col-md-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="mb-3">Proyectos</h6>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="form-label">Quitar del PDF</label>
-                        <select name="ProyectosQuitarIds" class="form-select" multiple size="8">
-                            @if (!Model.ProyectosAsociados.Any())
-                            {
-                                <option disabled>(Sin proyectos asociados)</option>
-                            }
-                            else
-                            {
-                                foreach (var p in Model.ProyectosAsociados)
+    <ul class="nav nav-pills mt-2" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#proyectos-pane" type="button">Proyectos</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tareas-pane" type="button">Tareas</button></li>
+    </ul>
+
+    <div class="tab-content mt-2">
+        <!-- ============ PROYECTOS ============ -->
+        <div class="tab-pane fade show active" id="proyectos-pane">
+            <div class="row g-3 align-items-stretch">
+                <!-- Disponibles -->
+                <div class="col-md-5">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Disponibles</h6>
+                                <input type="text" class="form-control form-control-sm w-50" placeholder="Filtrar..." data-filter="lista-proy-disponibles" />
+                            </div>
+                            <ul id="lista-proy-disponibles" class="list-group list-group-flush flex-grow-1 overflow-auto border" style="max-height:320px;">
+                                @if (!(Model.ProyectosDisponibles?.Any() ?? false))
                                 {
-                                    <option value="@p.Id">@p.Titulo</option>
+                                    <li class="list-group-item text-muted placeholder">(No hay proyectos disponibles)</li>
                                 }
-                            }
-                        </select>
-                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                                else
+                                {
+                                    foreach (var p in Model.ProyectosDisponibles)
+                                    {
+                                        <li class="list-group-item list-item" draggable="true" data-id="@p.Id" data-initial="disponible">
+                                            <input class="form-check-input me-2" type="checkbox" />
+                                            <span>@p.Titulo</span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-move="proy" data-dir="toSel">Agregar seleccionados</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="proy" data-dir="allToSel">Agregar todos</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <label class="form-label">Agregar al PDF</label>
-                        <select name="ProyectosAgregarIds" class="form-select" multiple size="8">
-                            @if (!Model.ProyectosDisponibles.Any())
-                            {
-                                <option disabled>(No hay proyectos disponibles)</option>
-                            }
-                            else
-                            {
-                                foreach (var p in Model.ProyectosDisponibles)
+                </div>
+                <!-- Flechas -->
+                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" data-move="proy" data-dir="toSel">&raquo;</button>
+                        <button type="button" class="btn btn-outline-secondary" data-move="proy" data-dir="toAvail">&laquo;</button>
+                    </div>
+                </div>
+                <!-- Asociados -->
+                <div class="col-md-5">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Asociados al PDF</h6>
+                                <input type="text" class="form-control form-control-sm w-50" placeholder="Filtrar..." data-filter="lista-proy-sel" />
+                            </div>
+                            <ul id="lista-proy-sel" class="list-group list-group-flush flex-grow-1 overflow-auto border" style="max-height:320px;">
+                                @if (!(Model.ProyectosAsociados?.Any() ?? false))
                                 {
-                                    <option value="@p.Id">@p.Titulo</option>
+                                    <li class="list-group-item text-muted placeholder">(Sin proyectos asociados)</li>
                                 }
-                            }
-                        </select>
-                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
+                                else
+                                {
+                                    foreach (var p in Model.ProyectosAsociados)
+                                    {
+                                        <li class="list-group-item list-item" draggable="true" data-id="@p.Id" data-initial="asociado">
+                                            <input class="form-check-input me-2" type="checkbox" />
+                                            <span>@p.Titulo</span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="proy" data-dir="toAvail">Quitar seleccionados</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="proy" data-dir="allToAvail">Quitar todos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ TAREAS ============ -->
+        <div class="tab-pane fade" id="tareas-pane">
+            <div class="row g-3 align-items-stretch">
+                <!-- Disponibles -->
+                <div class="col-md-5">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Disponibles</h6>
+                                <input type="text" class="form-control form-control-sm w-50" placeholder="Filtrar..." data-filter="lista-tar-disponibles" />
+                            </div>
+                            <ul id="lista-tar-disponibles" class="list-group list-group-flush flex-grow-1 overflow-auto border" style="max-height:320px;">
+                                @if (!(Model.TareasDisponibles?.Any() ?? false))
+                                {
+                                    <li class="list-group-item text-muted placeholder">(No hay tareas disponibles)</li>
+                                }
+                                else
+                                {
+                                    foreach (var t in Model.TareasDisponibles)
+                                    {
+                                        <li class="list-group-item list-item" draggable="true" data-id="@t.Id" data-initial="disponible">
+                                            <input class="form-check-input me-2" type="checkbox" />
+                                            <span>@t.Titulo</span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-move="tar" data-dir="toSel">Agregar seleccionados</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="tar" data-dir="allToSel">Agregar todos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flechas -->
+                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" data-move="tar" data-dir="toSel">&raquo;</button>
+                        <button type="button" class="btn btn-outline-secondary" data-move="tar" data-dir="toAvail">&laquo;</button>
+                    </div>
+                </div>
+                <!-- Asociadas -->
+                <div class="col-md-5">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Asociadas al PDF</h6>
+                                <input type="text" class="form-control form-control-sm w-50" placeholder="Filtrar..." data-filter="lista-tar-sel" />
+                            </div>
+                            <ul id="lista-tar-sel" class="list-group list-group-flush flex-grow-1 overflow-auto border" style="max-height:320px;">
+                                @if (!(Model.TareasAsociadas?.Any() ?? false))
+                                {
+                                    <li class="list-group-item text-muted placeholder">(Sin tareas asociadas)</li>
+                                }
+                                else
+                                {
+                                    foreach (var t in Model.TareasAsociadas)
+                                    {
+                                        <li class="list-group-item list-item" draggable="true" data-id="@t.Id" data-initial="asociado">
+                                            <input class="form-check-input me-2" type="checkbox" />
+                                            <span>@t.Titulo</span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                            <div class="mt-2 d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="tar" data-dir="toAvail">Quitar seleccionados</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-move="tar" data-dir="allToAvail">Quitar todos</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TAREAS -->
-    <div class="col-md-6">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="mb-3">Tareas</h6>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="form-label">Quitar del PDF</label>
-                        <select name="TareasQuitarIds" class="form-select" multiple size="8">
-                            @if (!Model.TareasAsociadas.Any())
-                            {
-                                <option disabled>(Sin tareas asociadas)</option>
-                            }
-                            else
-                            {
-                                foreach (var t in Model.TareasAsociadas)
-                                {
-                                    <option value="@t.Id">@t.Titulo</option>
-                                }
-                            }
-                        </select>
-                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label">Agregar al PDF</label>
-                        <select name="TareasAgregarIds" class="form-select" multiple size="8">
-                            @if (!Model.TareasDisponibles.Any())
-                            {
-                                <option disabled>(No hay tareas disponibles)</option>
-                            }
-                            else
-                            {
-                                foreach (var t in Model.TareasDisponibles)
-                                {
-                                    <option value="@t.Id">@t.Titulo</option>
-                                }
-                            }
-                        </select>
-                        <div class="form-text">Mantén Ctrl/⌘ para seleccionar varios.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Hidden payload -->
+    <div id="payload" class="d-none"></div>
 
-    <!-- Acciones -->
-    <div class="col-12 d-flex gap-2 justify-content-end">
+    <div class="col-12 d-flex gap-2 justify-content-end mt-3">
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a class="btn btn-outline-secondary" href="javascript:history.back()">Cancelar</a>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancelar</a>
     </div>
 </form>
-
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<script>
+window.initAsociarDualList = function () {
+  // 0) Quitar placeholders si hay elementos reales
+  ['lista-proy-sel','lista-proy-disponibles','lista-tar-sel','lista-tar-disponibles']
+    .forEach(id => {
+      const ul = document.getElementById(id);
+      if (!ul) return;
+      if (ul.querySelector('.list-item')) ul.querySelectorAll('.placeholder').forEach(p=>p.remove());
+    });
+
+  const pairs = { proy:{avail:'lista-proy-disponibles', sel:'lista-proy-sel'},
+                  tar: {avail:'lista-tar-disponibles',  sel:'lista-tar-sel'} };
+
+  // Filtro por texto
+  document.querySelectorAll('[data-filter]').forEach(inp=>{
+    inp.oninput = e=>{
+      const list = document.getElementById(e.target.dataset.filter);
+      const q = e.target.value.toLowerCase();
+      list.querySelectorAll('.list-item').forEach(li=>{
+        const txt = li.querySelector('span')?.textContent?.toLowerCase() ?? '';
+        li.style.display = txt.includes(q) ? '' : 'none';
+      });
+    };
+  });
+
+  // Click en li = toggle checkbox
+  document.querySelectorAll('.list-group').forEach(list=>{
+    list.onclick = e=>{
+      const li = e.target.closest('.list-item'); if(!li) return;
+      const cb = li.querySelector('input[type=checkbox]'); if(cb) cb.checked = !cb.checked;
+    };
+  });
+
+  // Drag & drop
+  function makeDnD(aId,bId){
+    [aId,bId].forEach(id=>{
+      const el = document.getElementById(id);
+      el.ondragstart = ev=>{
+        const li = ev.target.closest('.list-item'); if(!li) return;
+        ev.dataTransfer.setData('text/plain', li.dataset.id);
+        ev.dataTransfer.effectAllowed = 'move';
+      };
+      el.ondragover = ev=>{ ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+      el.ondrop = ev=>{
+        ev.preventDefault();
+        const idd = ev.dataTransfer.getData('text/plain');
+        const li = document.querySelector(`.list-item[data-id="${idd}"]`);
+        if(li && !el.contains(li)) el.appendChild(li);
+      };
+    });
+  }
+  makeDnD('lista-proy-disponibles','lista-proy-sel');
+  makeDnD('lista-tar-disponibles','lista-tar-sel');
+
+  // Botones mover
+  const moveSelected=(src,dst)=>src.querySelectorAll('.list-item').forEach(li=>{
+    const cb = li.querySelector('input[type=checkbox]');
+    if(cb && cb.checked){ dst.appendChild(li); cb.checked=false; }
+  });
+  const moveAll=(src,dst)=>src.querySelectorAll('.list-item').forEach(li=>{
+    dst.appendChild(li); const cb=li.querySelector('input'); if(cb) cb.checked=false;
+  });
+  document.querySelectorAll('[data-move]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const k = btn.dataset.move, dir = btn.dataset.dir;
+      const avail = document.getElementById(pairs[k].avail);
+      const sel   = document.getElementById(pairs[k].sel);
+      if(dir==='toSel')      moveSelected(avail, sel);
+      if(dir==='toAvail')    moveSelected(sel,  avail);
+      if(dir==='allToSel')   moveAll(avail, sel);
+      if(dir==='allToAvail') moveAll(sel,  avail);
+    };
+  });
+
+  // Atajos A/Q (pestaña activa)
+  document.onkeydown = e=>{
+    if(e.target.tagName==='INPUT') return;
+    const active = document.querySelector('.tab-pane.active'); if(!active) return;
+    const k = active.id.includes('proyectos') ? 'proy' : 'tar';
+    const avail = document.getElementById(pairs[k].avail);
+    const sel   = document.getElementById(pairs[k].sel);
+    if(e.key.toLowerCase()==='a') moveSelected(avail, sel);
+    if(e.key.toLowerCase()==='q') moveSelected(sel,  avail);
+  };
+
+  // Payload al enviar (sin bloquear el POST si hay errores)
+  const form = document.getElementById('asociacionesForm');
+  if(form){
+    form.addEventListener('submit', function () {
+      try {
+        const payload = document.getElementById('payload'); 
+        payload.innerHTML = '';
+        const addHidden=(name,arr)=>arr.forEach(v=>{
+          const i=document.createElement('input');
+          i.type='hidden';
+          i.name=name;           // mismo name repetido: el model binder arma la colección
+          i.value=v;
+          payload.appendChild(i);
+        });
+
+        // PROYECTOS
+        const proySel    = [...document.querySelectorAll('#lista-proy-sel .list-item')];
+        const proyAvail  = [...document.querySelectorAll('#lista-proy-disponibles .list-item')];
+        const proyAdded   = proySel  .filter(li=>li.dataset.initial==='disponible').map(li=>li.dataset.id);
+        const proyRemoved = proyAvail.filter(li=>li.dataset.initial==='asociado')  .map(li=>li.dataset.id);
+
+        // TAREAS
+        const tarSel    = [...document.querySelectorAll('#lista-tar-sel .list-item')];
+        const tarAvail  = [...document.querySelectorAll('#lista-tar-disponibles .list-item')];
+        const tarAdded   = tarSel  .filter(li=>li.dataset.initial==='disponible').map(li=>li.dataset.id);
+        const tarRemoved = tarAvail.filter(li=>li.dataset.initial==='asociado')  .map(li=>li.dataset.id);
+
+        addHidden('ProyectosAgregarIds', proyAdded);
+        addHidden('ProyectosQuitarIds',  proyRemoved);
+        addHidden('TareasAgregarIds',    tarAdded);
+        addHidden('TareasQuitarIds',     tarRemoved);
+
+        // Opcional: feedback visual
+        // form.classList.add('is-loading');
+        // form.querySelector('[type=submit]')?.setAttribute('disabled','disabled');
+      } catch (e) {
+        console.error('[Asociaciones] onsubmit error:', e);
+        // no prevenimos el submit
+      }
+      // addEventListener ignora "return"; no llamamos preventDefault, así que el POST continúa.
+    });
+  }
+};
+</script>
+
+<script>
+// Boot seguro del init al cargar el DOM
+(function () {
+  function boot() {
+    try { 
+      if (typeof window.initAsociarDualList === 'function') {
+        window.initAsociarDualList();
+      }
+    } catch (err) {
+      console.error('[Asociaciones] init error:', err);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
 }

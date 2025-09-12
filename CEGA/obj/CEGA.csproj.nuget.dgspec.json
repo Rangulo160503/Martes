@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rangulo\\Documents\\Martes2\\CEGA\\CEGA\\CEGA.csproj": {}
+    "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\CEGA.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rangulo\\Documents\\Martes2\\CEGA\\CEGA\\CEGA.csproj": {
+    "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\CEGA.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rangulo\\Documents\\Martes2\\CEGA\\CEGA\\CEGA.csproj",
+        "projectUniqueName": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\CEGA.csproj",
         "projectName": "CEGA",
-        "projectPath": "C:\\Users\\rangulo\\Documents\\Martes2\\CEGA\\CEGA\\CEGA.csproj",
-        "packagesPath": "C:\\Users\\rangulo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rangulo\\Documents\\Martes2\\CEGA\\CEGA\\obj\\",
+        "projectPath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\CEGA.csproj",
+        "packagesPath": "C:\\Users\\v-ronaldan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\rangulo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\v-ronaldan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -90,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

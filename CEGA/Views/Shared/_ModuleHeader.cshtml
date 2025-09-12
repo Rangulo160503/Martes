@@ -1,0 +1,10 @@
+﻿@model (string Title, string Subtitle)
+
+<div class="py-4 text-center text-white mb-4"
+     style="background: var(--brand); border-radius: .75rem;">
+    <h2 class="fw-bold mb-3">@Model.Title</h2>
+    @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+    {
+        <p class="mb-0 fs-5">@Html.Raw(Model.Subtitle)</p>
+    }
+</div>

@@ -6,7 +6,7 @@
 }
 
 <!-- Header -->
-<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand); border-radius: .75rem;">
     <h2 class="fw-bold mb-0">Módulo PDF</h2>
 </div>
 
@@ -26,11 +26,11 @@
         @await Html.PartialAsync("~/Views/Pdf/Partials/_SubirPdfPartial.cshtml", new PdfUploadVM())
     </div>
 
-    <!-- Asociar a PDF (dropdown de PDFs) + Resumen -->
+    <!-- Resumen / Comparar (solo PDF, sin asociaciones) -->
     <div class="col-lg-6">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title mb-3">Asociar Proyectos/Tareas a un PDF</h5>
+                <h5 class="card-title mb-3">Resumen y comparación del PDF</h5>
 
                 <div class="row g-2 align-items-end">
                     <div class="col-12">
@@ -41,50 +41,105 @@
                     </div>
                 </div>
 
-                <!-- Partial: Formulario de asociación -->
-                <div id="asociarContainer" class="mt-3"></div>
+                <ul class="nav nav-tabs mt-3" id="pdfTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="tab-resumen" data-bs-toggle="tab" data-bs-target="#pane-resumen" type="button" role="tab">Resumen</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-comparar" data-bs-toggle="tab" data-bs-target="#pane-comparar" type="button" role="tab">Comparar</button>
+                    </li>
+                </ul>
 
-                <!-- Partial: Resumen de asociaciones -->
-                <div id="resumenContainer" class="mt-3"></div>
+                <div class="tab-content pt-3">
+                    <div class="tab-pane fade show active" id="pane-resumen" role="tabpanel">
+                        <div id="resumenContainer" class="mt-0"></div>
+                    </div>
+                    <div class="tab-pane fade" id="pane-comparar" role="tabpanel">
+                        <div class="mb-2 small text-muted">Comparar el PDF seleccionado con otro PDF:</div>
+                        <div class="d-flex gap-2 mb-3">
+                            <select id="ddlCompareWith" class="form-select">
+                                <option value="">(Selecciona otro PDF…)</option>
+                            </select>
+                            <button id="btnComparar" type="button" class="btn btn-outline-primary">Comparar</button>
+                        </div>
+                        <div id="compararContainer" class="mt-0"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<!-- Anotaciones -->
+<form id="afTokenForm" class="d-none">@Html.AntiForgeryToken()</form>
+
+<!-- Modal para crear/editar anotación -->
+<div class="modal fade" id="anotModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Anotación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="anotModalBody"><!-- partial form --></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">Anotaciones</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="ddlAnotPdf" class="form-label mb-0">Escoger PDF</label>
+                        <small class="text-muted d-block">Selecciona el PDF activo para ver sus anotaciones.</small>
+                        <select id="ddlAnotPdf" class="form-select form-select-sm" style="min-width:220px">
+                            <option value="">(Todos)</option>
+                        </select>
+                        <button id="btnAnotRefrescar" type="button" class="btn btn-sm btn-outline-secondary">Refrescar</button>
+                        <button id="btnAnotNueva" type="button" class="btn btn-sm btn-primary">Nueva anotación</button>
+                    </div>
+                </div>
+                <div id="anotacionesContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <style>
-        #asociarContainer, #resumenContainer {
-            position: relative;
-        }
-
-        .is-loading {
-            opacity: .6;
-            transition: opacity .18s ease;
-        }
-
-            .is-loading::after {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background: rgba(255,255,255,.4);
-            }
-
-        .loading-spinner {
-            position: absolute;
-            inset: 0;
-            display: grid;
-            place-items: center;
-            pointer-events: none;
-        }
+        #resumenContainer, #compararContainer, #anotacionesContainer { position: relative; }
+        .is-loading { opacity: .6; transition: opacity .18s ease; }
+        .is-loading::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.4); }
+        .loading-spinner { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
     </style>
 
     <script>
         (async function () {
+            /* -------------------------- Refs -------------------------- */
             const ddl = document.getElementById('ddlPdfs');
-            const asociarContainer = document.getElementById('asociarContainer');
-            const resumenContainer = document.getElementById('resumenContainer');
+            const ddlCompareWith = document.getElementById('ddlCompareWith');
+            const btnComparar = document.getElementById('btnComparar');
+            const tabs = document.getElementById('pdfTabs');
 
+            const resumenContainer = document.getElementById('resumenContainer');
+            const compararContainer = document.getElementById('compararContainer');
+
+            /* Anotaciones */
+            const ddlAnotPdf = document.getElementById('ddlAnotPdf');
+            const btnAnotRefrescar = document.getElementById('btnAnotRefrescar');
+            const btnAnotNueva = document.getElementById('btnAnotNueva');
+            const anotacionesContainer = document.getElementById('anotacionesContainer');
+            const anotModalEl = document.getElementById('anotModal');
+            const anotModal = anotModalEl ? new bootstrap.Modal(anotModalEl) : null;
+            const anotModalBody = document.getElementById('anotModalBody');
+
+            /* ------------------------ Helpers ------------------------- */
             function setLoading(container, on) {
                 if (!container) return;
                 container.classList.toggle('is-loading', on);
@@ -99,132 +154,230 @@
                     container.querySelector('.loading-spinner')?.remove();
                 }
             }
+            const getQueryParam = (name) => (new URL(window.location.href)).searchParams.get(name) ?? "";
+            const getAfToken = () => document.querySelector('#afTokenForm input[name="__RequestVerificationToken"]')?.value ?? '';
 
+            /* ----------------------- Cargas base ----------------------- */
             async function cargarPdfs() {
                 try {
-                    console.log('[PDF] GET /Pdf/ListarPdfs');
                     const r = await fetch('/Pdf/ListarPdfs', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                     if (!r.ok) throw new Error(`HTTP ${r.status}`);
                     const data = await r.json(); // [{id, text}]
-                    ddl.innerHTML = '';
+                    ddl.innerHTML = data?.length
+                        ? '<option value="">— Selecciona un PDF —</option>' + data.map(x => `<option value="${x.id}">${x.text}</option>`).join('')
+                        : '<option value="">(No hay PDFs todavía)</option>';
+                    ddlCompareWith.innerHTML = '<option value="">(Selecciona otro PDF…)</option>' + (data?.map(x => `<option value="${x.id}">${x.text}</option>`).join('') ?? '');
+
                     if (!data?.length) {
-                        ddl.innerHTML = '<option value="">(No hay PDFs todavía)</option>';
-                        asociarContainer.innerHTML = '<div class="alert alert-info">Sube un PDF para poder asociar proyectos y tareas.</div>';
-                        resumenContainer.innerHTML = '';
-                        return;
+                        resumenContainer.innerHTML = '<div class="alert alert-info">Sube un PDF para ver su resumen.</div>';
+                        compararContainer.innerHTML = '<div class="alert alert-info">Sube al menos dos PDFs para poder comparar.</div>';
                     }
-                    ddl.innerHTML = '<option value="">— Selecciona un PDF —</option>' +
-                                    data.map(x => `<option value="${x.id}">${x.text}</option>`).join('');
                 } catch (err) {
                     ddl.innerHTML = '<option value="">(Error al cargar)</option>';
-                    asociarContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar la lista de PDFs: ${err}</div>`;
-                    resumenContainer.innerHTML = '';
+                    ddlCompareWith.innerHTML = '<option value="">(Error al cargar)</option>';
+                    resumenContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar la lista de PDFs: ${err}</div>`;
+                    compararContainer.innerHTML = '';
                 }
             }
 
-            async function cargarAsociar(idPdf, proyectoIds = []) {
-                if (!idPdf) { asociarContainer.innerHTML = ''; return; }
-                setLoading(asociarContainer, true);
-                try {
-                    const params = new URLSearchParams({ idPdf });
-                    proyectoIds.forEach(id => params.append('proyectoIds', id));
-                    console.log('[Asociar] GET /Pdf/AsociarPartial?' + params.toString());
-                    const resp = await fetch(`/Pdf/AsociarPartial?${params.toString()}`, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                    asociarContainer.innerHTML = await resp.text();
-                } catch (err) {
-                    asociarContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar el partial de asociación: ${err}</div>`;
-                } finally {
-                    setLoading(asociarContainer, false);
-                }
-            }
-
+            // Resumen usando tu endpoint existente: ResumenAsociaciones
             async function cargarResumen(idPdf) {
                 if (!idPdf) { resumenContainer.innerHTML = ''; return; }
                 setLoading(resumenContainer, true);
                 try {
-                    console.log('[Resumen] GET /Pdf/ResumenAsociaciones?id=' + idPdf);
                     const resp = await fetch(`/Pdf/ResumenAsociaciones?id=${encodeURIComponent(idPdf)}`, {
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     });
                     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                     resumenContainer.innerHTML = await resp.text();
                 } catch (err) {
-                    console.error('[Resumen] error:', err);
-                    resumenContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar el resumen: ${err}</div>`;
+                    resumenContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar el resumen del PDF: ${err}</div>`;
                 } finally {
                     setLoading(resumenContainer, false);
                 }
             }
 
-            // Cambio de PDF → recarga ambos partials
-            ddl?.addEventListener('change', async () => {
-                const id = ddl.value;
-                await cargarAsociar(id);
-                await cargarResumen(id);
-            });
-
-            // Cambio en selección de proyectos dentro del partial → recarga asociación (para filtrar tareas)
-            asociarContainer.addEventListener('change', (ev) => {
-                const sel = ev.target.closest('select[name="ProyectosAgregarIds"]');
-                if (!sel) return;
-                const idPdf = asociarContainer.querySelector('input[name="IdPdf"]')?.value;
-                if (!idPdf) return;
-                const proyectoIds = Array.from(sel.selectedOptions).map(o => o.value);
-                cargarAsociar(idPdf, proyectoIds);
-            });
-
-            // Submit del form de asociación → refresca ambos partials
-            asociarContainer.addEventListener('submit', async (ev) => {
-                const form = ev.target.closest('form');
-                if (!form) return;
-                ev.preventDefault();
-
+            // Comparar usando tu endpoint existente: Comparar
+            async function cargarComparacion(idPdfA, idPdfB) {
+                if (!idPdfA || !idPdfB) {
+                    compararContainer.innerHTML = '<div class="alert alert-info">Selecciona dos PDFs para comparar.</div>';
+                    return;
+                }
+                if (idPdfA === idPdfB) {
+                    compararContainer.innerHTML = '<div class="alert alert-warning">Selecciona un PDF distinto al actual para comparar.</div>';
+                    return;
+                }
+                setLoading(compararContainer, true);
                 try {
-                    setLoading(asociarContainer, true);
-                    const resp = await fetch(form.action, {
+                    const url = `/Pdf/Comparar?idA=${encodeURIComponent(idPdfA)}&idB=${encodeURIComponent(idPdfB)}`;
+                    const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    compararContainer.innerHTML = await r.text();
+                } catch (e) {
+                    compararContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar la comparación de PDFs: ${e}</div>`;
+                } finally {
+                    setLoading(compararContainer, false);
+                }
+            }
+
+            /* --------------- Anotaciones: filtros/lista ---------------- */
+            async function cargarPdfsAnot() {
+                try {
+                    const r = await fetch('/Pdf/ListarPdfs', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    const data = await r.json();
+                    ddlAnotPdf.innerHTML =
+                        '<option value="">(Todos)</option>' +
+                        (data?.map(x => `<option value="${x.id}">${x.text}</option>`).join('') ?? '');
+                    if (ddl?.value) ddlAnotPdf.value = ddl.value; // sincroniza con selección principal
+                } catch {
+                    ddlAnotPdf.innerHTML = '<option value="">(Error al cargar)</option>';
+                }
+            }
+            async function cargarAnotacionesListado(idPdf) {
+                if (!anotacionesContainer) return;
+                setLoading(anotacionesContainer, true);
+                try {
+                    const url = idPdf
+                        ? `/Pdf/AnotacionesPartial?idPdf=${encodeURIComponent(idPdf)}&top=1000`
+                        : `/Pdf/AnotacionesPartial?top=1000`;
+                    const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    anotacionesContainer.innerHTML = await r.text();
+                } catch (e) {
+                    anotacionesContainer.innerHTML = `<div class="alert alert-danger">No se pudo cargar Anotaciones: ${e}</div>`;
+                } finally { setLoading(anotacionesContainer, false); }
+            }
+
+            /* --------------- Anotaciones: modal crear/editar ----------- */
+            async function abrirFormCrearAnot() {
+                const idPdf = ddlAnotPdf?.value || ddl?.value || '';
+                if (!idPdf) { alert('Selecciona un PDF para crear la anotación.'); return; }
+                const url = `/Pdf/AnotacionesCrearPartial?idPdf=${encodeURIComponent(idPdf)}`;
+                const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!r.ok) { alert('No se pudo cargar el formulario.'); return; }
+                anotModalBody.innerHTML = await r.text(); // aquí se inyecta el form con AnotacionFormVM
+                anotModal?.show();
+            }
+            async function abrirFormEditarAnot(id) {
+                const r = await fetch(`/Pdf/AnotacionesEditarPartial?id=${encodeURIComponent(id)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!r.ok) { alert('No se pudo cargar el formulario.'); return; }
+                anotModalBody.innerHTML = await r.text();
+                anotModal?.show();
+            }
+
+            // Submit del form dentro del modal (delegado)
+            anotModalEl?.addEventListener('submit', async (e) => {
+                const form = e.target.closest('#anotForm');
+                if (!form) return;
+                e.preventDefault();
+                const resp = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!resp.ok) { alert('Error al guardar la anotación.'); return; }
+                anotModal?.hide();
+                await cargarAnotacionesListado(ddlAnotPdf?.value || '');
+            });
+
+            // Tabla/listado: acciones
+            anotacionesContainer?.addEventListener('click', async (ev) => {
+                const btn = ev.target.closest('button[data-action]');
+                if (!btn) return;
+                const action = btn.getAttribute('data-action');
+                if (action === 'new') {
+                    await abrirFormCrearAnot();
+                } else if (action === 'edit') {
+                    await abrirFormEditarAnot(btn.getAttribute('data-id'));
+                } else if (action === 'delete') {
+                    if (!confirm('¿Eliminar esta anotación?')) return;
+                    const fd = new FormData();
+                    fd.append('id', btn.getAttribute('data-id'));
+                    fd.append('__RequestVerificationToken', getAfToken());
+                    const r = await fetch('/Pdf/EliminarAnotacion', {
                         method: 'POST',
-                        body: new FormData(form),
+                        body: fd,
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     });
-                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                    asociarContainer.innerHTML = await resp.text();
-                    const idPdf = asociarContainer.querySelector('input[name="IdPdf"]')?.value || ddl.value;
-                    await cargarResumen(idPdf);
-                } catch (err) {
-                    asociarContainer.innerHTML = `<div class="alert alert-danger">No se pudo guardar: ${err}</div>`;
-                } finally {
-                    setLoading(asociarContainer, false);
+                    if (!r.ok) { alert('No se pudo eliminar.'); return; }
+                    await cargarAnotacionesListado(ddlAnotPdf?.value || '');
                 }
             });
 
-            // Inicial
+            /* ------------------------ Listeners ------------------------ */
+            ddl?.addEventListener('change', async () => {
+                const id = ddl.value;
+                resumenContainer.innerHTML = '';
+                compararContainer.innerHTML = '';
+
+                const active = document.querySelector('#pdfTabs .nav-link.active')?.id;
+                if (active === 'tab-resumen') await cargarResumen(id);
+                if (active === 'tab-comparar') {
+                    const idB = ddlCompareWith.value || getQueryParam('compareWith');
+                    await cargarComparacion(id, idB);
+                }
+
+                if (ddlAnotPdf) {
+                    ddlAnotPdf.value = id || '';
+                    await cargarAnotacionesListado(ddlAnotPdf.value);
+                }
+            });
+
+            ddlAnotPdf?.addEventListener('change', async () => {
+                await cargarAnotacionesListado(ddlAnotPdf.value);
+            });
+
+            btnAnotRefrescar?.addEventListener('click', async () => {
+                await cargarAnotacionesListado(ddlAnotPdf?.value || '');
+            });
+
+            btnAnotNueva?.addEventListener('click', abrirFormCrearAnot);
+
+            tabs?.addEventListener('shown.bs.tab', async (ev) => {
+                const id = ddl.value;
+                if (!id) return;
+                switch (ev.target.id) {
+                    case 'tab-resumen':
+                        if (!resumenContainer.innerHTML.trim()) await cargarResumen(id);
+                        break;
+                    case 'tab-comparar':
+                        if (!ddlCompareWith.value) {
+                            const q = getQueryParam('compareWith');
+                            if (q) ddlCompareWith.value = q;
+                        }
+                        if (!compararContainer.innerHTML.trim()) {
+                            await cargarComparacion(id, ddlCompareWith.value || getQueryParam('compareWith'));
+                        }
+                        break;
+                }
+            });
+
+            btnComparar?.addEventListener('click', async () => {
+                await cargarComparacion(ddl.value, ddlCompareWith.value);
+            });
+
+            /* ---------------------- Inicialización --------------------- */
             await cargarPdfs();
-            // Si ya quedó un valor seleccionado (o el navegador recuerda el último), dispara ambas cargas
+            await cargarPdfsAnot();
+
+            const preselectId = getQueryParam('id');
+            if (preselectId) {
+                const opt = Array.from(ddl.options).find(o => o.value === preselectId);
+                if (opt) ddl.value = preselectId;
+                if (ddlAnotPdf) ddlAnotPdf.value = preselectId;
+            }
+
+            const active = document.querySelector('#pdfTabs .nav-link.active')?.id;
             if (ddl.value) {
-                await cargarAsociar(ddl.value);
-                await cargarResumen(ddl.value);
-                    }function getQueryParam(name) {
-              const u = new URL(window.location.href);
-              return u.searchParams.get(name) ?? "";
-          }
+                if (active === 'tab-resumen') await cargarResumen(ddl.value);
+                if (active === 'tab-comparar') {
+                    const idB = ddlCompareWith.value || getQueryParam('compareWith');
+                    await cargarComparacion(ddl.value, idB);
+                }
+            }
 
-          // Inicial
-          await cargarPdfs();
-
-          // Si venimos desde /Pdf/Gestionar?id=123 o el navegador recuerda el último
-          const preselectId = getQueryParam('id');
-          if (preselectId) {
-              // Coloca la opción si existe y dispara las cargas
-              const opt = Array.from(ddl.options).find(o => o.value === preselectId);
-              if (opt) ddl.value = preselectId;
-          }
-          if (ddl.value) {
-              await cargarAsociar(ddl.value);
-              await cargarResumen(ddl.value);
-          }
+            await cargarAnotacionesListado(ddlAnotPdf?.value || '');
         })();
     </script>
 }

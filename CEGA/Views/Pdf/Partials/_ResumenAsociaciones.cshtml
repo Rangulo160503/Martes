@@ -1,7 +1,7 @@
 ﻿@model CEGA.Models.ViewModels.Pdf.ResumenAsociacionesVM
 
 <div class="card">
-    <div class="card-header fw-semibold">Resumen de asociaciones</div>
+    <div class="card-header fw-semibold">Resumen del PDF</div>
     <div class="card-body">
         <div class="mb-2 text-muted">
             <span class="me-2">PDF:</span>
@@ -9,53 +9,7 @@
         </div>
 
         <div class="row g-3">
-            <div class="col-12 col-lg-4">
-                <div class="border rounded p-2 h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-semibold">Proyectos</span>
-                        <span class="badge bg-primary">@Model.TotalProyectos</span>
-                    </div>
-                    @if (Model.Proyectos?.Any() == true)
-                    {
-                        <ul class="mb-0 small">
-                            @foreach (var p in Model.Proyectos)
-                            {
-                                <li>@p</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-
-                        <div class="text-muted small">Sin proyectos asociados.</div>
-                    }
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
-                <div class="border rounded p-2 h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-semibold">Tareas</span>
-                        <span class="badge bg-secondary">@Model.TotalTareas</span>
-                    </div>
-                    @if (Model.Tareas?.Any() == true)
-                    {
-                        <ul class="mb-0 small">
-                            @foreach (var t in Model.Tareas)
-                            {
-                                <li>@t</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-
-                        <div class="text-muted small">Sin tareas asociadas.</div>
-                    }
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
+            <div class="col-12">
                 <div class="border rounded p-2 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="fw-semibold">Anotaciones</span>
@@ -72,12 +26,10 @@
                     }
                     else
                     {
-
                         <div class="text-muted small">Sin anotaciones.</div>
                     }
                 </div>
             </div>
         </div>
-
     </div>
 </div>

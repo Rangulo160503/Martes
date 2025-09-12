@@ -12,72 +12,154 @@
     var puestos = ViewBag.Puestos as IEnumerable<Puesto> ?? Enumerable.Empty<Puesto>();
     var incapacidades = ViewBag.Incapacidades as IEnumerable<Incapacidad> ?? Enumerable.Empty<Incapacidad>();
     var vacaciones = ViewBag.Vacaciones as IEnumerable<VacacionesEmpleado> ?? Enumerable.Empty<VacacionesEmpleado>();
+    var resumen = ViewBag.ResumenEmpleados as IEnumerable<ResumenSalariosVM> ?? Enumerable.Empty<ResumenSalariosVM>();
+    var proyectosSelect = ViewBag.ProyectosSelect as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
 
-    // Lista de empleados para dropdowns en parciales (_Incapacidades / _Vacaciones)
+    // Lista de empleados para dropdowns en parciales (_Incapacidades / _Vacaciones / _Accidentes…)
     var empleadosSelect = ViewBag.EmpleadosSelect as IEnumerable<SelectListItem>
                           ?? (vmPuestos.Empleados ?? Enumerable.Empty<SelectListItem>());
+
+    // Contadores para badges
+    var salariosCount = resumen.Count();              // resumen de salarios/empleados
+    var vacCount = vacaciones.Count();
+    var puestosCount = puestos.Count();
+    var incapCount = incapacidades.Count();
+    var empleadosCount = empleadosSelect.Count();
 }
 
+@await Html.PartialAsync("_ModuleHeader", (
+"Módulo de Empleados",
+    "Administra <span class='fw-semibold'>salarios</span>, <span class='fw-semibold'>vacaciones</span>, <span class='fw-semibold'>puestos</span> e <span class='fw-semibold'>incapacidades</span>."
+))
+
+@await Html.PartialAsync("_Alerts")
+
 <div class="container my-4">
-    <h2 class="fw-bold mb-3">Gestión de Empleados</h2>
+    <div class="card card-lg">
+        <div class="card-header p-0">
+            <ul class="nav nav-tabs card-header-tabs nav-fill" id="empleadosTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="salarios-tab" data-bs-toggle="tab" data-bs-target="#salarios"
+                            type="button" role="tab" aria-controls="salarios" aria-selected="true">
+                        Salarios <span class="badge bg-success ms-1">@salariosCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="vacaciones-tab" data-bs-toggle="tab" data-bs-target="#vacaciones"
+                            type="button" role="tab" aria-controls="vacaciones" aria-selected="false">
+                        Vacaciones <span class="badge bg-success ms-1">@vacCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="puestos-tab" data-bs-toggle="tab" data-bs-target="#puestos"
+                            type="button" role="tab" aria-controls="puestos" aria-selected="false">
+                        Puestos <span class="badge bg-success ms-1">@puestosCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="incapacidades-tab" data-bs-toggle="tab" data-bs-target="#incapacidades"
+                            type="button" role="tab" aria-controls="incapacidades" aria-selected="false">
+                        Incapacidades <span class="badge bg-success ms-1">@incapCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="empleados-tab" data-bs-toggle="tab" data-bs-target="#empleados"
+                            type="button" role="tab" aria-controls="empleados" aria-selected="false">
+                        Empleados <span class="badge bg-success ms-1">@empleadosCount</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
 
-    <!-- Partial: cambiar puesto -->
-    @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
+        <div class="card-body">
+            <div class="tab-content mt-2">
+                <!-- TAB: Salarios (resumen/consulta de salarios por empleado) -->
+                <div class="tab-pane fade show active" id="salarios" role="tabpanel" aria-labelledby="salarios-tab">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Resumen de empleados</h5>
+                            @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
+                        </div>
+                    </div>
 
-    <hr class="my-4" />
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Salarios por puesto</h5>
+                            @await Html.PartialAsync("Partials/_Salarios", puestos)
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Partial: salarios (editar salario base por puesto) -->
-    @await Html.PartialAsync("Partials/_Salarios", puestos)
+                <!-- TAB: Vacaciones -->
+                <div class="tab-pane fade" id="vacaciones" role="tabpanel" aria-labelledby="vacaciones-tab">
+                    @{
+                        var vdVac = new ViewDataDictionary(ViewData);
+                        if (vdVac.ContainsKey("Empleados")) vdVac.Remove("Empleados");
+                        vdVac["Empleados"] = empleadosSelect;
+                    }
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Vacaciones</h5>
+                            @await Html.PartialAsync("Partials/_Vacaciones", vacaciones, vdVac)
+                        </div>
+                    </div>
+                </div>
 
-    <hr class="my-4" />
+                <!-- TAB: Puestos -->
+                <div class="tab-pane fade" id="puestos" role="tabpanel" aria-labelledby="puestos-tab">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Cambiar puesto</h5>
+                            @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Partial: incapacidades (subir archivo + listado) -->
-    <hr class="my-4" />
+                <!-- TAB: Incapacidades -->
+                <div class="tab-pane fade" id="incapacidades" role="tabpanel" aria-labelledby="incapacidades-tab">
+                    @{
+                        var vdInc = new ViewDataDictionary(ViewData);
+                        if (vdInc.ContainsKey("Empleados")) vdInc.Remove("Empleados");
+                        vdInc["Empleados"] = empleadosSelect;
+                    }
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Incapacidades</h5>
+                            @await Html.PartialAsync("Partials/_Incapacidades", incapacidades, vdInc)
+                        </div>
+                    </div>
+                </div>
 
-    @{
-        var vd = new ViewDataDictionary(ViewData);
-        if (vd.ContainsKey("Empleados")) vd.Remove("Empleados"); // evita duplicado
-        vd["Empleados"] = empleadosSelect;                       // setea la lista
-    }
-    @await Html.PartialAsync("Partials/_Incapacidades", incapacidades, vd)
+                <!-- TAB: Empleados (extra: accidentes por empleado/proyecto) -->
+                <div class="tab-pane fade" id="empleados" role="tabpanel" aria-labelledby="empleados-tab">
+                    @{
+                        var vdAcc = new ViewDataDictionary(ViewData);
+                        vdAcc["Empleados"] = empleadosSelect;
+                        vdAcc["Proyectos"] = proyectosSelect;
+                        vdAcc["Accidentes"] = ViewBag.Accidentes as IEnumerable<CEGA.Models.ViewModels.AccidenteFilaVM>
+                        ?? Enumerable.Empty<CEGA.Models.ViewModels.AccidenteFilaVM>();
+                        var accVm = ViewBag.AccidentesVm as CEGA.Models.ViewModels.AccidenteCrearVM
+                        ?? new CEGA.Models.ViewModels.AccidenteCrearVM();
+                    }
 
-    <hr class="my-4" />
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Listado de empleados</h5>
+                            @* Si más adelante tienes un partial de empleados puro, lo colocas aquí *@
+                            @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
+                        </div>
+                    </div>
 
-    @{
-        var vdVac = new ViewDataDictionary(ViewData);
-        if (vdVac.ContainsKey("Empleados")) vdVac.Remove("Empleados"); // evita duplicado
-        vdVac["Empleados"] = empleadosSelect;                           // setea la lista
-    }
-    @await Html.PartialAsync("Partials/_Vacaciones", vacaciones, vdVac)
-
-    <hr class="my-4" />
-    @{
-        var resumen = ViewBag.ResumenEmpleados as IEnumerable<ResumenSalariosVM>
-        ?? Enumerable.Empty<ResumenSalariosVM>();
-    }
-    @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
-    <hr class="my-4" />
-
-    @{
-        // ViewModels / listas para el partial de accidentes
-        var accVm = ViewBag.AccidentesVm as CEGA.Models.ViewModels.AccidenteCrearVM
-        ?? new CEGA.Models.ViewModels.AccidenteCrearVM();
-
-        var accidentes = ViewBag.Accidentes as IEnumerable<CEGA.Models.ViewModels.AccidenteFilaVM>
-        ?? Enumerable.Empty<CEGA.Models.ViewModels.AccidenteFilaVM>();
-
-        var proyectosSelect = ViewBag.ProyectosSelect as IEnumerable<SelectListItem>
-        ?? Enumerable.Empty<SelectListItem>();
-
-        // ya tenés empleadosSelect arriba (lo reutilizamos)
-        var vdAcc = new ViewDataDictionary(ViewData);
-        vdAcc["Empleados"] = empleadosSelect;     // dropdown Empleados
-        vdAcc["Proyectos"] = proyectosSelect;     // dropdown Proyectos
-        vdAcc["Accidentes"] = accidentes;         // tabla
-    }
-
-    @await Html.PartialAsync("Partials/_AccidentesEmpleadoProyecto", accVm, vdAcc)
-
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Accidentes por Empleado y Proyecto</h5>
+                            @await Html.PartialAsync("Partials/_AccidentesEmpleadoProyecto", accVm, vdAcc)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

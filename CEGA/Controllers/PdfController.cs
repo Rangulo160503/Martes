@@ -185,109 +185,18 @@ namespace CEGA.Controllers
 
             await _db.SaveChangesAsync(ct);
 
-            // Reconstruir VM para devolver el partial actualizado
-            var idsProyAsociados = await _db.PdfProyectos.Where(x => x.IdPdf == vm.IdPdf).Select(x => x.IdProyecto).ToListAsync(ct);
-            var idsTareasAsociadas = await _db.PdfTareas.Where(x => x.IdPdf == vm.IdPdf).Select(x => x.IdTarea).ToListAsync(ct);
-
-            vm.ProyectosAsociados = await _db.Proyectos.AsNoTracking()
-                .Where(p => idsProyAsociados.Contains(p.IdProyecto))
-                .OrderBy(p => p.Nombre)
-                .Select(p => new CEGA.Models.ViewModels.PdfAsociacionesVM.Item { Id = p.IdProyecto, Titulo = p.Nombre })
-                .ToListAsync(ct);
-
-            vm.ProyectosDisponibles = await _db.Proyectos.AsNoTracking()
-                .Where(p => !idsProyAsociados.Contains(p.IdProyecto))
-                .OrderBy(p => p.Nombre)
-                .Select(p => new CEGA.Models.ViewModels.PdfAsociacionesVM.Item { Id = p.IdProyecto, Titulo = p.Nombre })
-                .ToListAsync(ct);
-
-            vm.TareasAsociadas = await _db.Tareas.AsNoTracking()
-                .Where(t => idsTareasAsociadas.Contains(t.Id))
-                .OrderBy(t => t.Titulo)
-                .Select(t => new CEGA.Models.ViewModels.PdfAsociacionesVM.Item { Id = t.Id, Titulo = t.Titulo })
-                .ToListAsync(ct);
-
-            vm.TareasDisponibles = await _db.Tareas.AsNoTracking()
-                .Where(t => !idsTareasAsociadas.Contains(t.Id))
-                .OrderBy(t => t.Titulo)
-                .Select(t => new CEGA.Models.ViewModels.PdfAsociacionesVM.Item { Id = t.Id, Titulo = t.Titulo })
-                .ToListAsync(ct);
-
-            ViewBag.Success = "Asociaciones actualizadas.";
-            return PartialView("~/Views/Pdf/Partials/_AsociarPartial.cshtml", vm);
+            TempData["Mensaje"] = "Asociaciones actualizadas.";
+            return RedirectToAction(nameof(AsociarPartial), new { idPdf = vm.IdPdf });
         }
+
         [HttpGet]
-        public async Task<IActionResult> ResumenAsociaciones(int id, CancellationToken ct) // id = IdPdf
+        public async Task<IActionResult> ResumenAsociaciones(int id, CancellationToken ct)
         {
-            // ¿Existe el PDF?
-            var existePdf = await _db.Pdfs.AsNoTracking().AnyAsync(p => p.IdPdf == id, ct);
-            if (!existePdf) return NotFound($"No existe el PDF {id}");
-
-            // Nombre mostrado (si no tienes nombre de archivo, usamos un fallback)
-            var pdfNombre = $"PDF #{id}";
-
-            // Totales
-            var totalProyectos = await _db.PdfProyectos
-                .Where(x => x.IdPdf == id)
-                .Select(x => x.IdProyecto)
-                .Distinct()
-                .CountAsync(ct);
-
-            var totalTareas = await _db.PdfTareas
-                .Where(x => x.IdPdf == id)
-                .Select(x => x.IdTarea)
-                .Distinct()
-                .CountAsync(ct);
-
-            var totalAnotaciones = await _db.Anotaciones
-                .Where(a => a.IdPdf == id)
-                .CountAsync(ct);
-
-            // TOP 5 Proyectos (por nombre)
-            var proyectosTop5 = await _db.PdfProyectos
-                .Where(pp => pp.IdPdf == id)
-                .Join(_db.Proyectos,
-                      pp => pp.IdProyecto,
-                      pr => pr.IdProyecto,
-                      (pp, pr) => pr.Nombre)
-                .OrderBy(n => n)
-                .Take(5)
-                .ToListAsync(ct);
-
-            // TOP 5 Tareas (por título)
-            var tareasTop5 = await _db.PdfTareas
-                .Where(pt => pt.IdPdf == id)
-                .Join(_db.Tareas,
-                      pt => pt.IdTarea,
-                      t => t.Id,
-                      (pt, t) => t.Titulo)
-                .OrderBy(t => t)
-                .Take(5)
-                .ToListAsync(ct);
-
-            // TOP 5 Anotaciones (últimas)
-            var anotacionesTop5 = await _db.Anotaciones
-                .Where(a => a.IdPdf == id)
-                .OrderByDescending(a => a.IdAnotacion)
-                .Select(a => a.Texto)
-                .Take(5)
-                .ToListAsync(ct);
-
-            var vm = new ResumenAsociacionesVM
-            {
-                PdfId = id,
-                PdfNombre = pdfNombre,
-                TotalProyectos = totalProyectos,
-                TotalTareas = totalTareas,
-                TotalAnotaciones = totalAnotaciones,
-                Proyectos = proyectosTop5,
-                Tareas = tareasTop5,
-                Anotaciones = anotacionesTop5
-            };
-
+            var vm = await GetResumenAsync(id, ct);
+            if (vm is null) return NotFound($"No existe el PDF {id}");
             return PartialView("~/Views/Pdf/Partials/_ResumenAsociaciones.cshtml", vm);
         }
-        // Sirve el PDF como FileStreamResult para <iframe> / <object>
+
         [HttpGet]
         public async Task<IActionResult> Archivo(int id, CancellationToken ct)
         {
@@ -333,6 +242,188 @@ namespace CEGA.Controllers
             // Simplemente manda al Index con querystring ?id=...
             return RedirectToAction(nameof(Index), new { id });
         }
+        [HttpGet]
+        public async Task<IActionResult> Comparar(int idA, int idB, CancellationToken ct)
+        {
+            try
+            {
+                if (idA == idB) return BadRequest("Parámetros inválidos: deben ser distintos.");
 
+                var izq = await GetResumenAsync(idA, ct);
+                var der = await GetResumenAsync(idB, ct);
+
+                if (izq is null || der is null) return NotFound("No se encontraron los PDFs.");
+
+                var vm = new ComparacionResumenAsociacionesVM { Izquierdo = izq, Derecho = der };
+                return PartialView("~/Views/Pdf/Partials/_ResumenAsociacionesCompare.cshtml", vm);
+            }
+            catch (Exception ex)
+            {
+                // Log opcional: _logger.LogError(ex, "Error en Comparar");
+                return StatusCode(500, $"Error en Comparar: {ex.Message}");
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> AnotacionesPartial(int? idPdf, int top = 1000, CancellationToken ct = default)
+        {
+            var q = _db.Anotaciones.AsNoTracking().AsQueryable();
+
+            if (idPdf.HasValue)
+                q = q.Where(a => a.IdPdf == idPdf.Value);
+
+            var filas = await q
+                .OrderByDescending(a => a.IdAnotacion)
+                .Take(top)
+                .Select(a => new CEGA.Models.ViewModels.Pdf.AnotacionRowVM
+                {
+                    IdAnotacion = a.IdAnotacion,
+                    IdPdf = a.IdPdf,
+                    Cedula = a.Cedula,
+                    Texto = a.Texto
+                })
+                .ToListAsync(ct);
+
+            return PartialView("~/Views/Pdf/Partials/_AnotacionesTabla.cshtml", filas);
+        }
+        private async Task<ResumenAsociacionesVM?> GetResumenAsync(int idPdf, CancellationToken ct = default)
+        {
+            var existePdf = await _db.Pdfs.AsNoTracking().AnyAsync(p => p.IdPdf == idPdf, ct);
+            if (!existePdf) return null;
+
+            var pdfNombre = $"PDF #{idPdf}";
+
+            var totalProyectos = await _db.PdfProyectos
+                .Where(x => x.IdPdf == idPdf).Select(x => x.IdProyecto).Distinct().CountAsync(ct);
+
+            var totalTareas = await _db.PdfTareas
+                .Where(x => x.IdPdf == idPdf).Select(x => x.IdTarea).Distinct().CountAsync(ct);
+
+            var totalAnotaciones = await _db.Anotaciones
+                .Where(a => a.IdPdf == idPdf).CountAsync(ct);
+
+            var proyectosTop5 = await _db.PdfProyectos
+                .Where(pp => pp.IdPdf == idPdf)
+                .Join(_db.Proyectos, pp => pp.IdProyecto, pr => pr.IdProyecto, (pp, pr) => pr.Nombre)
+                .OrderBy(n => n).Take(5).ToListAsync(ct);
+
+            var tareasTop5 = await _db.PdfTareas
+                .Where(pt => pt.IdPdf == idPdf)
+                .Join(_db.Tareas, pt => pt.IdTarea, t => t.Id, (pt, t) => t.Titulo)
+                .OrderBy(t => t).Take(5).ToListAsync(ct);
+
+            var anotacionesTop5 = await _db.Anotaciones
+                .Where(a => a.IdPdf == idPdf)
+                .OrderByDescending(a => a.IdAnotacion)
+                .Select(a => a.Texto).Take(5).ToListAsync(ct);
+
+            return new ResumenAsociacionesVM
+            {
+                PdfId = idPdf,
+                PdfNombre = pdfNombre,
+                TotalProyectos = totalProyectos,
+                TotalTareas = totalTareas,
+                TotalAnotaciones = totalAnotaciones,
+                Proyectos = proyectosTop5,
+                Tareas = tareasTop5,
+                Anotaciones = anotacionesTop5
+            };
+        }
+        // LISTA (ya la tienes): AnotacionesPartial(int? idPdf, int top = 1000, ...)
+
+        // GET: Crear
+        [HttpGet]
+        public async Task<IActionResult> AnotacionesCrearPartial(int idPdf, CancellationToken ct)
+        {
+            var empleados = await _db.Empleados.AsNoTracking()
+                .OrderBy(e => e.Nombre) // ajusta al nombre real del campo
+                .Select(e => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = e.Cedula.ToString(),
+                    Text = $"{e.Nombre} ({e.Cedula})" // adapta si no tienes Nombre
+                })
+                .ToListAsync(ct);
+
+            var vm = new CEGA.Models.ViewModels.Pdf.AnotacionFormVM
+            {
+                IdPdf = idPdf,
+                FormAction = Url.Action(nameof(CrearAnotacion), "Pdf")!,
+                SubmitText = "Crear",
+                Empleados = empleados
+            };
+            return PartialView("~/Views/Pdf/Partials/_AnotacionesForm.cshtml", vm);
+        }
+
+        // POST: Crear
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearAnotacion(CEGA.Models.ViewModels.Pdf.AnotacionFormVM vm, CancellationToken ct)
+        {
+            if (vm.IdPdf <= 0 || string.IsNullOrWhiteSpace(vm.Texto)) return BadRequest("Datos inválidos.");
+            var existePdf = await _db.Pdfs.AsNoTracking().AnyAsync(p => p.IdPdf == vm.IdPdf, ct);
+            if (!existePdf) return NotFound($"No existe el PDF {vm.IdPdf}");
+
+            _db.Anotaciones.Add(new CEGA.Models.Anotacion { IdPdf = vm.IdPdf, Cedula = vm.Cedula, Texto = vm.Texto });
+            await _db.SaveChangesAsync(ct);
+            return Ok(new { ok = true });
+        }
+
+        // GET: Editar
+        [HttpGet]
+        public async Task<IActionResult> AnotacionesEditarPartial(int id, CancellationToken ct)
+        {
+            var a = await _db.Anotaciones.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IdAnotacion == id, ct);
+            if (a is null) return NotFound();
+
+            var empleados = await _db.Empleados.AsNoTracking()
+                .OrderBy(e => e.Nombre)
+                .Select(e => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = e.Cedula.ToString(),
+                    Text = $"{e.Nombre} ({e.Cedula})"
+                })
+                .ToListAsync(ct);
+
+            var vm = new CEGA.Models.ViewModels.Pdf.AnotacionFormVM
+            {
+                IdAnotacion = a.IdAnotacion,
+                IdPdf = a.IdPdf,
+                Cedula = a.Cedula,         // esto marca seleccionado en el dropdown
+                Texto = a.Texto,
+                FormAction = Url.Action(nameof(EditarAnotacion), "Pdf")!,
+                SubmitText = "Actualizar",
+                Empleados = empleados
+            };
+            return PartialView("~/Views/Pdf/Partials/_AnotacionesForm.cshtml", vm);
+        }
+        // POST: Editar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarAnotacion(CEGA.Models.ViewModels.Pdf.AnotacionFormVM vm, CancellationToken ct)
+        {
+            if (vm.IdAnotacion is null || vm.IdPdf <= 0 || string.IsNullOrWhiteSpace(vm.Texto))
+                return BadRequest("Datos inválidos.");
+
+            var a = await _db.Anotaciones.FirstOrDefaultAsync(x => x.IdAnotacion == vm.IdAnotacion.Value, ct);
+            if (a is null) return NotFound();
+
+            a.Cedula = vm.Cedula;
+            a.Texto = vm.Texto;
+            await _db.SaveChangesAsync(ct);
+            return Ok(new { ok = true });
+        }
+
+        // POST: Eliminar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarAnotacion(int id, CancellationToken ct)
+        {
+            var a = await _db.Anotaciones.FirstOrDefaultAsync(x => x.IdAnotacion == id, ct);
+            if (a is null) return NotFound();
+
+            _db.Anotaciones.Remove(a);
+            await _db.SaveChangesAsync(ct);
+            return Ok(new { ok = true });
+        }
     }
 }

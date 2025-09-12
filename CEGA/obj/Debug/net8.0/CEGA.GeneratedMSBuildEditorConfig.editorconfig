@@ -9,193 +9,217 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = CEGA
 build_property.RootNamespace = CEGA
-build_property.ProjectDir = C:\Users\rangulo\Documents\Martes2\CEGA\CEGA\
+build_property.ProjectDir = C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes3\Martes\CEGA\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\rangulo\Documents\Martes2\CEGA\CEGA
+build_property.MSBuildProjectDirectory = C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Martes3\Martes\CEGA
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Account/EditarUsuario.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Account/EditarUsuario.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxFZGl0YXJVc3VhcmlvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Account/Login.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Account/Partials/_PuestoForm.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Account/Partials/_PuestoForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQYXJ0aWFsc1xfUHVlc3RvRm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Account/Partials/_RegisterForm.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Account/Partials/_RegisterForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQYXJ0aWFsc1xfUmVnaXN0ZXJGb3JtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Account/Register.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Contabilidad/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Contabilidad/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Contabilidad/Partials/_CierreDiarioPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Contabilidad/Partials/_CierreDiarioPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9DaWVycmVEaWFyaW9QYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Contabilidad/Partials/_GastosPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Contabilidad/Partials/_GastosPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9HYXN0b3NQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Contabilidad/Partials/_IngresosPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Contabilidad/Partials/_IngresosPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9JbmdyZXNvc1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Contabilidad/Partials/_ResumenFinancieroPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Contabilidad/Partials/_ResumenFinancieroPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29udGFiaWxpZGFkXFBhcnRpYWxzXF9SZXN1bWVuRmluYW5jaWVyb1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_AccidentesEmpleadoProyecto.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_AccidentesEmpleadoProyecto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9BY2NpZGVudGVzRW1wbGVhZG9Qcm95ZWN0by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_CrearEmpleado.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_CrearEmpleado.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9DcmVhckVtcGxlYWRvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_IncapacidadEditar.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_IncapacidadEditar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9JbmNhcGFjaWRhZEVkaXRhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_Incapacidades.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_Incapacidades.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9JbmNhcGFjaWRhZGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_Puestos.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_Puestos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9QdWVzdG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_ResumenEmpleados.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_ResumenEmpleados.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9SZXN1bWVuRW1wbGVhZG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_Salarios.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_Salarios.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9TYWxhcmlvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Empleados/Partials/_Vacaciones.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Empleados/Partials/_Vacaciones.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1wbGVhZG9zXFBhcnRpYWxzXF9WYWNhY2lvbmVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Home/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Home/Privacy.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Marketing/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Marketing/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFya2V0aW5nXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Marketing/Partials/_CampaniasPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Marketing/Partials/_CampaniasPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFya2V0aW5nXFBhcnRpYWxzXF9DYW1wYW5pYXNQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Marketing/Partials/_ClientesPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Marketing/Partials/_ClientesPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFya2V0aW5nXFBhcnRpYWxzXF9DbGllbnRlc1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Marketing/Partials/_PoolsPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Marketing/Partials/_PoolsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFya2V0aW5nXFBhcnRpYWxzXF9Qb29sc1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Partials/_AsociarPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_AnotacionesForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9Bbm90YWNpb25lc0Zvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_AnotacionesTabla.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9Bbm90YWNpb25lc1RhYmxhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_AsociarPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9Bc29jaWFyUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Partials/_ResumenAsociaciones.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_ResumenAsociaciones.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9SZXN1bWVuQXNvY2lhY2lvbmVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/Partials/_SubirPdfPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_ResumenAsociacionesCompare.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9SZXN1bWVuQXNvY2lhY2lvbmVzQ29tcGFyZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/Partials/_SubirPdfPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFBhcnRpYWxzXF9TdWJpclBkZlBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Pdf/VerPlano.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Pdf/VerPlano.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGRmXFZlclBsYW5vLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Reporteria/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Reporteria/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0ZXJpYVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Reporteria/Partials/_AccidentesPorEmpleadoPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Reporteria/Partials/_AccidentesPorEmpleadoPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0ZXJpYVxQYXJ0aWFsc1xfQWNjaWRlbnRlc1BvckVtcGxlYWRvUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Reporteria/Partials/_IncapacidadesPorEmpleadoPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Reporteria/Partials/_IncapacidadesPorEmpleadoPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0ZXJpYVxQYXJ0aWFsc1xfSW5jYXBhY2lkYWRlc1BvckVtcGxlYWRvUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Seguimiento/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Seguimiento/Partials/_CrearProyectoPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Partials/_CrearProyectoPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cUGFydGlhbHNcX0NyZWFyUHJveWVjdG9QYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Seguimiento/Partials/_CrearTareaPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Partials/_CrearTareaPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cUGFydGlhbHNcX0NyZWFyVGFyZWFQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Seguimiento/Partials/_ProyectosTablaPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Partials/_ProyectoFormPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cUGFydGlhbHNcX1Byb3llY3RvRm9ybVBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Partials/_ProyectosTablaPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cUGFydGlhbHNcX1Byb3llY3Rvc1RhYmxhUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Seguimiento/Partials/_TareasTablaPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Seguimiento/Partials/_TareasTablaPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VndWltaWVudG9cUGFydGlhbHNcX1RhcmVhc1RhYmxhUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Shared/Error.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Shared/_ModalNuevoPuesto.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/_Alerts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbGVydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/_ModalNuevoPuesto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Nb2RhbE51ZXZvUHVlc3RvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/_ModuleHeader.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Nb2R1bGVIZWFkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Usuarios/Index.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Usuarios/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/_ViewImports.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/_ViewStart.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rangulo/Documents/Martes2/CEGA/CEGA/Views/Shared/_Layout.cshtml]
+[C:/Users/v-ronaldan/OneDrive - Microsoft/Documents/Martes3/Martes/CEGA/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-e05o1uhfuz

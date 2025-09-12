@@ -6,22 +6,53 @@
     var tareas = (IEnumerable<CEGA.Models.Seguimiento.Tarea>)(ViewBag.Tareas ?? Enumerable.Empty<CEGA.Models.Seguimiento.Tarea>());
     var proyectos = (IEnumerable<CEGA.Models.ViewModels.ProyectoFilaVM>)(ViewBag.Proyectos ?? Enumerable.Empty<CEGA.Models.ViewModels.ProyectoFilaVM>());
     var proyectoVM = (CEGA.Models.ViewModels.ProyectoCrearVM)(ViewBag.ProyectoVM ?? new CEGA.Models.ViewModels.ProyectoCrearVM());
+
+    // Endpoints para el modal de edición / recarga de tabla
+    var urlTabla = Url.Action("ProyectosTablaPartial", "Seguimiento")!;
+    var urlNuevo = Url.Action("ProyectoCrearPartial", "Seguimiento")!;   // (opcional si quieres botón "Nuevo" por modal)
+    var urlEditar = Url.Action("ProyectoEditarPartial", "Seguimiento")!;
 }
 
+<!-- Header -->
+<div class="py-4 text-center text-white mb-4" style="background: var(--brand); border-radius: .75rem;">
+    <h2 class="fw-bold mb-0">Seguimiento de Tareas</h2>
+</div>
+
+<!-- PROYECTOS -->
 <div class="row g-4">
-    <!-- Fila de PROYECTOS -->
+    <!-- Crear proyecto (se conserva tu partial tal cual) -->
     <div class="col-lg-5">
         @await Html.PartialAsync("Partials/_CrearProyectoPartial", proyectoVM)
     </div>
+
+    <!-- Tabla de proyectos (con Editar/Eliminar) -->
     <div class="col-lg-7">
-        @await Html.PartialAsync("Partials/_ProyectosTablaPartial", proyectos)
+        <div id="proyectosTablaContainer">
+            @await Html.PartialAsync("Partials/_ProyectosTablaPartial", proyectos)
+        </div>
+    </div>
+</div>
+
+<!-- Token antifalsificación para POST vía fetch si lo usas -->
+<form id="afTokenForm" class="d-none">@Html.AntiForgeryToken()</form>
+
+<!-- Modal para Editar (y opcionalmente Crear por modal si mantienes el botón "Nuevo" en la tabla) -->
+<div class="modal fade" id="proyectoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Proyecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="proyectoModalBody"><!-- aquí se inyecta _ProyectoFormPartial --></div>
+        </div>
     </div>
 </div>
 
 <hr class="my-4" />
 
+<!-- TAREAS -->
 <div class="row g-4">
-    <!-- Fila de TAREAS -->
     <div class="col-lg-5">
         @await Html.PartialAsync("Partials/_CrearTareaPartial", Model)
     </div>
@@ -32,4 +63,64 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+          const cont      = document.getElementById('proyectosTablaContainer');
+          const modalEl   = document.getElementById('proyectoModal');
+          const modalBody = document.getElementById('proyectoModalBody');
+          const modal     = modalEl ? new bootstrap.Modal(modalEl) : null;
+
+          const URLS = {
+            tabla:  '@urlTabla',
+            nuevo:  '@urlNuevo',   // Solo si conservas el botón "Nuevo" en la tabla
+            editar: '@urlEditar'
+          };
+
+          async function recargarTabla() {
+            const r = await fetch(URLS.tabla, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            cont.innerHTML = await r.text();
+          }
+
+          async function abrirForm(url) {
+            const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            modalBody.innerHTML = await r.text();
+            modal?.show();
+          }
+
+          // Delegado: Editar (y opcionalmente Nuevo por modal si lo dejas en la tabla)
+          cont.addEventListener('click', async (ev) => {
+            const btn = ev.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            if (action === 'new-proyecto')  return abrirForm(URLS.nuevo); // opcional
+            if (action === 'edit-proyecto') return abrirForm(`${URLS.editar}?id=${encodeURIComponent(btn.getAttribute('data-id'))}`);
+            // Eliminar usa el <form> fallback del partial y hace POST normal (no requiere JS).
+          });
+
+          // Submit de crear/editar dentro del modal (para la ruta /Seguimiento/EditarProyecto o CrearProyecto por modal)
+          modalEl?.addEventListener('submit', async (e) => {
+            const form = e.target.closest('#proyectoForm');
+            if (!form) return;
+            e.preventDefault();
+
+            const resp = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (resp.ok) {
+              modal?.hide();
+              modalBody.innerHTML = '';
+              await recargarTabla();
+            } else {
+              // Si hay errores de validación, vuelve el mismo partial con 400
+              modalBody.innerHTML = await resp.text();
+            }
+          });
+
+          // Limpia el body del modal al cerrar
+          modalEl?.addEventListener('hidden.bs.modal', () => { modalBody.innerHTML = ''; });
+        })();
+    </script>
 }

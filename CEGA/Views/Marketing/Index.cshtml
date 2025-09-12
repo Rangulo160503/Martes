@@ -1,42 +1,73 @@
 ﻿@model CEGA.Models.ViewModels.MarketingPageVM
 @using CEGA.Models
+@using System.Linq
+
 
 @{
     ViewData["Title"] = "Marketing";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var campCount = Model?.Campanias?.Count() ?? 0;
+    var poolCount = Model?.Pools?.Count() ?? 0;
+    var cliCount = Model?.Clientes?.Count() ?? 0;
 }
 
-<!-- Header -->
-<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
-    <h2 class="fw-bold mb-0">Marketing</h2>
+@await Html.PartialAsync("_ModuleHeader", (
+"Módulo de Marketing",
+    "Gestiona <span class='fw-semibold'>campañas</span>, <span class='fw-semibold'>pools de correos</span> y <span class='fw-semibold'>clientes</span>."
+))
+
+@await Html.PartialAsync("_Alerts")
+
+<div class="card card-lg">
+    <div class="card-header p-0">
+        <ul class="nav nav-tabs card-header-tabs nav-fill" id="marketingTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes"
+                        type="button" role="tab" aria-controls="clientes" aria-selected="true">
+                    Clientes <span class="badge bg-success ms-1">@cliCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pool-tab" data-bs-toggle="tab" data-bs-target="#pool"
+                        type="button" role="tab" aria-controls="pool" aria-selected="false">
+                    Pools de Correos <span class="badge bg-success ms-1">@poolCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="camp-tab" data-bs-toggle="tab" data-bs-target="#camp"
+                        type="button" role="tab" aria-controls="camp" aria-selected="false">
+                    Campañas <span class="badge bg-success ms-1">@campCount</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <div class="tab-content mt-2">
+            <!-- Clientes -->
+            <div class="tab-pane fade show active" id="clientes" role="tabpanel" aria-labelledby="clientes-tab">
+                @await Html.PartialAsync("Partials/_ClientesPartial",
+                                Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>())
+            </div>
+
+            <!-- Pools -->
+            <div class="tab-pane fade" id="pool" role="tabpanel" aria-labelledby="pool-tab">
+                @await Html.PartialAsync("Partials/_PoolsPartial", Model)
+            </div>
+
+            <!-- Campañas -->
+            <div class="tab-pane fade" id="camp" role="tabpanel" aria-labelledby="camp-tab">
+                @{
+                    // El partial espera Pools en ViewBag (compatibilidad)
+                    ViewBag.Pools = Model?.Pools ?? Enumerable.Empty<PoolCorreo>();
+                }
+                @await Html.PartialAsync("Partials/_CampaniasPartial",
+                Model?.Campanias ?? Enumerable.Empty<CEGA.Models.CampMarketing>())
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- Alertas -->
-@if (TempData["Mensaje"] != null)
-{
-    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger  mb-3">@TempData["Error"]</div>
-}
-
-<!-- Clientes -->
-@await Html.PartialAsync("Partials/_ClientesPartial",
-Model?.Clientes ?? Enumerable.Empty<ClienteMarketing>())
-
-<hr class="my-4" />
-
-<!-- Pools de correos -->
-@await Html.PartialAsync("Partials/_PoolsPartial", Model)
-
-<hr class="my-4" />
-@{
-    ViewBag.Pools = Model?.Pools ?? Enumerable.Empty<PoolCorreo>();
-}
-@await Html.PartialAsync("Partials/_CampaniasPartial",
-Model?.Campanias ?? Enumerable.Empty<CEGA.Models.CampMarketing>())
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -1,0 +1,29 @@
+﻿@model CEGA.Models.ViewModels.Pdf.AnotacionFormVM
+
+<form action="@Model.FormAction" method="post" id="anotForm">
+    @Html.AntiForgeryToken()
+    @if (Model.IdAnotacion.HasValue)
+    {
+        <input type="hidden" name="IdAnotacion" value="@Model.IdAnotacion" />
+    }
+    <input type="hidden" name="IdPdf" value="@Model.IdPdf" />
+
+    <div class="mb-2">
+        <label class="form-label">Cédula</label>
+        @* Usa Tag Helpers para que se seleccione automáticamente según Model.Cedula *@
+        <select class="form-select" asp-for="Cedula" asp-items="Model.Empleados" required>
+            <option value="">— Selecciona —</option>
+        </select>
+        @Html.ValidationMessageFor(m => m.Cedula, null, new { @class = "text-danger small" })
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Texto</label>
+        <textarea class="form-control" name="Texto" rows="4" maxlength="1000" required>@Model.Texto</textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">@Model.SubmitText</button>
+    </div>
+</form>

@@ -1,39 +1,82 @@
 ﻿@model CEGA.Models.ViewModels.ContabilidadPageVM
 @using CEGA.Models
 @using CEGA.Models.ViewModels
+@using System.Linq
 
 @{
     ViewData["Title"] = "Contabilidad";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var ingresosCount = Model?.Ingresos?.Count() ?? 0;
+    var gastosCount = Model?.Gastos?.Count() ?? 0;
+    var cierresCount = Model?.Cierres?.Count() ?? 0;
 }
 
-<div class="py-4 text-center text-white mb-4" style="background: var(--brand-mid); border-radius: .75rem;">
-    <h2 class="fw-bold mb-0">Contabilidad</h2>
+@await Html.PartialAsync("_ModuleHeader", (
+"Módulo de Contabilidad",
+    "Administra <span class='fw-semibold'>ingresos</span>, <span class='fw-semibold'>gastos</span>, <span class='fw-semibold'>cierres diarios</span> y su <span class='fw-semibold'>resumen financiero</span>."
+))
+
+@await Html.PartialAsync("_Alerts")
+
+<div class="card card-lg">
+    <div class="card-header p-0">
+        <ul class="nav nav-tabs card-header-tabs nav-fill" id="contaTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen"
+                        type="button" role="tab" aria-controls="resumen" aria-selected="true">
+                    Resumen
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ingresos-tab" data-bs-toggle="tab" data-bs-target="#ingresos"
+                        type="button" role="tab" aria-controls="ingresos" aria-selected="false">
+                    Ingresos <span class="badge bg-success ms-1">@ingresosCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gastos-tab" data-bs-toggle="tab" data-bs-target="#gastos"
+                        type="button" role="tab" aria-controls="gastos" aria-selected="false">
+                    Gastos <span class="badge bg-success ms-1">@gastosCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cierres-tab" data-bs-toggle="tab" data-bs-target="#cierres"
+                        type="button" role="tab" aria-controls="cierres" aria-selected="false">
+                    Cierre diario <span class="badge bg-success ms-1">@cierresCount</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body">
+        <div class="tab-content mt-2">
+            <!-- Resumen -->
+            <div class="tab-pane fade show active" id="resumen" role="tabpanel" aria-labelledby="resumen-tab">
+                @await Html.PartialAsync("Partials/_ResumenFinancieroPartial",
+                                Model?.Resumen ?? new ResumenFinanciero())
+            </div>
+
+            <!-- Ingresos -->
+            <div class="tab-pane fade" id="ingresos" role="tabpanel" aria-labelledby="ingresos-tab">
+                @await Html.PartialAsync("Partials/_IngresosPartial",
+                                Model?.Ingresos ?? Enumerable.Empty<MovimientoContable>())
+            </div>
+
+            <!-- Gastos -->
+            <div class="tab-pane fade" id="gastos" role="tabpanel" aria-labelledby="gastos-tab">
+                @await Html.PartialAsync("Partials/_GastosPartial",
+                                Model?.Gastos ?? Enumerable.Empty<MovimientoContable>())
+            </div>
+
+            <!-- Cierre diario -->
+            <div class="tab-pane fade" id="cierres" role="tabpanel" aria-labelledby="cierres-tab">
+                @await Html.PartialAsync("Partials/_CierreDiarioPartial",
+                                Model?.Cierres ?? Enumerable.Empty<CEGA.Models.ViewModels.CierreDiarioVM>())
+            </div>
+        </div>
+    </div>
 </div>
-
-
-<!-- 1) Resumen financiero (KPIs) -->
-<partial name="Partials/_ResumenFinancieroPartial"
-         model="Model?.Resumen ?? new ResumenFinanciero()" />
-
-<hr class="my-4" />
-
-<!-- 2) Ingresos (incluye fijos como 'CR - Datafonos') -->
-<partial name="Partials/_IngresosPartial"
-         model="Model?.Ingresos ?? Enumerable.Empty<MovimientoContable>()" />
-
-<hr class="my-4" />
-
-<!-- 3) Gastos -->
-<partial name="Partials/_GastosPartial"
-         model="Model?.Gastos ?? Enumerable.Empty<MovimientoContable>()" />
-
-<hr class="my-4" />
-
-<!-- 5) Cierre diario -->
-<partial name="Partials/_CierreDiarioPartial"
-         model="Model?.Cierres ?? Enumerable.Empty<CEGA.Models.ViewModels.CierreDiarioVM>()" />
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
