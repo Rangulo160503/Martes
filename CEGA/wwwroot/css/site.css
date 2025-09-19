@@ -2,11 +2,11 @@
    Variables de marca (unificadas)
    =========================== */
 :root {
-    --brand: #184a3e; /* verde oscuro */
-    --brand-text: #eaf5f0; /* texto claro */
-    --brand-border: #0f2f27; /* borde oscuro */
-    --accent: #7fe3be; /* acento sutil */
-    --topbar-h: 56px; /* altura del navbar superior (Bootstrap por defecto) */
+    --brand: #1e3a8a; /* azul oscuro principal */
+    --brand-text: #eaf2ff; /* texto claro sobre azul */
+    --brand-border: #162c63; /* borde más oscuro */
+    --accent: #60a5fa; /* acento azul claro */
+    --topbar-h: 56px; /* altura del navbar superior */
 }
 
 /* ===========================
@@ -141,11 +141,11 @@ body.app {
 /* Sidebar CEGA con misma paleta del topbar y alineado bajo el topbar */
 .sidebar-cega {
     width: 260px;
-    background: var(--brand-2) 100%);
+    background: var(--brand); /* azul sólido */
     color: #fff;
     position: sticky;
-    top: var(--topbar-h); /* se “pega” bajo el topbar */
-    height: calc(100vh - var(--topbar-h)); /* ocupa todo el alto visible bajo el topbar */
+    top: var(--topbar-h);
+    height: calc(100vh - var(--topbar-h));
     align-self: flex-start;
     padding: .75rem .75rem 1rem;
     overflow-y: auto;
