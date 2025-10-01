@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bwYxT1T9zEI=",
+  "dgSpecHash": "Vf228aIMOeg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Martes3\\Martes\\CEGA\\CEGA.csproj",
+  "projectFilePath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Alexlimpio\\Martes\\CEGA\\CEGA.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\azure.core\\1.44.1\\azure.core.1.44.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
