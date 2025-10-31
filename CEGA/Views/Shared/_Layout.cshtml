@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
-<body class="app">
-
+<body class="app d-flex flex-column min-vh-100">
     <!-- TOP NAVBAR (siempre visible) -->
     <header>
-        <nav class="navbar navbar-expand-md navbar-dark navbar-cega sticky-top-cega shadow-sm mb-0">
+        <nav class="navbar navbar-expand-md navbar-dark navbar-cega sticky-top-cega mb-0">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">CEGA</a>
 
@@ -47,86 +46,95 @@
                                 </form>
                             </li>
                         }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <!-- SHELL con SIDEBAR + CONTENIDO -->
-        <div class="app-shell">
-            <!-- SIDEBAR (módulos) -->
-            <aside id="sidebar-cega" class="sidebar-cega">
-                <div class="sidebar-head">
-                    <button class="btn btn-sm btn-outline-light d-md-none" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#sidebarNav"
-                            aria-controls="sidebarNav" aria-expanded="false" aria-label="Menú">
-                        ☰
-                    </button>
+
+    <!-- Contenido principal -->
+    <main class="flex-fill">
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <!-- SHELL con SIDEBAR + CONTENIDO -->
+            <div class="app-shell">
+                @* TODO: tu sidebar y contenido reales *@
+                <aside id="sidebar-cega" class="sidebar-cega">
+                    <div class="sidebar-head">
+                        <button class="btn btn-sm btn-outline-light d-md-none"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#sidebarNav"
+                                aria-controls="sidebarNav"
+                                aria-expanded="true"
+                                aria-label="Menú">
+                            ☰
+                        </button>
+                    </div>
+
+                    <!-- ¡visible por defecto! -->
+                    <nav id="sidebarNav" class="collapse show d-md-block">
+                        <a class="nav-link" asp-controller="Usuarios" asp-action="Index">Gestión de Usuarios</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Empleados" asp-action="Index">Empleados</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Marketing" asp-action="Index">Marketing</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Contabilidad" asp-action="Index">Contabilidad</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Reporteria" asp-action="Index">Reportería</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Seguimiento" asp-action="Index">Seguimiento</a>
+                        <hr class="sidebar-sep" />
+
+                        <a class="nav-link" asp-controller="Pdf" asp-action="Index">Módulo PDF</a>
+                    </nav>
+                </aside>
+
+                <div class="content-cega">
+                    <div role="main" class="pb-4">
+                        @RenderBody()
+                    </div>
                 </div>
-
-                <nav id="sidebarNav" class="collapse d-md-block">
-                    <a class="nav-link" asp-controller="Usuarios" asp-action="Index">Gestión de Usuarios</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Empleados" asp-action="Index">Empleados</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Marketing" asp-action="Index">Marketing</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Contabilidad" asp-action="Index">Contabilidad</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Reporteria" asp-action="Index">Reportería</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Seguimiento" asp-action="Index">Seguimiento</a>
-                    <hr class="sidebar-sep" />
-                    <a class="nav-link" asp-controller="Pdf" asp-action="Index">Módulo PDF</a>
-                </nav>
-            </aside>
-
-            <!-- CONTENIDO -->
-            <div class="content-cega">
-                <main role="main" class="pb-4">
-                    @RenderBody()
-                </main>
             </div>
-        </div>
-    }
-    else
-    {
-        <!-- Sin autenticación: solo contenido (pero con top navbar arriba) -->
-        <div class="container">
-            <main role="main" class="pb-4">
-                @RenderBody()
-            </main>
-        </div>
-    }
+        }
+        else
+        {
+            <div class="container">
+                <div role="main" class="pb-4">
+                    @RenderBody()
+                </div>
+            </div>
+        }
+    </main>
 
-    <footer class="border-top py-3 text-muted">
+    <!-- Footer pegado al fondo -->
+    <footer id="site-footer" class="border-top py-3 text-muted mt-auto">
         <div class="container">&copy; 2025 - CEGA</div>
     </footer>
 
     @RenderSection("Modals", required: false)
 
-    <!-- Modal global -->
-    <div class="modal fade" id="modalDynamic" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body"></div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Scripts base -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

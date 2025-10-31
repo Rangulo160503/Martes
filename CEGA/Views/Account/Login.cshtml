@@ -21,6 +21,7 @@
                     <div class="card-body">
                         <h5 class="card-title mb-3">Iniciar sesión</h5>
                         <form asp-action="Login" method="post" class="vstack gap-3">
+                            <div asp-validation-summary="All" class="text-danger mb-2"></div>
                             @Html.AntiForgeryToken()
                             <div>
                                 <label asp-for="UserOrEmail" class="form-label">Usuario o correo</label>
