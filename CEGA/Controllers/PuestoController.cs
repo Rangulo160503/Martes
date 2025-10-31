@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class PuestoController : Controller
     {
         private readonly ApplicationDbContext _context;

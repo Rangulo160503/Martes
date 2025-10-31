@@ -470,3 +470,8 @@ C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\obj\De
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\obj\Debug\net8.0\CEGA.pdb
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\obj\Debug\net8.0\CEGA.genruntimeconfig.cache
 C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\obj\Debug\net8.0\ref\CEGA.dll
+C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\bin\Debug\net8.0\MailKit.dll
+C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\bin\Debug\net8.0\MimeKit.dll
+C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\v-ronaldan\OneDrive - Microsoft\Documents\Alexlimpio\Martes\CEGA\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

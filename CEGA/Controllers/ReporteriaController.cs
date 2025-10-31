@@ -1,5 +1,6 @@
 ﻿using CEGA.Models;
 using CEGA.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class ReporteriaController : Controller
     {
         private readonly string _cs;

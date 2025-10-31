@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 var cs = builder.Configuration.GetConnectionString("DefaultConnection")
          ?? throw new InvalidOperationException("Missing 'DefaultConnection'.");
 
+builder.Services.AddScoped<CEGA.Servicios.IEmailSender, CEGA.Servicios.MailKitEmailSender>();
+
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(cs, sql => sql.EnableRetryOnFailure())
 );

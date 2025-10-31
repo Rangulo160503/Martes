@@ -1,6 +1,7 @@
 ﻿using CEGA.Data;
 using CEGA.Models;
 using CEGA.Models.ViewModels;
+using CEGA.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization; // CharUnicodeInfo
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;         // NormalizationForm
 
 namespace CEGA.Controllers
@@ -16,7 +18,12 @@ namespace CEGA.Controllers
     public class AccountController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public AccountController(ApplicationDbContext context) => _context = context;
+        private readonly IWebHostEnvironment _env;
+        public AccountController(ApplicationDbContext context, IWebHostEnvironment env)
+        {
+            _context = context;
+            _env = env;
+        }
 
         // =====================
         //        LOGIN
@@ -213,6 +220,53 @@ namespace CEGA.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Login));
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult RecuperarAcceso()
+        {
+            return View(); // busca Views/Account/RecuperarAcceso.cshtml
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> RecuperarAcceso(string email, [FromServices] IEmailSender mail)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Json(new { ok = false, msg = "Debe ingresar un correo válido." });
+            }
+
+            var emp = await _context.Empleados.FirstOrDefaultAsync(e => e.Email.ToLower() == email.Trim().ToLower() && e.Activo);
+            if (emp == null)
+            {
+                // Por seguridad, no confirmamos si el correo existe
+                return Json(new { ok = true, msg = "Si el correo existe, se enviarán las instrucciones de acceso." });
+            }
+
+            // 1️⃣ Generar contraseña temporal
+            string tempPassword = GenerarPasswordTemporal(8);
+            emp.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+            await _context.SaveChangesAsync();
+
+            // 2️⃣ Leer plantilla HTML
+            var templatePath = Path.Combine(_env.ContentRootPath, "EmailTemplates", "RecuperarAcceso.html");
+            var html = await System.IO.File.ReadAllTextAsync(templatePath, Encoding.UTF8);
+            html = html.Replace("{{Nombre}}", emp.Nombre ?? "Usuario")
+                       .Replace("{{Contrasenna}}", tempPassword);
+
+            // 3️⃣ Enviar correo
+            await mail.SendAsync(emp.Email, "Recuperación de acceso - CEGA", html);
+
+            return Json(new { ok = true, msg = "Si el correo existe, se enviarán las instrucciones de acceso." });
+        }
+
+        private static string GenerarPasswordTemporal(int len)
+        {
+            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            var bytes = RandomNumberGenerator.GetBytes(len);
+            var sb = new StringBuilder(len);
+            for (int i = 0; i < len; i++) sb.Append(chars[bytes[i] % chars.Length]);
+            return sb.ToString();
         }
 
         // =====================

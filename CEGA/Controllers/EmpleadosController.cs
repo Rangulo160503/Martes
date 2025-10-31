@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;                        // MemoryStream
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class EmpleadosController : Controller
     {
         private readonly ApplicationDbContext _context;

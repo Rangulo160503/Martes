@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "hJztf5p4BYc=",
+  "dgSpecHash": "uqtlyIIhX10=",
   "success": true,
   "projectFilePath": "C:\\Users\\v-ronaldan\\OneDrive - Microsoft\\Documents\\Alexlimpio\\Martes\\CEGA\\CEGA.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,8 @@
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\azure.security.keyvault.certificates\\4.6.0\\azure.security.keyvault.certificates.4.6.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\azure.security.keyvault.secrets\\4.6.0\\azure.security.keyvault.secrets.4.6.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
+    "C:\\Users\\v-ronaldan\\.nuget\\packages\\bouncycastle.cryptography\\2.6.1\\bouncycastle.cryptography.2.6.1.nupkg.sha512",
+    "C:\\Users\\v-ronaldan\\.nuget\\packages\\mailkit\\4.14.1\\mailkit.4.14.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.0\\microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\8.0.0\\microsoft.aspnetcore.authentication.openidconnect.8.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\8.0.1\\microsoft.aspnetcore.cryptography.internal.8.0.1.nupkg.sha512",
@@ -64,6 +66,7 @@
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.kiota.serialization.text\\1.17.1\\microsoft.kiota.serialization.text.1.17.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\v-ronaldan\\.nuget\\packages\\mimekit\\4.14.0\\mimekit.4.14.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\std.uritemplate\\2.0.1\\std.uritemplate.2.0.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.clientmodel\\1.1.0\\system.clientmodel.1.1.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.1\\system.configuration.configurationmanager.6.0.1.nupkg.sha512",
@@ -79,7 +82,7 @@
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.cryptography.cng\\5.0.0\\system.security.cryptography.cng.5.0.0.nupkg.sha512",
-    "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.cryptography.pkcs\\8.0.0\\system.security.cryptography.pkcs.8.0.0.nupkg.sha512",
+    "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.cryptography.pkcs\\8.0.1\\system.security.cryptography.pkcs.8.0.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.cryptography.protecteddata\\6.0.0\\system.security.cryptography.protecteddata.6.0.0.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.cryptography.xml\\8.0.1\\system.security.cryptography.xml.8.0.1.nupkg.sha512",
     "C:\\Users\\v-ronaldan\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",

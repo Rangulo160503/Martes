@@ -1,6 +1,7 @@
 ﻿using CEGA.Models;
 using CEGA.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Graph;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class MarketingController : Controller
     {
         private readonly ITokenAcquisition _tokenAcquisition;

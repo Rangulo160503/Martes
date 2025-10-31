@@ -1,6 +1,7 @@
 ﻿using CEGA.Data;
 using CEGA.Models.ViewModels;
 using CEGA.Models.ViewModels.Pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class PdfController : Controller
     {
         private readonly ApplicationDbContext _db;

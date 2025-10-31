@@ -1,10 +1,12 @@
 ﻿using CEGA.Models;
 using CEGA.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class ContabilidadController : Controller
     {
         private readonly string _cs;

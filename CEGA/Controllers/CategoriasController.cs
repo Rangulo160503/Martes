@@ -1,9 +1,11 @@
 ﻿using CEGA.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class CategoriasController : Controller
     {
         private readonly string _cs;

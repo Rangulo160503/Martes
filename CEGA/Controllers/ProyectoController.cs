@@ -3,12 +3,14 @@ using CEGA.Data;
 using CEGA.Models;
 using CEGA.Models.Seguimiento;
 using CEGA.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace CEGA.Controllers
 {
+    [Authorize]
     public class ProyectoController : Controller
     {
         private readonly ApplicationDbContext _db;
