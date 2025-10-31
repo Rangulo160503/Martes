@@ -127,6 +127,19 @@
 
     @RenderSection("Modals", required: false)
 
+    <div class="modal fade" id="modalDynamic" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body"><div class="p-3 text-center">Cargando…</div></div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Scripts base -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

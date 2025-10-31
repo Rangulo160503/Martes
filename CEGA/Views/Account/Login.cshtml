@@ -42,7 +42,14 @@
                                     Crear cuenta
                                 </button>
                             </div>
-                            <a asp-action="RecuperarAcceso" class="small mt-2 d-inline-block">¿Olvidó su contraseña?</a>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span></span>
+                                <button type="button"
+                                        class="btn btn-link p-0"
+                                        onclick="openModal('@Url.Action("RecuperarAcceso", "Account")','Recuperar acceso')">
+                                    ¿Olvidó su contraseña?
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -213,25 +220,4 @@
         <p class="mb-4">Conversemos sobre tus necesidades y construyamos juntos la mejor solución.</p>
     </div>
 </section>
-
-@if (Layout != null)
-{
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-        <script>
-            window.openModal = async function (url, title) {
-              const el = document.getElementById('modalDynamic');
-              if (!el) { location.href = url; return; } // fallback si no existe el modal
-
-              el.querySelector('.modal-title').textContent = title || '';
-              const body = el.querySelector('.modal-body');
-              body.innerHTML = '<div class="p-3 text-center">Cargando…</div>';
-
-              const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-              body.innerHTML = await res.text();
-
-              bootstrap.Modal.getOrCreateInstance(el).show();
-            };
-        </script>
-    }
-}
+<partial name="_ValidationScriptsPartial" />

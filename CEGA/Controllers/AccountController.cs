@@ -221,43 +221,22 @@ namespace CEGA.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Login));
         }
-        [AllowAnonymous]
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
         public IActionResult RecuperarAcceso()
+        => PartialView("Partials/_RecuperarAcceso", new RecuperarAccesoViewModel());
+
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecuperarAcceso(RecuperarAccesoViewModel vm)
         {
-            return View(); // busca Views/Account/RecuperarAcceso.cshtml
-        }
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> RecuperarAcceso(string email, [FromServices] IEmailSender mail)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return Json(new { ok = false, msg = "Debe ingresar un correo válido." });
-            }
+            if (!ModelState.IsValid)
+                return PartialView("Partials/_RecuperarAcceso", vm);
 
-            var emp = await _context.Empleados.FirstOrDefaultAsync(e => e.Email.ToLower() == email.Trim().ToLower() && e.Activo);
-            if (emp == null)
-            {
-                // Por seguridad, no confirmamos si el correo existe
-                return Json(new { ok = true, msg = "Si el correo existe, se enviarán las instrucciones de acceso." });
-            }
+            var email = (vm.Email ?? "").Trim().ToLowerInvariant();
+            var emp = await _context.Empleados.AsNoTracking()
+                         .FirstOrDefaultAsync(e => e.Email.ToLower() == email);
 
-            // 1️⃣ Generar contraseña temporal
-            string tempPassword = GenerarPasswordTemporal(8);
-            emp.PasswordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-            await _context.SaveChangesAsync();
-
-            // 2️⃣ Leer plantilla HTML
-            var templatePath = Path.Combine(_env.ContentRootPath, "EmailTemplates", "RecuperarAcceso.html");
-            var html = await System.IO.File.ReadAllTextAsync(templatePath, Encoding.UTF8);
-            html = html.Replace("{{Nombre}}", emp.Nombre ?? "Usuario")
-                       .Replace("{{Contrasenna}}", tempPassword);
-
-            // 3️⃣ Enviar correo
-            await mail.SendAsync(emp.Email, "Recuperación de acceso - CEGA", html);
-
-            return Json(new { ok = true, msg = "Si el correo existe, se enviarán las instrucciones de acceso." });
+            // (no revelar existencia)
+            return Json(new { ok = true, message = "Si el correo está registrado, se enviará un enlace de recuperación." });
         }
 
         private static string GenerarPasswordTemporal(int len)

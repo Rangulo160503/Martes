@@ -1,6 +1,5 @@
 ﻿// Helpers y manejo de modales + POST dentro de modales (data-modal-post)
 (() => {
-    // Obtiene el modal global y su instancia de Bootstrap
     function getModal() {
         const el = document.getElementById('modalDynamic');
         if (!el) return null;
@@ -8,10 +7,18 @@
         return { el, instance };
     }
 
-    // Abre contenido (parcial) en el modal global
+    // Re-parse unobtrusive validation en el bloque que acabamos de inyectar
+    function reparseValidation(body) {
+        if (window.jQuery && window.$ && $.validator && $.validator.unobtrusive) {
+            const $body = $(body);
+            $body.find('form').removeData('validator').removeData('unobtrusiveValidation');
+            $.validator.unobtrusive.parse($body);
+        }
+    }
+
     window.openModal = async function (url, title) {
         const modal = getModal();
-        if (!modal) { window.location.href = url; return; } // fallback si no existe el modal
+        if (!modal) { window.location.href = url; return; }
 
         const { el, instance } = modal;
         const header = el.querySelector('.modal-title');
@@ -21,13 +28,12 @@
 
         try {
             const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
-            if (res.redirected) {
-                modal?.instance.hide();
-                window.location.href = res.url;
-                return;
-            }
+            if (res.redirected) { instance.hide(); window.location.href = res.url; return; }
             const html = await res.text();
-            if (body) body.innerHTML = html;
+            if (body) {
+                body.innerHTML = html;
+                reparseValidation(body); // 👈 IMPORTANTE
+            }
             instance.show();
         } catch (err) {
             if (body) body.innerHTML = '<div class="p-3 text-danger text-center">No se pudo cargar el contenido.</div>';
@@ -35,7 +41,6 @@
         }
     };
 
-    // Intercepta formularios con data-modal-post para que NO naveguen y se re-rendericen en el modal
     document.addEventListener('submit', async (e) => {
         const form = e.target;
         if (!(form instanceof HTMLFormElement)) return;
@@ -45,51 +50,68 @@
 
         const modal = getModal();
         const body = modal?.el.querySelector('.modal-body');
+        const fd = new FormData(form); // incluye __RequestVerificationToken
 
         try {
             const res = await fetch(form.action, {
                 method: form.method || 'POST',
-                body: new FormData(form),
+                body: fd,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 credentials: 'same-origin'
             });
 
-            // Si el servidor redirige (registro exitoso), seguimos la redirección
-            // justo tras obtener 'res'
-            if (!res.ok) {
-                const ct = res.headers.get('content-type') || '';
-                if (ct.includes('text/html')) {
-                    const html = await res.text();
-                    if (body) body.innerHTML = html;
+            // Seguir redirección si la hay
+            if (res.redirected) { modal?.instance.hide(); window.location.href = res.url; return; }
+
+            const ct = (res.headers.get('content-type') || '').toLowerCase();
+
+            if (ct.includes('application/json')) {
+                const data = await res.json();
+
+                // ✅ Manejo de éxito genérico del forgot
+                if (data.ok) {
+                    if (body) {
+                        body.innerHTML = `
+              <div class="alert alert-success m-0" role="alert">
+                ${data.message || 'Operación completada correctamente.'}
+              </div>`;
+                    }
+                    // opcional: cerrar modal después de 2s
+                    setTimeout(() => modal?.instance.hide(), 1800);
                     return;
                 }
+
+                // Otros casos JSON (errores, selects, etc.)
+                if (data.error && body) {
+                    body.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                    return;
+                }
+                const url = data.redirectUrl || data.redirectTo;
+                if (url) { modal?.instance.hide(); window.location.href = url; return; }
+
+                // Si vino HTML embebido en JSON
+                if (data.html && body) {
+                    body.innerHTML = data.html;
+                    reparseValidation(body); // 👈
+                    return;
+                }
+
+                // Fallback
+                if (body) body.innerHTML = '<div class="p-3 text-danger text-center">Respuesta JSON no reconocida.</div>';
+                return;
             }
 
-            // Normalmente el servidor devuelve HTML de la vista con validaciones
-            const ct = res.headers.get('content-type') || '';
+            // HTML (validaciones del servidor o partial actualizado)
             if (ct.includes('text/html')) {
                 const html = await res.text();
-                if (body) body.innerHTML = html;
-            } else if (ct.includes('application/json')) {
-                const data = await res.json();
-                if (data.id && data.nombre) {
-                    const sel = document.getElementById('PuestoId');
-                    if (sel) { /* actualizar select como ya haces */ modal?.instance.hide(); return; }
-                    openModal('/Account/Register?selectPuestoId=' + data.id, 'Crear cuenta'); // si estás dentro del modal
-                    return;
+                if (body) {
+                    body.innerHTML = html;
+                    reparseValidation(body); // 👈
                 }
-
-                if (data.error) {
-                    const msg = document.querySelector('#puestoModalMsg') || document.querySelector('#puestoInlineMsg');
-                    if (msg) { msg.className = 'small text-danger'; msg.textContent = data.error; }
-                    return;
-                }
-                const url = data.redirectUrl || data.redirectTo;   // ← clave
-                if (url) { modal?.instance.hide(); window.location.href = url; return; }
-                if (data.html && body) body.innerHTML = data.html;
-            } else {
-                if (body) body.innerHTML = '<div class="p-3 text-danger text-center">Respuesta inesperada del servidor.</div>';
+                return;
             }
+
+            if (body) body.innerHTML = '<div class="p-3 text-danger text-center">Respuesta inesperada del servidor.</div>';
         } catch (err) {
             console.error(err);
             if (body) body.innerHTML = '<div class="p-3 text-danger text-center">Ocurrió un error. Intenta de nuevo.</div>';

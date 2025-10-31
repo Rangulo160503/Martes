@@ -1,0 +1,18 @@
+﻿@model CEGA.Models.ViewModels.RecuperarAccesoViewModel
+
+<form asp-action="RecuperarAcceso" method="post" data-modal-post>
+    @Html.AntiForgeryToken()
+
+    @if (ViewData["OkMessage"] is string ok)
+    {
+        <div class="alert alert-success mb-3">@ok</div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Correo registrado</label>
+        <input asp-for="Email" class="form-control" autocomplete="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Enviar</button>
+</form>
