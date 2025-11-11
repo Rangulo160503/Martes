@@ -131,20 +131,19 @@ html {
 .app-shell {
     display: flex;
     gap: 0;
-    min-height: calc(100vh - var(--topbar-h));
+    min-height: 100vh; /* antes: calc(100vh - var(--topbar-h)) */
+    align-items: stretch; /* estira columnas */
 }
 
-/* Sidebar CEGA con misma paleta del topbar y alineado bajo el topbar */
 .sidebar-cega {
     width: 260px;
     background: var(--brand);
     color: #fff;
     position: sticky;
-    top: var(--topbar-h); /* se “pega” bajo el topbar */
-    height: calc(100vh - var(--topbar-h)); /* ocupa todo el alto visible bajo el topbar */
-    align-self: flex-start;
-    padding: .75rem .75rem 1rem;
+    top: 0; /* header no es fixed */
+    height: 100vh; /* ocupa la ventana completa */
     overflow-y: auto;
+    padding: .75rem .75rem 1rem;
 }
 
     .sidebar-cega .sidebar-head {
@@ -238,13 +237,16 @@ html {
 @media (max-width:767.98px) {
     .sidebar-cega {
         width: 100%;
-        height: auto;
-        position: relative;
+        position: static; /* ya no sticky en móvil */
         top: auto;
+        height: auto;
+        overflow: visible;
+        padding: .75rem .75rem 1rem;
     }
 
     .app-shell {
-        min-height: auto;
+        flex-direction: column;
+        min-height: auto; /* deja que la página crezca; footer lo empuja abajo */
     }
 }
 .sidebar-cega {
@@ -292,4 +294,30 @@ main.flex-fill { /* el main ocupará el espacio disponible */
 
 body > footer { /* empuja el footer hacia abajo */
     margin-top: auto;
+}
+/* ===========================
+   Corrección de línea lateral (override)
+   =========================== */
+
+/* Quita cualquier borde o sombra residual */
+.sidebar-cega {
+    border-right: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Evita que el contenido tenga borde o separación visual */
+.content-cega {
+    border-left: 0 !important;
+    background-clip: content-box;
+}
+
+/* ====================================
+   CORRECCIÓN VISUAL (Sidebar y contenido)
+   ==================================== */
+.app-shell {
+    background: var(--brand);
+}
+
+.content-cega {
+    background: #fff; /* mantiene el área de gráficos blanca */
 }
