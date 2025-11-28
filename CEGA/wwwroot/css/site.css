@@ -321,3 +321,99 @@ body > footer { /* empuja el footer hacia abajo */
 .content-cega {
     background: #fff; /* mantiene el área de gráficos blanca */
 }
+
+
+/* === Shell general estilo Dasher === */
+.app-shell-cega {
+    display: flex;
+    min-height: calc(100vh - 56px); /* 56px aprox de la navbar superior CEGA */
+    background-color: #f5f7fb;
+}
+
+/* Sidebar (miniSidebar) */
+#miniSidebar {
+    width: 260px;
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 1.25rem 0;
+    position: sticky;
+    top: 56px; /* que arranque debajo de la barra verde de CEGA */
+    align-self: flex-start;
+}
+
+    /* Logo dentro del sidebar */
+    #miniSidebar .brand-logo {
+        padding: 0 1.5rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 1rem;
+    }
+
+        #miniSidebar .brand-logo img {
+            height: 32px;
+            width: auto;
+        }
+
+    #miniSidebar .site-logo-text {
+        letter-spacing: 0.05em;
+    }
+
+    /* Lista de navegación del sidebar */
+    #miniSidebar .navbar-nav {
+        padding: 0 1rem;
+    }
+
+    #miniSidebar .nav-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #9ca3af;
+        padding: 0 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    #miniSidebar .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        color: #374151;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+        #miniSidebar .nav-link:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+
+        #miniSidebar .nav-link.active {
+            background-color: #0f766e; /* verde azulado estilo Dasher */
+            color: #ffffff;
+        }
+
+    #miniSidebar .nav-icon {
+        font-size: 1.1rem;
+        display: inline-flex;
+        width: 20px;
+        justify-content: center;
+    }
+
+    /* Bloque de "Upgrade" al final del sidebar */
+    #miniSidebar .upgrade-ui {
+        border-top: 1px solid #e5e7eb;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+
+/* Contenido principal a la derecha del sidebar */
+.app-content-cega {
+    flex: 1;
+    padding: 1.5rem 2rem 2rem;
+    background-color: #f5f7fb;
+}
+
+/* Contenedor como en Dasher */
+.custom-container {
+    max-width: 1200px;
+    margin: 0 auto 1.5rem;
+}
