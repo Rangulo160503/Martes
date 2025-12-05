@@ -5,105 +5,141 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Header -->
-<div class="py-4 text-center text-white mb-4" style="background: var(--brand); border-radius: .75rem;">
-    <h2 class="fw-bold mb-0">Módulo PDF</h2>
-</div>
+@await Html.PartialAsync("_ModuleHeader", (
+"Módulo PDF",
+    "Sube planos en PDF, genera resúmenes, compara documentos y administra anotaciones."
+))
 
-<!-- Alertas -->
-@if (TempData["Mensaje"] != null)
-{
-    <div class="alert alert-success mb-3">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
-}
+@await Html.PartialAsync("_Alerts")
 
-<div class="row g-4">
-    <!-- Subir PDF -->
-    <div class="col-lg-6">
-        @await Html.PartialAsync("~/Views/Pdf/Partials/_SubirPdfPartial.cshtml", new PdfUploadVM())
-    </div>
-
-    <!-- Resumen / Comparar (solo PDF, sin asociaciones) -->
-    <div class="col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Resumen y comparación del PDF</h5>
-
-                <div class="row g-2 align-items-end">
-                    <div class="col-12">
-                        <label for="ddlPdfs" class="form-label">Selecciona un PDF</label>
-                        <select id="ddlPdfs" class="form-select">
-                            <option value="">(Cargando PDFs…)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <ul class="nav nav-tabs mt-3" id="pdfTabs" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link active" id="tab-resumen" data-bs-toggle="tab" data-bs-target="#pane-resumen" type="button" role="tab">Resumen</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" id="tab-comparar" data-bs-toggle="tab" data-bs-target="#pane-comparar" type="button" role="tab">Comparar</button>
-                    </li>
-                </ul>
-
-                <div class="tab-content pt-3">
-                    <div class="tab-pane fade show active" id="pane-resumen" role="tabpanel">
-                        <div id="resumenContainer" class="mt-0"></div>
-                    </div>
-                    <div class="tab-pane fade" id="pane-comparar" role="tabpanel">
-                        <div class="mb-2 small text-muted">Comparar el PDF seleccionado con otro PDF:</div>
-                        <div class="d-flex gap-2 mb-3">
-                            <select id="ddlCompareWith" class="form-select">
-                                <option value="">(Selecciona otro PDF…)</option>
-                            </select>
-                            <button id="btnComparar" type="button" class="btn btn-outline-primary">Comparar</button>
-                        </div>
-                        <div id="compararContainer" class="mt-0"></div>
-                    </div>
-                </div>
-
-            </div>
+<!-- Card principal estilo Dasher -->
+<div class="page-card mt-4">
+    <!-- Encabezado interno -->
+    <div class="page-card-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="h4 fw-bold mb-1">Gestión de planos PDF</h2>
+            <p class="text-muted small mb-0">
+                A la izquierda puedes subir nuevos documentos; a la derecha consultarlos, resumirlos y compararlos.
+            </p>
         </div>
     </div>
-</div>
 
-<!-- Anotaciones -->
-<form id="afTokenForm" class="d-none">@Html.AntiForgeryToken()</form>
+    <div class="page-card-body">
+        <div class="row g-4">
+            <!-- Subir PDF -->
+            <div class="col-lg-6">
+                @await Html.PartialAsync("~/Views/Pdf/Partials/_SubirPdfPartial.cshtml", new PdfUploadVM())
+            </div>
 
-<!-- Modal para crear/editar anotación -->
-<div class="modal fade" id="anotModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Anotación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body" id="anotModalBody"><!-- partial form --></div>
-    </div>
-  </div>
-</div>
+            <!-- Resumen / Comparar (solo PDF, sin asociaciones) -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Resumen y comparación del PDF</h5>
 
-<div class="row g-4 mt-1">
-    <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="card-title mb-0">Anotaciones</h5>
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="ddlAnotPdf" class="form-label mb-0">Escoger PDF</label>
-                        <small class="text-muted d-block">Selecciona el PDF activo para ver sus anotaciones.</small>
-                        <select id="ddlAnotPdf" class="form-select form-select-sm" style="min-width:220px">
-                            <option value="">(Todos)</option>
-                        </select>
-                        <button id="btnAnotRefrescar" type="button" class="btn btn-sm btn-outline-secondary">Refrescar</button>
-                        <button id="btnAnotNueva" type="button" class="btn btn-sm btn-primary">Nueva anotación</button>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12">
+                                <label for="ddlPdfs" class="form-label">Selecciona un PDF</label>
+                                <select id="ddlPdfs" class="form-select">
+                                    <option value="">(Cargando PDFs…)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <ul class="nav dash-tabs border-0 mt-3" id="pdfTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active"
+                                        id="tab-resumen"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pane-resumen"
+                                        type="button"
+                                        role="tab">
+                                    Resumen
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link"
+                                        id="tab-comparar"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pane-comparar"
+                                        type="button"
+                                        role="tab">
+                                    Comparar
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content pt-3">
+                            <div class="tab-pane fade show active" id="pane-resumen" role="tabpanel">
+                                <div id="resumenContainer" class="mt-0"></div>
+                            </div>
+                            <div class="tab-pane fade" id="pane-comparar" role="tabpanel">
+                                <div class="mb-2 small text-muted">
+                                    Comparar el PDF seleccionado con otro PDF:
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <select id="ddlCompareWith" class="form-select">
+                                        <option value="">(Selecciona otro PDF…)</option>
+                                    </select>
+                                    <button id="btnComparar" type="button" class="btn btn-outline-primary">
+                                        Comparar
+                                    </button>
+                                </div>
+                                <div id="compararContainer" class="mt-0"></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <div id="anotacionesContainer"></div>
+            </div>
+        </div>
+
+        <!-- Anotaciones -->
+        <form id="afTokenForm" class="d-none">@Html.AntiForgeryToken()</form>
+
+        <!-- Modal para crear/editar anotación -->
+        <div class="modal fade" id="anotModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Anotación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" id="anotModalBody"><!-- partial form --></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <h5 class="card-title mb-0">Anotaciones</h5>
+                                <small class="text-muted">
+                                    Gestiona comentarios y marcas asociadas a cada PDF.
+                                </small>
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <div class="d-flex flex-column">
+                                    <label for="ddlAnotPdf" class="form-label mb-0">Escoger PDF</label>
+                                    <small class="text-muted">Selecciona el PDF activo para ver sus anotaciones.</small>
+                                </div>
+                                <select id="ddlAnotPdf" class="form-select form-select-sm" style="min-width:220px">
+                                    <option value="">(Todos)</option>
+                                </select>
+                                <button id="btnAnotRefrescar" type="button" class="btn btn-sm btn-outline-secondary">
+                                    Refrescar
+                                </button>
+                                <button id="btnAnotNueva" type="button" class="btn btn-sm btn-primary">
+                                    Nueva anotación
+                                </button>
+                            </div>
+                        </div>
+                        <div id="anotacionesContainer"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -113,10 +149,29 @@
     <partial name="_ValidationScriptsPartial" />
 
     <style>
-        #resumenContainer, #compararContainer, #anotacionesContainer { position: relative; }
-        .is-loading { opacity: .6; transition: opacity .18s ease; }
-        .is-loading::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.4); }
-        .loading-spinner { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+        #resumenContainer, #compararContainer, #anotacionesContainer {
+            position: relative;
+        }
+
+        .is-loading {
+            opacity: .6;
+            transition: opacity .18s ease;
+        }
+
+            .is-loading::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: rgba(255,255,255,.4);
+            }
+
+        .loading-spinner {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+        }
     </style>
 
     <script>
@@ -272,7 +327,7 @@
             const url = `/Pdf/AnotacionesCrearPartial?idPdf=${encodeURIComponent(idPdf)}`;
             const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             if (!r.ok) { alert('No se pudo cargar el formulario.'); return; }
-            anotModalBody.innerHTML = await r.text(); // aquí se inyecta el form con AnotacionFormVM
+            anotModalBody.innerHTML = await r.text();
             anotModal?.show();
           }
           async function abrirFormEditarAnot(id) {
@@ -325,7 +380,6 @@
           ddl?.addEventListener('change', async () => {
             const id = ddl.value;
 
-            // reconstruir segundo selector y estado del botón
             rebuildCompare(id || "");
             btnComparar.disabled = !(ddl.value && ddlCompareWith.value && ddl.value !== ddlCompareWith.value);
 

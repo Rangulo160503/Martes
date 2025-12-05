@@ -14,6 +14,7 @@ namespace CEGA.Models
 
         [Column(TypeName = "date")]
         public DateTime Fecha { get; set; }        // Día tomado
+        public bool Activa { get; set; } = true;
 
         [ForeignKey(nameof(Cedula))]
         public Empleado? Empleado { get; set; }    // Navegación (opcional)

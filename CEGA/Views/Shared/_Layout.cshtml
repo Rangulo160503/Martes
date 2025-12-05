@@ -12,10 +12,16 @@
 <body class="app d-flex flex-column min-vh-100">
     <!-- TOP NAVBAR (siempre visible) -->
     <header>
-        <nav class="navbar navbar-expand-md navbar-dark navbar-cega sticky-top-cega mb-0">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">CEGA</a>
+        <nav class="navbar navbar-expand-md navbar-light navbar-cega sticky-top-cega mb-0">
+            <div class="container-fluid">
+                <!-- Marca -->
+                <a class="navbar-brand d-flex align-items-center gap-2"
+                   asp-controller="Home" asp-action="Index">
+                    <span class="brand-logo-circle">C</span>
+                    <span class="brand-wordmark">CEGA</span>
+                </a>
 
+                <!-- Botón menú móvil -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false"
                         aria-label="Toggle navigation">
@@ -37,12 +43,21 @@
                     <ul class="navbar-nav ms-auto align-items-center">
                         @if (User?.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <span class="navbar-text me-2">Hola, @User.Identity!.Name</span>
+                            <li class="nav-item me-2">
+                                <div class="dash-user-pill">
+                                    <span class="dash-user-avatar">
+                                        @User.Identity!.Name?.FirstOrDefault()
+                                    </span>
+                                    <span class="dash-user-name">
+                                        @User.Identity!.Name
+                                    </span>
+                                </div>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+                                    <button class="btn btn-logout btn-sm" type="submit">
+                                        Cerrar sesión
+                                    </button>
                                 </form>
                             </li>
                         }
@@ -52,49 +67,73 @@
         </nav>
     </header>
 
-
     <!-- Contenido principal -->
     <main class="flex-fill">
         @if (User?.Identity?.IsAuthenticated == true)
         {
             <!-- SHELL con SIDEBAR + CONTENIDO -->
             <div class="app-shell">
-                @* TODO: tu sidebar y contenido reales *@
                 <aside id="sidebar-cega" class="sidebar-cega">
-                    <div class="sidebar-head">
-                        <button class="btn btn-sm btn-outline-light d-md-none"
-                                type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#sidebarNav"
-                                aria-controls="sidebarNav"
-                                aria-expanded="true"
-                                aria-label="Menú">
-                            ☰
-                        </button>
+                    <div class="sidebar-inner">
+                        <!-- cabecera del sidebar -->
+                        <div class="sidebar-head d-flex align-items-center justify-content-between px-3 mb-2">
+                            <span class="sidebar-title d-none d-md-inline">Panel</span>
+
+                            <button class="btn btn-sm btn-outline-secondary d-md-none"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#sidebarNav"
+                                    aria-controls="sidebarNav"
+                                    aria-expanded="true"
+                                    aria-label="Menú">
+                                ☰
+                            </button>
+                        </div>
+
+                        <nav id="sidebarNav" class="sidebar-nav collapse show d-md-block">
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Usuarios" ? "active" : "")"
+                               asp-controller="Usuarios" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Gestión de Usuarios</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empleados" ? "active" : "")"
+                               asp-controller="Empleados" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Empleados</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Marketing" ? "active" : "")"
+                               asp-controller="Marketing" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Marketing</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Contabilidad" ? "active" : "")"
+                               asp-controller="Contabilidad" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Contabilidad</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reporteria" ? "active" : "")"
+                               asp-controller="Reporteria" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Reportería</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Seguimiento" ? "active" : "")"
+                               asp-controller="Seguimiento" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Seguimiento</span>
+                            </a>
+
+                            <a class="sidebar-item nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pdf" ? "active" : "")"
+                               asp-controller="Pdf" asp-action="Index">
+                                <span class="sidebar-dot"></span>
+                                <span>Módulo PDF</span>
+                            </a>
+                        </nav>
                     </div>
-
-                    <!-- ¡visible por defecto! -->
-                    <nav id="sidebarNav" class="collapse show d-md-block">
-                        <a class="nav-link" asp-controller="Usuarios" asp-action="Index">Gestión de Usuarios</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Empleados" asp-action="Index">Empleados</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Marketing" asp-action="Index">Marketing</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Contabilidad" asp-action="Index">Contabilidad</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Reporteria" asp-action="Index">Reportería</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Seguimiento" asp-action="Index">Seguimiento</a>
-                        <hr class="sidebar-sep" />
-
-                        <a class="nav-link" asp-controller="Pdf" asp-action="Index">Módulo PDF</a>
-                    </nav>
                 </aside>
 
                 <div class="content-cega">
@@ -115,8 +154,11 @@
     </main>
 
     <!-- Footer pegado al fondo -->
-    <footer id="site-footer" class=" py-3 text-muted mt-auto">
-        <div class="container">&copy; 2025 - CEGA</div>
+    <footer id="site-footer" class="footer-cega mt-auto">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="text-muted small">© 2025 · CEGA</span>
+            <span class="text-muted small">Dashboard interno</span>
+        </div>
     </footer>
 
     @RenderSection("Modals", required: false)
@@ -132,7 +174,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Scripts base -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -3,19 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CEGA.Models
 {
-    [Table("Incapacidad")]
     public class Incapacidad
     {
-        [Required]
-        [Key]
+        public int Id { get; set; }
+
+        // 🔹 Esta columna EXISTE en la tabla dbo.Incapacidad
+        [ForeignKey(nameof(Empleado))]      // <- le decimos a EF: este es el FK
         public int Cedula { get; set; }
-        [Required]
-        public byte[] Archivo { get; set; } = Array.Empty<byte>();
 
-        // Navegación
-        [ForeignKey(nameof(Cedula))]
+        public byte[] Archivo { get; set; } = default!;
+
+        public DateTime Fecha { get; set; }
+
+        // 🔹 Navegación al empleado (PK = Cedula)
         public Empleado? Empleado { get; set; }
-
-        // La BD le pone el valor por defecto (GETDATE()/SYSUTCDATETIME)
     }
 }

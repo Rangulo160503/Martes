@@ -5,9 +5,13 @@
         <span>Anotaciones</span>
         <div class="d-flex align-items-center gap-2">
             <small class="text-muted">Mostrando @Model.Count() registro(s)</small>
-            <a asp-controller="Pdf" asp-action="CrearAnotacion" class="btn btn-sm btn-primary">
-                Nueva anotación
-            </a>
+            @{
+                var idPdf = (string?)ViewContext?.HttpContext?.Request?.Query["idPdf"];
+                if (string.IsNullOrWhiteSpace(idPdf) && Model?.Any() == true)
+                {
+                    idPdf = Model.First().IdPdf.ToString();
+                }
+            }
         </div>
     </div>
 
@@ -48,3 +52,18 @@
         </table>
     </div>
 </div>
+@section Scripts {
+    <script>
+        $(function () {
+            $('#btnNuevaAnotacion').on('click', function () {
+                const idPdf = $(this).data('idpdf');
+                if (!idPdf) { alert('Selecciona un PDF para crear la anotación.'); return; }
+                const url = `/Pdf/AnotacionesCrearPartial?idPdf=${encodeURIComponent(idPdf)}`;
+                $('#anotModal .modal-content').load(url, function (_response, status) {
+                    if (status !== 'success') { alert('No se pudo cargar el formulario.'); return; }
+                    $('#anotModal').modal('show');
+                });
+            });
+        });
+    </script>
+    }

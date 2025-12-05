@@ -2,11 +2,11 @@
    Variables de marca (unificadas)
    =========================== */
 :root {
-    --brand: #184a3e; /* verde oscuro */
-    --brand-text: #eaf5f0; /* texto claro */
-    --brand-border: #0f2f27; /* borde oscuro */
-    --accent: #7fe3be; /* acento sutil */
-    --topbar-h: 56px; /* altura del navbar superior (Bootstrap por defecto) */
+    --brand: #184a3e; /* verde CEGA oscuro */
+    --brand-text: #eaf5f0;
+    --brand-border: #0f2f27;
+    --accent: #7fe3be;
+    --topbar-h: 56px;
 }
 
 /* ===========================
@@ -18,72 +18,142 @@ html {
     min-height: 100%;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
     html {
         font-size: 16px;
     }
 }
 
-
-    body.app :is(.btn:focus,.btn:active:focus,.btn-link.nav-link:focus,.form-control:focus,.form-check-input:focus) {
-        outline: 0;
-    }
-
-/* ===========================
-   Navbar CEGA (superior)
-   =========================== */
-/* Verde sólido en topbar y sidebar */
-.navbar-cega {
-    background: var(--brand); /* sólido */
+html,
+body {
+    height: 100%;
 }
 
-    .navbar-cega .navbar-brand {
-        color: #fff;
-        font-weight: 700;
-        letter-spacing: .3px;
+    body.app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f5f7fb;
     }
 
-        .navbar-cega .navbar-brand:hover {
-            color: #fff;
-            opacity: .9;
+        /* foco limpio en botones/inputs */
+        body.app :is(.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus) {
+            outline: 0;
         }
 
-    .navbar-cega .nav-link {
-        color: var(--brand-text);
-        border-radius: .5rem;
-        padding-inline: .75rem;
-    }
+main.flex-fill {
+    flex: 1 0 auto;
+}
 
-        .navbar-cega .nav-link:hover, .navbar-cega .nav-link.active {
-            color: #fff;
-            background: rgba(255,255,255,.08);
-        }
-
-    .navbar-cega .navbar-text {
-        color: var(--brand-text);
-    }
-
-    /* Botones coherentes en topbar */
-    .navbar-cega .btn-outline-secondary,
-    .navbar-cega .btn-outline-light {
-        color: #fff;
-        border-color: rgba(255,255,255,.35);
-    }
-
-        .navbar-cega .btn-outline-secondary:hover,
-        .navbar-cega .btn-outline-light:hover {
-            background: #fff;
-            color: var(--brand);
-        }
+/* ===========================
+   Navbar CEGA
+   =========================== */
+.navbar-cega {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+}
 
 .sticky-top-cega {
     position: sticky;
     top: 0;
-    z-index: 1030;
+    z-index: 1020;
+}
+
+/* Marca */
+.brand-logo-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background-color: #ecfdf3;
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.brand-wordmark {
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .85rem;
+    color: #0f172a;
+}
+
+/* Enlaces navbar */
+.navbar-cega .nav-link {
+    font-size: .9rem;
+    font-weight: 500;
+    color: #4b5563;
+    padding-inline: .75rem;
+    border-radius: .5rem;
+}
+
+    .navbar-cega .nav-link:hover,
+    .navbar-cega .nav-link.active {
+        color: #0f766e;
+        background: rgba(15, 118, 110, .06);
+    }
+
+/* Usuario (pill derecha) */
+.dash-user-pill {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    background-color: #f3f4f6;
+    font-size: .8rem;
+    color: #111827;
+}
+
+.dash-user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background-color: #0f766e;
+    color: #ecfdf5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.dash-user-name {
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-logout {
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    color: #374151;
+    padding: .3rem .9rem;
+    font-weight: 500;
+}
+
+    .btn-logout:hover {
+        background-color: #f3f4f6;
+    }
+
+/* ===========================
+   Footer
+   =========================== */
+.footer-cega {
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    padding: .6rem 0;
+    font-size: .8rem;
 }
 
 /* ===========================
-   Modales (padre/hijo)
+   Modales
    =========================== */
 #modalDynamic .modal-content.dimmed {
     position: relative;
@@ -93,7 +163,7 @@ html {
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,.55);
+        background: rgba(0, 0, 0, .55);
         z-index: 1060;
         pointer-events: auto;
     }
@@ -126,294 +196,291 @@ html {
 }
 
 /* ===========================
-   Layout con Sidebar
+   Sidebar CEGA – estilo Dasher
    =========================== */
 .app-shell {
     display: flex;
-    gap: 0;
-    min-height: 100vh; /* antes: calc(100vh - var(--topbar-h)) */
-    align-items: stretch; /* estira columnas */
+    min-height: 0;
 }
 
 .sidebar-cega {
-    width: 260px;
-    background: var(--brand);
-    color: #fff;
-    position: sticky;
-    top: 0; /* header no es fixed */
-    height: 100vh; /* ocupa la ventana completa */
-    overflow-y: auto;
-    padding: .75rem .75rem 1rem;
+    width: 240px;
+    background-color: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+    color: #111827;
+    box-shadow: none !important;
 }
 
-    .sidebar-cega .sidebar-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: .25rem .25rem .5rem;
-    }
-
-    .sidebar-cega .brand {
-        font-weight: 700;
-        letter-spacing: .3px;
-    }
-
-/* Separadores */
-.sidebar-sep {
-    border-color: rgba(255,255,255,.12);
-    opacity: .6;
-    margin: .5rem 0;
+.sidebar-inner {
+    height: 100%;
+    padding-top: 0.75rem;
 }
 
-/* Enlaces del sidebar */
-.sidebar-cega .nav-link {
-    color: rgba(255,255,255,.9);
-    padding: .6rem .7rem;
-    border-radius: .5rem;
-    display: block;
+.sidebar-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+    font-weight: 600;
 }
 
-    .sidebar-cega .nav-link:hover,
-    .sidebar-cega .nav-link:focus {
-        color: #fff;
-        background: rgba(255,255,255,.08);
-        text-decoration: none;
-    }
-
-    .sidebar-cega .nav-link.active {
-        color: #0f2f27;
-        background: #fff;
-    }
-
-/* Subitems */
-.sidebar-cega .nav-subitem {
-    padding-left: 1.6rem;
-    font-size: .95rem;
-    color: rgba(255,255,255,.85);
+.sidebar-nav {
+    padding-top: 0.25rem;
 }
 
-/* Botones colapsables del sidebar */
-.sidebar-cega .nav-toggle {
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    border: 0;
-    color: rgba(255,255,255,.9);
-    padding: .6rem .7rem;
-    border-radius: .5rem;
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 1rem;
+    margin: 0.15rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4b5563;
+    text-decoration: none;
 }
 
-    .sidebar-cega .nav-toggle:hover {
-        background: rgba(255,255,255,.08);
-        color: #fff;
-    }
-
-    .sidebar-cega .nav-toggle .caret {
-        display: inline-block;
-        width: .55rem;
-        height: .55rem;
-        margin-left: .4rem;
-        transform: rotate(-45deg);
-        transition: transform .2s ease;
-    }
-
-    .sidebar-cega .nav-toggle[aria-expanded="true"] .caret {
-        transform: rotate(45deg);
-    }
-
-/* Cuenta */
-.sidebar-account .nav-subitem {
-    color: #fff;
+.sidebar-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background-color: #bbf7d0;
+    border: 2px solid #16a34a;
 }
 
-/* Contenido */
+.sidebar-item:hover {
+    background-color: #e0f2fe;
+    color: #0f172a;
+}
+
+.sidebar-item.active {
+    background-color: #dcfce7;
+    color: #14532d;
+}
+
+/* eliminar línea verde antigua */
+.sidebar-cega .nav-link::before,
+.sidebar-cega .sidebar-item::before {
+    content: none !important;
+}
+
 .content-cega {
     flex: 1;
-    min-width: 0;
-    padding: 1rem 1rem 2rem;
+    padding: 1.5rem 2rem;
+    background: #fff;
 }
 
-/* Responsive: sidebar colapsable */
-@media (max-width:767.98px) {
+/* Responsive */
+@media (max-width: 767.98px) {
     .sidebar-cega {
         width: 100%;
-        position: static; /* ya no sticky en móvil */
-        top: auto;
-        height: auto;
-        overflow: visible;
-        padding: .75rem .75rem 1rem;
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .content-cega {
+        padding: 1rem 1.25rem;
     }
 
     .app-shell {
         flex-direction: column;
-        min-height: auto; /* deja que la página crezca; footer lo empuja abajo */
+        min-height: auto;
     }
 }
-.sidebar-cega {
-    background: var(--brand); /* sólido */
-}
 
-/* Footer con misma paleta que navbar/sidebar */
-body > footer {
-    background: var(--brand);
-    color: var(--brand-text);
-    border-top: 1px solid var(--brand-border);
-}
-
-    /* El layout trae `text-muted`; forzamos color legible en el footer */
-    body > footer .text-muted {
-        color: var(--brand-text) !important;
-        opacity: .9;
-    }
-
-    /* Enlaces en el footer */
-    body > footer a {
-        color: var(--brand-text);
-        text-decoration: none;
-    }
-
-        body > footer a:hover {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-/* Footer pegado al fondo (sin cubrir contenido) */
-html, body {
-    height: 100%;
-}
-
-    body.app {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-main.flex-fill { /* el main ocupará el espacio disponible */
-    flex: 1 0 auto;
-}
-
-body > footer { /* empuja el footer hacia abajo */
-    margin-top: auto;
-}
 /* ===========================
-   Corrección de línea lateral (override)
+   Tabs de módulos (verde claro)
+   Aplica a: Empleados, Marketing,
+   Contabilidad, Reportería, PDF
    =========================== */
 
-/* Quita cualquier borde o sombra residual */
-.sidebar-cega {
-    border-right: 0 !important;
-    box-shadow: none !important;
+#empleadosTabs .nav-link,
+#marketingTabs .nav-link,
+#contaTabs .nav-link,
+#reportTabs .nav-link,
+#pdfTabs .nav-link {
+    background-color: #ecfdf3; /* verde muy claro */
+    border: 1px solid #bbf7d0; /* borde verde suave */
+    color: #166534; /* texto verde oscuro */
+    border-radius: 999px;
+    margin-right: 6px;
+    font-weight: 500;
 }
 
-/* Evita que el contenido tenga borde o separación visual */
-.content-cega {
-    border-left: 0 !important;
-    background-clip: content-box;
+    #empleadosTabs .nav-link:hover,
+    #marketingTabs .nav-link:hover,
+    #contaTabs .nav-link:hover,
+    #reportTabs .nav-link:hover,
+    #pdfTabs .nav-link:hover {
+        background-color: #dcfce7;
+        border-color: #86efac;
+        color: #14532d;
+    }
+
+    #empleadosTabs .nav-link.active,
+    #marketingTabs .nav-link.active,
+    #contaTabs .nav-link.active,
+    #reportTabs .nav-link.active,
+    #pdfTabs .nav-link.active {
+        background-color: #16a34a; /* verde CEGA principal */
+        border-color: #16a34a;
+        color: #ffffff;
+    }
+
+/* ===========================
+   Dashboard Dasher
+   =========================== */
+.dash-header {
+    background-color: #0f3b33;
+    color: #fff;
+    padding: 1.75rem 2rem;
+    border-radius: 1rem;
 }
 
-/* ====================================
-   CORRECCIÓN VISUAL (Sidebar y contenido)
-   ==================================== */
-.app-shell {
-    background: var(--brand);
+.dash-badge-brand {
+    background-color: rgba(209, 250, 229, 0.18);
+    color: #bbf7d0;
+    border-radius: 999px;
+    font-weight: 600;
+    padding: .25rem .9rem;
+    font-size: .75rem;
 }
 
-.content-cega {
-    background: #fff; /* mantiene el área de gráficos blanca */
+.dash-tabs .nav-link {
+    border-radius: 999px;
+    padding-inline: 1.25rem;
+    padding-block: .4rem;
+    font-weight: 500;
+    color: #e5e7eb;
 }
 
+    .dash-tabs .nav-link.active {
+        background-color: #f9fafb;
+        color: #0f172a;
+    }
 
-/* === Shell general estilo Dasher === */
-.app-shell-cega {
-    display: flex;
-    min-height: calc(100vh - 56px); /* 56px aprox de la navbar superior CEGA */
-    background-color: #f5f7fb;
+.dash-stat-card {
+    border-radius: 1.4rem;
+    padding: 1.1rem 1.3rem;
+    background: #fff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    border: 0;
 }
 
-/* Sidebar (miniSidebar) */
-#miniSidebar {
-    width: 260px;
+.dash-stat-green {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+}
+
+.dash-stat-blue {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.dash-stat-label {
+    font-size: .8rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.dash-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #022c22;
+}
+
+.dash-stat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background-color: rgba(255,255,255,0.8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #065f46;
+}
+
+.dash-card {
+    border-radius: 1.25rem;
+    border: 0;
+    box-shadow: 0 18px 40px rgba(15,23,42,0.08);
+}
+
+.dash-chart-wrapper {
+    height: 360px;
+    position: relative;
+}
+
+/* ===========================
+   Page-card genérica
+   =========================== */
+.page-card {
     background-color: #ffffff;
-    border-right: 1px solid #e5e7eb;
-    padding: 1.25rem 0;
-    position: sticky;
-    top: 56px; /* que arranque debajo de la barra verde de CEGA */
-    align-self: flex-start;
+    border-radius: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
 }
 
-    /* Logo dentro del sidebar */
-    #miniSidebar .brand-logo {
-        padding: 0 1.5rem 1rem;
-        border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 1rem;
-    }
+.page-card-header {
+    margin-bottom: 1rem;
+}
 
-        #miniSidebar .brand-logo img {
-            height: 32px;
-            width: auto;
-        }
-
-    #miniSidebar .site-logo-text {
-        letter-spacing: 0.05em;
-    }
-
-    /* Lista de navegación del sidebar */
-    #miniSidebar .navbar-nav {
-        padding: 0 1rem;
-    }
-
-    #miniSidebar .nav-heading {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: #9ca3af;
-        padding: 0 0.5rem;
-        margin-bottom: 0.25rem;
-    }
-
-    #miniSidebar .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.5rem;
-        color: #374151;
-        text-decoration: none;
-        font-size: 0.95rem;
-    }
-
-        #miniSidebar .nav-link:hover {
-            background-color: #f3f4f6;
-            color: #111827;
-        }
-
-        #miniSidebar .nav-link.active {
-            background-color: #0f766e; /* verde azulado estilo Dasher */
-            color: #ffffff;
-        }
-
-    #miniSidebar .nav-icon {
-        font-size: 1.1rem;
-        display: inline-flex;
-        width: 20px;
-        justify-content: center;
-    }
-
-    /* Bloque de "Upgrade" al final del sidebar */
-    #miniSidebar .upgrade-ui {
-        border-top: 1px solid #e5e7eb;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-    }
-
-/* Contenido principal a la derecha del sidebar */
-.app-content-cega {
-    flex: 1;
-    padding: 1.5rem 2rem 2rem;
+/* ===========================
+   Login / Auth
+   =========================== */
+.login-hero {
     background-color: #f5f7fb;
 }
 
-/* Contenedor como en Dasher */
-.custom-container {
-    max-width: 1200px;
-    margin: 0 auto 1.5rem;
+.login-logo {
+    width: 56px;
+    height: 56px;
+    background-color: rgba(22, 163, 74, 0.08);
+    color: #16a34a;
+    border-radius: 999px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.login-card {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 24px 45px rgba(15,23,42,0.12);
+}
+
+    .login-card .btn-success {
+        background-color: #16a34a;
+        border-color: #16a34a;
+        font-weight: 600;
+    }
+
+        .login-card .btn-success:hover {
+            background-color: #15803d;
+            border-color: #15803d;
+        }
+
+    .login-card .form-control-lg {
+        border-radius: 999px;
+    }
+
+    .login-card .form-control {
+        border-color: #e5e7eb;
+    }
+
+.modal-body .form-control-lg {
+    border-radius: 999px;
+}
+
+.modal-body .btn-success.btn-lg {
+    background-color: #16a34a;
+    border-color: #16a34a;
+    font-weight: 600;
+    border-radius: 999px;
+}
+
+    .modal-body .btn-success.btn-lg:hover {
+        background-color: #15803d;
+        border-color: #15803d;
+    }

@@ -1,18 +1,32 @@
 ﻿@model CEGA.Models.ViewModels.RecuperarAccesoViewModel
 
-<form asp-action="RecuperarAcceso" method="post" data-modal-post>
+<form asp-action="RecuperarAcceso"
+      method="post"
+      data-modal-post
+      class="vstack gap-3">
     @Html.AntiForgeryToken()
 
     @if (ViewData["OkMessage"] is string ok)
     {
-        <div class="alert alert-success mb-3">@ok</div>
+        <div class="alert alert-success mb-2">@ok</div>
     }
 
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label">Correo registrado</label>
-        <input asp-for="Email" class="form-control" autocomplete="email" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+    <div>
+        <label asp-for="Email" class="form-label fw-semibold">
+            Correo registrado
+        </label>
+        <input asp-for="Email"
+               class="form-control form-control-lg"
+               autocomplete="email"
+               placeholder="tucorreo@ejemplo.com" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100">Enviar</button>
+    <button type="submit" class="btn btn-success btn-lg w-100">
+        Enviar enlace
+    </button>
+
+    <p class="text-muted small text-center mb-0">
+        Te enviaremos un enlace para restablecer tu contraseña si el correo existe en el sistema.
+    </p>
 </form>

@@ -20,7 +20,7 @@
                           ?? (vmPuestos.Empleados ?? Enumerable.Empty<SelectListItem>());
 
     // Contadores para badges
-    var salariosCount = resumen.Count();              // resumen de salarios/empleados
+    var salariosCount = resumen.Count();
     var vacCount = vacaciones.Count();
     var puestosCount = puestos.Count();
     var incapCount = incapacidades.Count();
@@ -34,128 +34,195 @@
 
 @await Html.PartialAsync("_Alerts")
 
-<div class="container my-4">
-    <div class="card card-lg">
-        <div class="card-header p-0">
-            <ul class="nav nav-tabs card-header-tabs nav-fill" id="empleadosTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="salarios-tab" data-bs-toggle="tab" data-bs-target="#salarios"
-                            type="button" role="tab" aria-controls="salarios" aria-selected="true">
-                        Salarios <span class="badge bg-success ms-1">@salariosCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="vacaciones-tab" data-bs-toggle="tab" data-bs-target="#vacaciones"
-                            type="button" role="tab" aria-controls="vacaciones" aria-selected="false">
-                        Vacaciones <span class="badge bg-success ms-1">@vacCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="puestos-tab" data-bs-toggle="tab" data-bs-target="#puestos"
-                            type="button" role="tab" aria-controls="puestos" aria-selected="false">
-                        Puestos <span class="badge bg-success ms-1">@puestosCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="incapacidades-tab" data-bs-toggle="tab" data-bs-target="#incapacidades"
-                            type="button" role="tab" aria-controls="incapacidades" aria-selected="false">
-                        Incapacidades <span class="badge bg-success ms-1">@incapCount</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="empleados-tab" data-bs-toggle="tab" data-bs-target="#empleados"
-                            type="button" role="tab" aria-controls="empleados" aria-selected="false">
-                        Empleados <span class="badge bg-success ms-1">@empleadosCount</span>
-                    </button>
-                </li>
-            </ul>
+<!-- Card principal estilo Dasher -->
+<div class="page-card mt-4">
+
+    <!-- Encabezado interno de la card -->
+    <div class="page-card-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <div>
+            <h2 class="h4 fw-bold mb-1">Gestión de Empleados</h2>
+            <p class="text-muted small mb-0">
+                Consulta y actualiza información clave del personal y sus proyectos.
+            </p>
         </div>
 
-        <div class="card-body">
-            <div class="tab-content mt-2">
-                <!-- TAB: Salarios (resumen/consulta de salarios por empleado) -->
-                <div class="tab-pane fade show active" id="salarios" role="tabpanel" aria-labelledby="salarios-tab">
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Resumen de empleados</h5>
-                            @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
-                        </div>
-                    </div>
+        <div class="d-flex flex-wrap gap-2 small">
+            <span class="badge bg-light text-secondary">Salarios: @salariosCount</span>
+            <span class="badge bg-light text-secondary">Vacaciones: @vacCount</span>
+            <span class="badge bg-light text-secondary">Puestos: @puestosCount</span>
+            <span class="badge bg-light text-secondary">Incapacidades: @incapCount</span>
+            <span class="badge bg-light text-secondary">Empleados: @empleadosCount</span>
+        </div>
+    </div>
 
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Salarios por puesto</h5>
-                            @await Html.PartialAsync("Partials/_Salarios", puestos)
-                        </div>
-                    </div>
+    <!-- Tabs estilo Dasher -->
+    <ul class="nav dash-tabs border-0 mb-3" id="empleadosTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    id="salarios-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#salarios"
+                    type="button"
+                    role="tab"
+                    aria-controls="salarios"
+                    aria-selected="true">
+                Salarios
+                <span class="badge bg-success ms-1">@salariosCount</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="vacaciones-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#vacaciones"
+                    type="button"
+                    role="tab"
+                    aria-controls="vacaciones"
+                    aria-selected="false">
+                Vacaciones
+                <span class="badge bg-success ms-1">@vacCount</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="puestos-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#puestos"
+                    type="button"
+                    role="tab"
+                    aria-controls="puestos"
+                    aria-selected="false">
+                Puestos
+                <span class="badge bg-success ms-1">@puestosCount</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="incapacidades-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#incapacidades"
+                    type="button"
+                    role="tab"
+                    aria-controls="incapacidades"
+                    aria-selected="false">
+                Incapacidades
+                <span class="badge bg-success ms-1">@incapCount</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="empleados-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#empleados"
+                    type="button"
+                    role="tab"
+                    aria-controls="empleados"
+                    aria-selected="false">
+                Empleados
+                <span class="badge bg-success ms-1">@empleadosCount</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-2">
+        <!-- TAB: Salarios (resumen/consulta de salarios por empleado) -->
+        <div class="tab-pane fade show active"
+             id="salarios"
+             role="tabpanel"
+             aria-labelledby="salarios-tab">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Resumen de empleados</h5>
+                    @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
                 </div>
+            </div>
 
-                <!-- TAB: Vacaciones -->
-                <div class="tab-pane fade" id="vacaciones" role="tabpanel" aria-labelledby="vacaciones-tab">
-                    @{
-                        var vdVac = new ViewDataDictionary(ViewData);
-                        if (vdVac.ContainsKey("Empleados")) vdVac.Remove("Empleados");
-                        vdVac["Empleados"] = empleadosSelect;
-                    }
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Vacaciones</h5>
-                            @await Html.PartialAsync("Partials/_Vacaciones", vacaciones, vdVac)
-                        </div>
-                    </div>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Salarios por puesto</h5>
+                    @await Html.PartialAsync("Partials/_Salarios", puestos)
                 </div>
+            </div>
+        </div>
 
-                <!-- TAB: Puestos -->
-                <div class="tab-pane fade" id="puestos" role="tabpanel" aria-labelledby="puestos-tab">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Cambiar puesto</h5>
-                            @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
-                        </div>
-                    </div>
+        <!-- TAB: Vacaciones -->
+        <div class="tab-pane fade"
+             id="vacaciones"
+             role="tabpanel"
+             aria-labelledby="vacaciones-tab">
+            @{
+                var vdVac = new ViewDataDictionary(ViewData);
+                if (vdVac.ContainsKey("Empleados")) vdVac.Remove("Empleados");
+                vdVac["Empleados"] = empleadosSelect;
+            }
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Vacaciones</h5>
+                    @await Html.PartialAsync("Partials/_Vacaciones", vacaciones, vdVac)
                 </div>
+            </div>
+        </div>
 
-                <!-- TAB: Incapacidades -->
-                <div class="tab-pane fade" id="incapacidades" role="tabpanel" aria-labelledby="incapacidades-tab">
-                    @{
-                        var vdInc = new ViewDataDictionary(ViewData);
-                        if (vdInc.ContainsKey("Empleados")) vdInc.Remove("Empleados");
-                        vdInc["Empleados"] = empleadosSelect;
-                    }
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Incapacidades</h5>
-                            @await Html.PartialAsync("Partials/_Incapacidades", incapacidades, vdInc)
-                        </div>
-                    </div>
+        <!-- TAB: Puestos -->
+        <div class="tab-pane fade"
+             id="puestos"
+             role="tabpanel"
+             aria-labelledby="puestos-tab">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Cambiar puesto</h5>
+                    @await Html.PartialAsync("Partials/_Puestos", vmPuestos)
                 </div>
+            </div>
+        </div>
 
-                <!-- TAB: Empleados (extra: accidentes por empleado/proyecto) -->
-                <div class="tab-pane fade" id="empleados" role="tabpanel" aria-labelledby="empleados-tab">
-                    @{
-                        var vdAcc = new ViewDataDictionary(ViewData);
-                        vdAcc["Empleados"] = empleadosSelect;
-                        vdAcc["Proyectos"] = proyectosSelect;
-                        vdAcc["Accidentes"] = ViewBag.Accidentes as IEnumerable<CEGA.Models.ViewModels.AccidenteFilaVM>
-                        ?? Enumerable.Empty<CEGA.Models.ViewModels.AccidenteFilaVM>();
-                        var accVm = ViewBag.AccidentesVm as CEGA.Models.ViewModels.AccidenteCrearVM
-                        ?? new CEGA.Models.ViewModels.AccidenteCrearVM();
-                    }
+        <!-- TAB: Incapacidades -->
+        <div class="tab-pane fade"
+             id="incapacidades"
+             role="tabpanel"
+             aria-labelledby="incapacidades-tab">
+            @{
+                var vdInc = new ViewDataDictionary(ViewData);
+                if (vdInc.ContainsKey("Empleados")) vdInc.Remove("Empleados");
+                vdInc["Empleados"] = empleadosSelect;
+            }
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Incapacidades</h5>
+                    @await Html.PartialAsync("Partials/_Incapacidades", incapacidades, vdInc)
+                </div>
+            </div>
+        </div>
 
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Listado de empleados</h5>
-                            @* Si más adelante tienes un partial de empleados puro, lo colocas aquí *@
-                            @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
-                        </div>
-                    </div>
+        <!-- TAB: Empleados (extra: accidentes por empleado/proyecto) -->
+        <div class="tab-pane fade"
+             id="empleados"
+             role="tabpanel"
+             aria-labelledby="empleados-tab">
+            @{
+                var vdAcc = new ViewDataDictionary(ViewData);
+                vdAcc["Empleados"] = empleadosSelect;
+                vdAcc["Proyectos"] = proyectosSelect;
+                vdAcc["Accidentes"] =
+                ViewBag.Accidentes as IEnumerable<CEGA.Models.ViewModels.AccidenteFilaVM>
+                ?? Enumerable.Empty<CEGA.Models.ViewModels.AccidenteFilaVM>();
 
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Accidentes por Empleado y Proyecto</h5>
-                            @await Html.PartialAsync("Partials/_AccidentesEmpleadoProyecto", accVm, vdAcc)
-                        </div>
-                    </div>
+                var accVm = ViewBag.AccidentesVm as CEGA.Models.ViewModels.AccidenteCrearVM
+                ?? new CEGA.Models.ViewModels.AccidenteCrearVM();
+            }
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Listado de empleados</h5>
+                    @* Si más adelante tienes un partial de empleados puro, lo colocas aquí *@
+                    @await Html.PartialAsync("Partials/_ResumenEmpleados", resumen)
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Accidentes por Empleado y Proyecto</h5>
+                    @await Html.PartialAsync("Partials/_AccidentesEmpleadoProyecto", accVm, vdAcc)
                 </div>
             </div>
         </div>

@@ -3,13 +3,45 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Header con fondo (usa la variable de marca oficial) -->
-<div class="py-4 text-center text-white mb-4"
-     style="background: var(--brand); border-radius: .75rem;">
-    <h2 class="fw-bold mb-3">Usuarios vs Proyectos</h2>
-    <p class="mb-0 fs-5">
-        Visualiza cuántos <span class="fw-semibold">proyectos distintos</span> toca cada usuario (según sus tareas).
-    </p>
+<!-- CABECERA ESTILO DASHER -->
+<div class="dash-header d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <span class="badge dash-badge-brand mb-2">Dashboard</span>
+        <h1 class="h3 fw-bold mb-1">Usuarios vs Proyectos</h1>
+        <p class="text-muted mb-0">
+            Visualiza cuántos <span class="fw-semibold">proyectos distintos</span> toca cada usuario según sus tareas.
+        </p>
+    </div>
+
+    <!-- Tabs como pills, arriba a la derecha -->
+    <div>
+        <ul class="nav nav-pills dash-tabs" id="dashTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="graficos-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#graficos"
+                        type="button"
+                        role="tab"
+                        aria-controls="graficos"
+                        aria-selected="true">
+                    Gráficos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="resumen-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#resumen"
+                        type="button"
+                        role="tab"
+                        aria-controls="resumen"
+                        aria-selected="false">
+                    Resumen
+                </button>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <!-- Alertas -->
@@ -22,82 +54,98 @@
     <div class="alert alert-danger mb-3">@TempData["Error"]</div>
 }
 
-<!-- Tarjeta con tabs (arte de Marketing) -->
-<div class="card card-lg">
-    <div class="card-header p-0">
-        <ul class="nav nav-tabs card-header-tabs nav-fill" id="dashTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="graficos-tab" data-bs-toggle="tab" data-bs-target="#graficos"
-                        type="button" role="tab" aria-controls="graficos" aria-selected="true">
-                    Gráficos
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen"
-                        type="button" role="tab" aria-controls="resumen" aria-selected="false">
-                    Resumen
-                </button>
-            </li>
-        </ul>
+<!-- TARJETAS KPI ESTILO DASHER -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="dash-stat-card dash-stat-green">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="dash-stat-label">Usuarios con actividad</span>
+                <span class="dash-stat-icon">
+                    <i class="bi bi-people"></i>
+                </span>
+            </div>
+            <div id="kpiUsuarios" class="dash-stat-value">—</div>
+        </div>
     </div>
 
-    <div class="card-body">
-        <div class="tab-content mt-2">
-            <!-- Tab: Gráficos -->
-            <div class="tab-pane fade show active" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                <div class="row g-3 mb-3">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="text-muted small">Usuarios con actividad</div>
-                                <div id="kpiUsuarios" class="h3 mb-0">—</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="text-muted small">Proyectos totales</div>
-                                <div id="kpiProyectos" class="h3 mb-0">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="dash-stat-card dash-stat-blue">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="dash-stat-label">Proyectos totales</span>
+                <span class="dash-stat-icon">
+                    <i class="bi bi-kanban"></i>
+                </span>
+            </div>
+            <div id="kpiProyectos" class="dash-stat-value">—</div>
+        </div>
+    </div>
+</div>
 
-                <div class="row g-4">
-                    <div class="col-md-7">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title mb-0">Proyectos por usuario (Top)</h5>
-                                    <select id="topN" class="form-select form-select-sm" style="width:auto">
-                                        <option value="5">Top 5</option>
-                                        <option value="10" selected>Top 10</option>
-                                        <option value="15">Top 15</option>
-                                        <option value="25">Top 25</option>
-                                    </select>
-                                </div>
-                                <div style="height:420px"><canvas id="chartBar"></canvas></div>
-                            </div>
+<!-- CONTENIDO PRINCIPAL (GRÁFICOS / RESUMEN) -->
+<div class="tab-content" id="dashTabsContent">
+    <!-- TAB: GRÁFICOS -->
+    <div class="tab-pane fade show active" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
+        <div class="row g-4">
+            <!-- BAR -->
+            <div class="col-xl-8">
+                <div class="card dash-card h-100">
+                    <div class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0">
+                        <div>
+                            <h5 class="card-title mb-1">Proyectos por usuario</h5>
+                            <p class="text-muted small mb-0">Top N usuarios con más proyectos distintos.</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">Top N</span>
+                            <select id="topN" class="form-select form-select-sm w-auto">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                                <option value="25">25</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="col-md-5">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Participación (Top N)</h5>
-                                <div style="height:420px"><canvas id="chartPie"></canvas></div>
-                            </div>
+                    <div class="card-body">
+                        <div class="dash-chart-wrapper">
+                            <canvas id="chartBar"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab: Resumen -->
-            <div class="tab-pane fade" id="resumen" role="tabpanel" aria-labelledby="resumen-tab">
-                <div class="alert alert-info mb-0">
-                    Este panel cuenta <strong>proyectos distintos por usuario</strong> a partir de sus tareas.
-                    Cambia el “Top N” para ajustar los gráficos.
+            <!-- PIE -->
+            <div class="col-xl-4">
+                <div class="card dash-card h-100">
+                    <div class="card-header border-0 bg-transparent pb-0">
+                        <h5 class="card-title mb-1">Participación (Top N)</h5>
+                        <p class="text-muted small mb-0">
+                            Distribución porcentual de proyectos entre los usuarios del Top N.
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="dash-chart-wrapper">
+                            <canvas id="chartPie"></canvas>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: RESUMEN -->
+    <div class="tab-pane fade" id="resumen" role="tabpanel" aria-labelledby="resumen-tab">
+        <div class="card dash-card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Resumen del panel</h5>
+                <p class="mb-2">
+                    Este panel cuenta <strong>proyectos distintos por usuario</strong> a partir de sus tareas.
+                </p>
+                <p class="mb-2">
+                    Usa el selector <strong>Top N</strong> para ajustar cuántos usuarios se incluyen en los gráficos.
+                </p>
+                <p class="mb-0 text-muted small">
+                    Idea: puedes usar este tablero para identificar personas sobrecargadas de proyectos,
+                    distribuir mejor las tareas y justificar decisiones de asignación.
+                </p>
             </div>
         </div>
     </div>
@@ -135,11 +183,26 @@
                 if (barChart) barChart.destroy();
                 barChart = new Chart(elBar, {
                     type: 'bar',
-                    data: { labels, datasets: [{ label: '# Proyectos', data }] },
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: '# Proyectos',
+                            data,
+                            backgroundColor: 'rgba(37, 99, 235, 0.7)'
+                        }]
+                    },
                     options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            }
+                        }
                     }
                 });
 
@@ -147,14 +210,24 @@
                 if (pieChart) pieChart.destroy();
                 pieChart = new Chart(elPie, {
                     type: 'pie',
-                    data: { labels, datasets: [{ data }] },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    data: {
+                        labels,
+                        datasets: [ { data } ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
                 });
             }
 
             async function refresh() {
-                try { renderCharts(await loadData()); }
-                catch (e) { console.error(e); alert('No se pudieron cargar los datos del dashboard.'); }
+                try {
+                    renderCharts(await loadData());
+                } catch (e) {
+                    console.error(e);
+                    alert('No se pudieron cargar los datos del dashboard.');
+                }
             }
 
             topN.addEventListener('change', refresh);

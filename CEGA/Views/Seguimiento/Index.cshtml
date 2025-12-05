@@ -9,26 +9,55 @@
 
     // Endpoints para el modal de edición / recarga de tabla
     var urlTabla = Url.Action("ProyectosTablaPartial", "Seguimiento")!;
-    var urlNuevo = Url.Action("ProyectoCrearPartial", "Seguimiento")!;   // (opcional si quieres botón "Nuevo" por modal)
+    var urlNuevo = Url.Action("ProyectoCrearPartial", "Seguimiento")!;   // opcional si mantienes "Nuevo" por modal
     var urlEditar = Url.Action("ProyectoEditarPartial", "Seguimiento")!;
 }
 
-<!-- Header -->
-<div class="py-4 text-center text-white mb-4" style="background: var(--brand); border-radius: .75rem;">
-    <h2 class="fw-bold mb-0">Seguimiento de Tareas</h2>
-</div>
+@await Html.PartialAsync("_ModuleHeader", (
+"Módulo de Seguimiento",
+    "Crea proyectos, registra tareas y da seguimiento al avance por colaborador."
+))
 
-<!-- PROYECTOS -->
-<div class="row g-4">
-    <!-- Crear proyecto (se conserva tu partial tal cual) -->
-    <div class="col-lg-5">
-        @await Html.PartialAsync("Partials/_CrearProyectoPartial", proyectoVM)
+@await Html.PartialAsync("_Alerts")
+
+<!-- Card principal estilo Dasher -->
+<div class="page-card mt-4">
+    <!-- Encabezado interno -->
+    <div class="page-card-header d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="h4 fw-bold mb-1">Seguimiento de Tareas</h2>
+            <p class="text-muted small mb-0">
+                Organiza proyectos en la izquierda y consulta su detalle y tareas en la derecha.
+            </p>
+        </div>
     </div>
 
-    <!-- Tabla de proyectos (con Editar/Eliminar) -->
-    <div class="col-lg-7">
-        <div id="proyectosTablaContainer">
-            @await Html.PartialAsync("Partials/_ProyectosTablaPartial", proyectos)
+    <div class="page-card-body">
+        <!-- PROYECTOS -->
+        <div class="row g-4">
+            <!-- Crear proyecto -->
+            <div class="col-lg-5">
+                @await Html.PartialAsync("Partials/_CrearProyectoPartial", proyectoVM)
+            </div>
+
+            <!-- Tabla de proyectos (con Editar/Eliminar) -->
+            <div class="col-lg-7">
+                <div id="proyectosTablaContainer">
+                    @await Html.PartialAsync("Partials/_ProyectosTablaPartial", proyectos)
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- TAREAS -->
+        <div class="row g-4">
+            <div class="col-lg-5">
+                @await Html.PartialAsync("Partials/_CrearTareaPartial", Model)
+            </div>
+            <div class="col-lg-7">
+                @await Html.PartialAsync("Partials/_TareasTablaPartial", tareas)
+            </div>
         </div>
     </div>
 </div>
@@ -46,18 +75,6 @@
             </div>
             <div class="modal-body" id="proyectoModalBody"><!-- aquí se inyecta _ProyectoFormPartial --></div>
         </div>
-    </div>
-</div>
-
-<hr class="my-4" />
-
-<!-- TAREAS -->
-<div class="row g-4">
-    <div class="col-lg-5">
-        @await Html.PartialAsync("Partials/_CrearTareaPartial", Model)
-    </div>
-    <div class="col-lg-7">
-        @await Html.PartialAsync("Partials/_TareasTablaPartial", tareas)
     </div>
 </div>
 
@@ -97,7 +114,7 @@
             // Eliminar usa el <form> fallback del partial y hace POST normal (no requiere JS).
           });
 
-          // Submit de crear/editar dentro del modal (para la ruta /Seguimiento/EditarProyecto o CrearProyecto por modal)
+          // Submit de crear/editar dentro del modal
           modalEl?.addEventListener('submit', async (e) => {
             const form = e.target.closest('#proyectoForm');
             if (!form) return;

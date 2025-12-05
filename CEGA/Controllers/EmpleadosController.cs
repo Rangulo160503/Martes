@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.IO;
-using System.Text.RegularExpressions;                        // MemoryStream
+using System.IO;                        // MemoryStream
+using System.Text.RegularExpressions;
 
 namespace CEGA.Controllers
 {
@@ -33,6 +33,9 @@ namespace CEGA.Controllers
                 .OrderBy(e => e.Apellido1).ThenBy(e => e.Apellido2).ThenBy(e => e.Nombre)
                 .ToListAsync();
 
+            ViewBag.EmpleadosEntidad = empleados;
+
+
             var vmPuestos = new CambiarPuestoVM
             {
                 Empleados = empleados.Select(e => new SelectListItem
@@ -53,7 +56,7 @@ namespace CEGA.Controllers
                 Text = $"{e.Cedula} — {e.Nombre} {e.Apellido1} {e.Apellido2}".Trim()
             }).ToList();
 
-            var incapacidades = await _context.Incapacidades
+            var incapacidades = await _context.Incapacidad
                 .AsNoTracking()
                 .Include(i => i.Empleado)
                 .OrderBy(i => i.Cedula)
@@ -82,7 +85,7 @@ namespace CEGA.Controllers
                                         .Select(p => p.SalarioBase)
                                         .FirstOrDefault(),
                     VacacionesTomadas = _context.Vacaciones.Count(v => v.Cedula == e.Cedula),
-                    TieneIncapacidad = _context.Incapacidades.Any(i => i.Cedula == e.Cedula)
+                    TieneIncapacidad = _context.Incapacidad.Any(i => i.Cedula == e.Cedula)
                 })
                 .OrderBy(r => r.NombreCompleto)
                 .ToListAsync();
@@ -93,7 +96,7 @@ namespace CEGA.Controllers
             ViewBag.ResumenVacaciones = Enumerable.Empty<VacacionesResumenVM>(); // (si luego lo llenas)
             ViewBag.Incapacidades = incapacidades;
             ViewBag.Vacaciones = vacaciones;
-            ViewBag.ResumenEmpleados = resumenEmpleados; // ← NUEVO
+            ViewBag.ResumenEmpleados = resumenEmpleados;
 
             if (ViewBag.EmpleadosSelect == null)
             {
@@ -115,8 +118,7 @@ namespace CEGA.Controllers
                 .Select(p => new SelectListItem { Value = p.IdProyecto.ToString(), Text = p.Nombre })
                 .ToListAsync();
 
-            
-            // Filtros
+            // Filtros accidentes
             DateTime? accFecha = DateTime.TryParse(Request.Query["accFecha"], out var f)
                                  ? f.Date : (DateTime?)null;
 
@@ -145,16 +147,16 @@ namespace CEGA.Controllers
                 }
             ).ToListAsync();
 
-            // VM para el form de crear
+            // VM para el form de crear accidente
             ViewBag.AccidentesVm = new AccidenteCrearVM
             {
                 Empleados = (IEnumerable<SelectListItem>)ViewBag.EmpleadosSelect,
                 Proyectos = (IEnumerable<SelectListItem>)ViewBag.ProyectosSelect
             };
 
-
             return View();
         }
+
         // POST: crear accidente
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -173,8 +175,8 @@ namespace CEGA.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), new { accFecha = vm.Fecha.ToString("yyyy-MM-dd") });
-
         }
+
         // POST: actualizar accidente (inline)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -190,8 +192,8 @@ namespace CEGA.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), new { accFecha = vm.Fecha.ToString("yyyy-MM-dd") });
-
         }
+
         // POST: eliminar accidente
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -206,6 +208,7 @@ namespace CEGA.Controllers
 
             return RedirectToAction(nameof(Index), new { accFecha = ("yyyy-MM-dd") });
         }
+
         // Helper dentro del controller
         private async Task<List<string>> GetAllowedValuesFromCheckAsync(string tableName, string columnName)
         {
@@ -251,7 +254,6 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
             }
         }
 
-
         // POST: /Empleados/CambiarPuesto
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -285,6 +287,8 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
             return RedirectToAction(nameof(Index));
         }
 
+        // ===================== Incapacidades =====================
+
         // POST: /Empleados/SubirIncapacidad
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -316,44 +320,41 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
                 bytes = ms.ToArray();
             }
 
-            // PK = Cedula (upsert)
-            var inc = await _context.Incapacidades.FindAsync(cedula);
-            if (inc == null)
+            // Siempre crea un registro nuevo (histórico)
+            var inc = new Incapacidad
             {
-                _context.Incapacidades.Add(new Incapacidad
-                {
-                    Cedula = cedula,
-                    Archivo = bytes
-                });
-            }
-            else
-            {
-                inc.Archivo = bytes;
-                _context.Incapacidades.Update(inc);
-            }
+                Cedula = cedula,
+                Archivo = bytes,
+                Fecha = DateTime.Today
+            };
 
+            _context.Incapacidad.Add(inc);
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "Incapacidad cargada correctamente.";
             return RedirectToAction(nameof(Index));
         }
-        // === READ (descargar) ===
+
+        // === READ (descargar última incapacidad del empleado) ===
         [HttpGet]
         public async Task<IActionResult> DescargarIncapacidad(int cedula)
         {
-            var inc = await _context.Incapacidades.FindAsync(cedula);
+            var inc = await _context.Incapacidad
+                .Where(i => i.Cedula == cedula)
+                .OrderByDescending(i => i.Fecha)
+                .ThenByDescending(i => i.Id)
+                .FirstOrDefaultAsync();
+
             if (inc == null || inc.Archivo == null || inc.Archivo.Length == 0)
                 return NotFound();
 
-            // Usa un nombre/tipo genérico; si tus archivos son PDF, cambia el mime.
-            return File(inc.Archivo, "application/octet-stream", $"incapacidad_{cedula}.bin");
+            return File(
+                inc.Archivo,
+                "application/octet-stream",
+                $"incapacidad_{cedula}_{inc.Id}.bin"
+            );
         }
 
-        // === UPDATE (abrir modal) ===
-        [HttpGet]
-        public IActionResult EditarIncapacidad(int cedula)
-            => PartialView("Partials/_IncapacidadEditar", cedula);
-
-        // === UPDATE (guardar reemplazo) ===
+        // === UPDATE (guardar reemplazo = agregar otra incapacidad) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ActualizarIncapacidad(int cedula, IFormFile archivo)
@@ -371,46 +372,44 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
                 bytes = ms.ToArray();
             }
 
-            var inc = await _context.Incapacidades.FindAsync(cedula);
-            if (inc == null)
+            var nueva = new Incapacidad
             {
-                _context.Incapacidades.Add(new Incapacidad
-                {
-                    Cedula = cedula,
-                    Archivo = bytes
-                });
-            }
-            else
-            {
-                inc.Archivo = bytes; // la entidad ya está trackeada; no hace falta Update()
-            }
+                Cedula = cedula,
+                Archivo = bytes,
+                Fecha = DateTime.Today
+            };
 
+            _context.Incapacidad.Add(nueva);
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "Incapacidad actualizada.";
 
-            var isAjax = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
-            if (isAjax) return Json(new { ok = true, redirectUrl = Url.Action("Index", "Empleados") });
+            var isAjax = string.Equals(
+                Request.Headers["X-Requested-With"],
+                "XMLHttpRequest",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (isAjax)
+                return Json(new { ok = true, redirectUrl = Url.Action("Index", "Empleados") });
 
             return RedirectToAction(nameof(Index));
         }
 
-        // === DELETE ===
+        // === DELETE (por Id – no usado en UI, pero consistente) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EliminarIncapacidad(int cedula)
+        public async Task<IActionResult> EliminarIncapacidad(int id)
         {
-            var inc = await _context.Incapacidades.FindAsync(cedula);
+            var inc = await _context.Incapacidad.FindAsync(id);
             if (inc == null)
             {
                 TempData["Error"] = "Registro no encontrado.";
                 return RedirectToAction(nameof(Index));
             }
-            _context.Incapacidades.Remove(inc);
+            _context.Incapacidad.Remove(inc);
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "Incapacidad eliminada.";
             return RedirectToAction(nameof(Index));
         }
-        // ===================== Vacaciones =====================
 
         // POST: /Empleados/AgregarVacacion
         [HttpPost]
@@ -418,6 +417,8 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
         [Authorize] // opcional
         public async Task<IActionResult> AgregarVacacion(int cedula, DateTime fecha)
         {
+            fecha = fecha.Date;
+
             if (cedula <= 0)
             {
                 TempData["Error"] = "Seleccione un empleado.";
@@ -436,14 +437,30 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Vacaciones.Add(new VacacionesEmpleado { Cedula = cedula, Fecha = fecha.Date });
+            // 👇 NUEVO: respetar índice único (Cedula, Fecha)
+            var yaExiste = await _context.Vacaciones
+                .AnyAsync(v => v.Cedula == cedula && v.Fecha == fecha);
+
+            if (yaExiste)
+            {
+                TempData["Error"] = "Ya existe una vacación registrada para ese colaborador en esa fecha.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Vacaciones.Add(new VacacionesEmpleado
+            {
+                Cedula = cedula,
+                Fecha = fecha,
+                Activa = true // siempre se crea activa
+            });
             await _context.SaveChangesAsync();
 
             TempData["Mensaje"] = "Vacación registrada.";
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Empleados/EliminarVacacion
+
+        // POST: /Empleados/EliminarVacacion (no usado en UI)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize] // opcional
@@ -462,13 +479,16 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
             TempData["Mensaje"] = "Vacación eliminada.";
             return RedirectToAction(nameof(Index));
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public Task<IActionResult> CrearVacacion(int Cedula, DateTime Fecha)
-    => AgregarVacacion(Cedula, Fecha);
+            => AgregarVacacion(Cedula, Fecha);
+
+        // POST: /Empleados/ActualizarVacacion
         [HttpPost]
         [ValidateAntiForgeryToken]
-            public async Task<IActionResult> ActualizarVacacion(int Id, DateTime Fecha)
+        public async Task<IActionResult> ActualizarVacacion(int Id, DateTime Fecha, bool Activa)
         {
             var vac = await _context.Vacaciones.FindAsync(Id);
             if (vac == null)
@@ -478,11 +498,12 @@ WHERE OBJECT_NAME(cc.parent_object_id) = @table
             }
 
             vac.Fecha = Fecha.Date;
+            vac.Activa = Activa;
+
             await _context.SaveChangesAsync();
 
             TempData["Mensaje"] = "Vacación actualizada.";
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
