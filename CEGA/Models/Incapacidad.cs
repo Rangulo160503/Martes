@@ -3,19 +3,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CEGA.Models
 {
+    [Table("Incapacidad")]
     public class Incapacidad
     {
+        // PK autoincremental
         public int Id { get; set; }
 
-        // 🔹 Esta columna EXISTE en la tabla dbo.Incapacidad
-        [ForeignKey(nameof(Empleado))]      // <- le decimos a EF: este es el FK
+        // FK hacia Empleado.Cedula
+        [ForeignKey(nameof(Empleado))]
         public int Cedula { get; set; }
 
+        // Archivo binario
         public byte[] Archivo { get; set; } = default!;
 
+        // Fecha de incapacidad / carga
         public DateTime Fecha { get; set; }
 
-        // 🔹 Navegación al empleado (PK = Cedula)
+        // Navegación
         public Empleado? Empleado { get; set; }
     }
+
 }

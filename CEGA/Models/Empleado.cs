@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CEGA.Models
@@ -9,7 +11,6 @@ namespace CEGA.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Range(100000000, 999999999)]
         public int Cedula { get; set; }
-
 
         [Required, MaxLength(50)] public string Nombre { get; set; } = "";
         [MaxLength(50)] public string? SegundoNombre { get; set; }
@@ -31,9 +32,12 @@ namespace CEGA.Models
 
         // Contacto
         [Required, MaxLength(8)]
-        [RegularExpression(@"^\d{8}$")] public string TelefonoPersonal { get; set; } = "";
+        [RegularExpression(@"^\d{8}$")]
+        public string TelefonoPersonal { get; set; } = "";
+
         [Required, MaxLength(8)]
-        [RegularExpression(@"^\d{8}$")] public string TelefonoEmergencia { get; set; } = "";
+        [RegularExpression(@"^\d{8}$")]
+        public string TelefonoEmergencia { get; set; } = "";
 
         // Perfil
         [Required, MaxLength(20)] public string Sexo { get; set; } = "M";
@@ -45,13 +49,25 @@ namespace CEGA.Models
         [MaxLength(200)] public string? Alergias { get; set; }
         [MaxLength(100)] public string? ContactoEmergenciaNombre { get; set; }
         [MaxLength(8)]
-        [RegularExpression(@"^\d{8}$")] public string? ContactoEmergenciaTelefono { get; set; }
+        [RegularExpression(@"^\d{8}$")]
+        public string? ContactoEmergenciaTelefono { get; set; }
+
         [MaxLength(50)] public string? PolizaSeguro { get; set; }
 
         // Puesto/cargo (NULL en BD, pero obligatorio en la UI al guardar)
         public int? PuestoId { get; set; }
-        [ForeignKey(nameof(PuestoId))] public Puesto? Puesto { get; set; }
+        [ForeignKey(nameof(PuestoId))]
+        public Puesto? Puesto { get; set; }
+
+        // 🔹 Navegación inversa: un empleado puede tener muchas incapacidades
+        public ICollection<Incapacidad> Incapacidades { get; set; } = new List<Incapacidad>();
     }
 
-    public enum RolEmpleado : byte { AdminSistema = 1, RRHH = 2, Supervisor = 3, Colaborador = 4 }
+    public enum RolEmpleado : byte
+    {
+        AdminSistema = 1,
+        RRHH = 2,
+        Supervisor = 3,
+        Colaborador = 4
+    }
 }

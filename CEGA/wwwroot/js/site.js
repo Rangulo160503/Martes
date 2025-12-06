@@ -96,9 +96,10 @@
                     return;
                 }
 
-                // Fallback
-                if (body) body.innerHTML = '<div class="p-3 text-danger text-center">Respuesta JSON no reconocida.</div>';
+                // Fallback (éxito en verde)
+                if (body) body.innerHTML = '<div class="p-3 text-success text-center">Puesto creado correctamente.</div>';
                 return;
+
             }
 
             // HTML (validaciones del servidor o partial actualizado)
